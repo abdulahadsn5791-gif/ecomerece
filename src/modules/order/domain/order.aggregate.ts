@@ -5,6 +5,11 @@ import type { Id } from '../../../core/domain/value-objects/id.vo';
 import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
 import { Reason } from '../../../core/domain/value-objects/reason.vo';
 import type { FullAddressVO } from '../../../core/domain/value-objects/street-address.vo';
+import { OrderCancelledEvent } from './events/order-cancelled.event';
+import { OrderCompletedEvent } from './events/order-completed.event';
+import { OrderCreatedEvent } from './events/order-created.event';
+import { OrderRefundedEvent } from './events/order-refunded.event';
+import { OrderReturnedEvent } from './events/order-returned.event';
 import { StatusVo } from './value-objects/status.vo';
 
 export type createOrderPros = {
@@ -60,6 +65,7 @@ export class OrderAggregate extends AggregateRoot {
     }
 
     create(data: createOrderPros): OrderAggregate {
+        this.raise(new OrderCreatedEvent({ orderId: data.id, actorId: data.buyerId }))
         return new OrderAggregate(
             data.id,
             data.variantId,
@@ -72,6 +78,7 @@ export class OrderAggregate extends AggregateRoot {
 
             EffectiveDate.today(),
         );
+
     }
 
     rehydrate(
@@ -98,10 +105,20 @@ export class OrderAggregate extends AggregateRoot {
         );
     }
 
-    cancelOrder(actorId: Id, reason: Reason) { }
-    confirmOrder(actorId: Id) { }
-    returnOrder(actorId: Id, reason: Reason) { }
-    refundOrder(actorId: Id, reason: Reason) { }
-    completeOrder(actroId: Id) { }
+    cancelOrder(actorId: Id, reason: Reason) {
+        this.raise(new OrderCancelledEvent({ orderId: this._id, actorId: actorId, reason: reason }));
+    }
+    confirmOrder(actorId: Id) {
+        this.raise(new OrderCo)
+    }
+    returnOrder(actorId: Id, reason: Reason) {
+        this.raise(new OrderReturnedEvent({ orderId: this._id, actorId: actorId, reason: reason }))
+    }
+    refundOrder(actorId: Id, reason: Reason) {
+        this.raise(new OrderRefundedEvent({ orderId: this._id, actorId: actorId, reason: reason }))
+    }
+    completeOrder(actroId: Id) {
+        this.raise(new OrderCompletedEvent({ orderId: this._id, actorId: actorId, reason: reason }))
+    }
 }
 

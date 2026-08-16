@@ -1,4 +1,4 @@
-import { eventBus, InMemoryEventBus } from '../../core/domain/infrastructure/in-memory-event-bus';
+import { eventBus } from '../../core/domain/infrastructure/in-memory-event-bus';
 import { queryBus } from '../../core/domain/infrastructure/in-memory-query-bus';
 import { UserSignedInHandler } from './application/event-handlers/user-signed-in.handler';
 import { EnsureActiveQuery } from './application/queries/ensure-active.query';

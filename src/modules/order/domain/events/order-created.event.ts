@@ -3,8 +3,8 @@ import { EffectiveDate } from "../../../../core/domain/value-objects/effective-d
 import { Id } from "../../../../core/domain/value-objects/id.vo";
 
 
-export class OrderCreatedEvent implements IEvent<{ orderId: Id, actorId: Id, }> {
+export class OrderCreatedEvent implements IEvent<{ orderId: Id, actorId: Id }> {
     readonly type = 'order.created';
     readonly occurredOn = EffectiveDate.today()
-    constructor(public readonly payload: { orderId: Id, actorId: Id, }) { }
+    constructor(public readonly payload: { orderId: Id, actorId: Id }) { }
 }

@@ -2,16 +2,17 @@ import { AggregateRoot } from '../../../core/domain/aggregate-root';
 import { DeleteInfoVO } from '../../../core/domain/value-objects/delete-info.vo';
 import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
 import type { Id } from '../../../core/domain/value-objects/id.vo';
-import type { Name } from '../../../core/domain/value-objects/name.vo';
 import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
+import { Reason } from '../../../core/domain/value-objects/reason.vo';
 import type { FullAddressVO } from '../../../core/domain/value-objects/street-address.vo';
+import { StatusVo } from './value-objects/status.vo';
 
 export type createOrderPros = {
     id: Id;
     variantId: Id;
     buyerId: Id;
     price: Quantity;
-    status: Name;
+    status: StatusVo;
     address: FullAddressVO;
 };
 
@@ -21,7 +22,7 @@ export class OrderAggregate extends AggregateRoot {
         private readonly _variantId: Id,
         private readonly _buyerId: Id,
         private _price: Quantity,
-        private _status: Name,
+        private _status: StatusVo,
         private _address: FullAddressVO,
         private _delete: DeleteInfoVO,
         private readonly _version: Quantity,
@@ -78,7 +79,7 @@ export class OrderAggregate extends AggregateRoot {
         _variantId: Id,
         _buyerId: Id,
         _price: Quantity,
-        _status: Name,
+        _status: StatusVo,
         _address: FullAddressVO,
         _delete: DeleteInfoVO,
         _version: Quantity,
@@ -96,4 +97,11 @@ export class OrderAggregate extends AggregateRoot {
             _createdAt,
         );
     }
+
+    cancelOrder(actorId: Id, reason: Reason) { }
+    confirmOrder(actorId: Id) { }
+    returnOrder(actorId: Id, reason: Reason) { }
+    refundOrder(actorId: Id, reason: Reason) { }
+    completeOrder(actroId: Id) { }
 }
+

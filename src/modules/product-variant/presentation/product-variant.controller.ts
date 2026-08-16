@@ -1,0 +1,49 @@
+import { Context } from "hono";
+import { BaseController } from "../../../core/controller/base.controller";
+import { productVariantApplicationService } from "../application/product-variant.app.service";
+import { createMyProductVariantDto } from "./dto/create-product-variant";
+import { idSchema } from "../../../../shared/dtos/id-schema";
+import { updateMyVariatPriceDto } from "./dto/variant-price.dto";
+import { upadteMyVariantMetaDto } from "./dto/variant-meta.dto";
+import { toggleVariantApperaaracneDto } from "./dto/variant-appearance.dto";
+import { softDeleteMyVariantDto } from "./dto/delete-varient.dto";
+
+export class ProductVariantController extends BaseController<productVariantApplicationService> {
+
+    createMyProductVariant = async (c: Context) => {
+        const data = await this.body(c, createMyProductVariantDto)
+        const actor = c.get('user');
+        return this.ok(c, await this.service.createMyProductVariant(data, actor));
+    }
+    getVarientsByProductId = async (c: Context) => {
+        const productId = this.param(c, 'id', idSchema);
+        return this.ok(c, await this.service.getVarientsByProductId(productId))
+
+    }
+    updateMyVariantPrice = async (c: Context) => {
+        const data = await this.body(c, updateMyVariatPriceDto);
+        const actor = c.get('user');
+        return this.ok(c, await this.service.updateMyVariantPrice(data, actor));
+    }
+    updateMyVariantMeta = async (c: Context) => {
+        const data = await this.body(c, upadteMyVariantMetaDto)
+        const actor = c.get('user');
+        return this.ok(c, await this.service.updateMyVariantMeta(data, actor));
+    }
+    toggleMyVaraintAppereance = async (c: Context) => {
+        const data = await this.body(c, toggleVariantApperaaracneDto);
+        const actor = c.get('user');
+        return this.ok(c, await this.service.toggleMyVaraintAppereance(data, actor))
+    }
+    softDeleteMyVariant = async (c: Context) => {
+        const data = await this.body(c, softDeleteMyVariantDto);
+        const actor = c.get('user');
+        return this.ok(c, await this.service.softDeleteMyVariant(data, actor))
+    }
+    recoverVariant = async (c: Context) => {
+        const id = this.param(c, 'id', idSchema);
+        const actor = c.get('user');
+        return this.ok(c, await this.service.recoverVariant(id, actor))
+    }
+}
+

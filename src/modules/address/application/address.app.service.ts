@@ -1,35 +1,46 @@
-import { InMemoryQueryBus } from "../../../core/domain/infrastructure/in-memory-query-bus";
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { Reason } from "../../../core/domain/value-objects/reason.vo";
+import type { InMemoryQueryBus } from '../../../core/domain/infrastructure/in-memory-query-bus';
+import { Id } from '../../../core/domain/value-objects/id.vo';
+import { Reason } from '../../../core/domain/value-objects/reason.vo';
 
-import { CityVO, CountryVO, PostalCodeVO, StateVO, StreetAddressVO } from "../../../core/domain/value-objects/street-address.vo";
-import { BaseService } from "../../../core/services/base.services";
-import { BadRequestError } from "../../../errors/app-error";
-import { EnsureActiveUserGetByIdQuery } from "../../user/application/queries/ensure-active-user-get-by-id.query";
-import { UserPersistence } from "../../user/infrastructure/user.models";
-import { AddressAggregate } from "../domain/address.aggregate";
-import { AddressResponseReadModel } from "../domain/read-models/address.response-read-models";
-import { AddressMapper } from "../infrastructure/address.mapper";
-import { AddressRepository } from "../infrastructure/address.repository";
-import { AddressMessages, addressMessagesType } from "../presentation/address.messgae";
-import { createMyAddressDtoType } from "../presentation/dto/create-address.dto";
+import {
+    CityVO,
+    CountryVO,
+    PostalCodeVO,
+    StateVO,
+    StreetAddressVO,
+} from '../../../core/domain/value-objects/street-address.vo';
+import { BaseService } from '../../../core/services/base.services';
+import { BadRequestError } from '../../../errors/app-error';
+import { EnsureActiveUserGetByIdQuery } from '../../user/application/queries/ensure-active-user-get-by-id.query';
+import type { UserPersistence } from '../../user/infrastructure/user.models';
+import { AddressAggregate } from '../domain/address.aggregate';
+import type { AddressResponseReadModel } from '../domain/read-models/address.response-read-models';
+import { AddressMapper } from '../infrastructure/address.mapper';
+import type { AddressRepository } from '../infrastructure/address.repository';
+import { AddressMessages, type addressMessagesType } from '../presentation/address.messgae';
+import type { createMyAddressDtoType } from '../presentation/dto/create-address.dto';
 
 export class AddressApplicationService extends BaseService {
-    constructor(private readonly addressRepo: AddressRepository,
-        private readonly queryBus: InMemoryQueryBus
-    ) { super() }
+    constructor(
+        private readonly addressRepo: AddressRepository,
+        private readonly queryBus: InMemoryQueryBus,
+    ) {
+        super();
+    }
 
     async canEditAddress(actorId: Id): Promise<void> {
-        const activeUser = await this.queryBus.execute(new EnsureActiveUserGetByIdQuery({ userId: actorId }));
-        if (!activeUser.user) throw new BadRequestError("User is not found");
-        if (!activeUser.active) throw new BadRequestError("User is not active");
+        const activeUser = await this.queryBus.execute(
+            new EnsureActiveUserGetByIdQuery({ userId: actorId }),
+        );
+        if (!activeUser.user) throw new BadRequestError('User is not found');
+        if (!activeUser.active) throw new BadRequestError('User is not active');
     }
 
     async getMyAddresses(actor: UserPersistence): Promise<AddressResponseReadModel[] | null> {
         const userId = Id.create(actor._id);
         const address = await this.addressRepo.FindByOwnerId(userId);
         if (!address) return null;
-        const addresses = address.map((value) => (AddressMapper.aggregateToResponseReadModel(value)))
+        const addresses = address.map((value) => AddressMapper.aggregateToResponseReadModel(value));
         return addresses;
     }
 
@@ -63,7 +74,10 @@ export class AddressApplicationService extends BaseService {
         return AddressMessages.addressDeleted(actorId, addressId);
     }
 
-    async createMyAddress(data: createMyAddressDtoType, actor: UserPersistence): Promise<addressMessagesType> {
+    async createMyAddress(
+        data: createMyAddressDtoType,
+        actor: UserPersistence,
+    ): Promise<addressMessagesType> {
         const addressId = Id.create();
         const actorId = Id.create(actor._id);
         const streetAddress = StreetAddressVO.create(data.streetAddress);
@@ -78,15 +92,14 @@ export class AddressApplicationService extends BaseService {
             _ownerId: actorId,
             _postalCode: postalCode,
             _state: state,
-            _streetAddress: streetAddress
+            _streetAddress: streetAddress,
         });
         const exsistingAddress = await this.addressRepo.FindByOwnerId(actorId);
-        if (exsistingAddress && exsistingAddress?.length >= 4) throw new BadRequestError("Maximum length reached");
+        if (exsistingAddress && exsistingAddress?.length >= 4)
+            throw new BadRequestError('Maximum length reached');
         await this.canEditAddress(actorId);
         await this.addressRepo.Create(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);
-        return AddressMessages.addressCreated(actorId, addressId, response)
+        return AddressMessages.addressCreated(actorId, addressId, response);
     }
-
-
 }

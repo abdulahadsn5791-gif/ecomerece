@@ -1,4 +1,5 @@
-import mongoose, { HydratedDocument, InferSchemaType, Schema } from "mongoose";
+import mongoose, { type HydratedDocument, type InferSchemaType, Schema } from 'mongoose';
+
 const deletedSchema = new Schema(
     {
         deleted: { type: Boolean, default: false, required: true },
@@ -19,7 +20,6 @@ export const AddressSchema = new Schema(
             ref: 'User',
             required: true,
             index: true,
-
         },
         streetAddress: {
             type: String,
@@ -56,7 +56,6 @@ export const AddressSchema = new Schema(
         fullAddress: {
             type: String,
             required: true,
-
         },
         version: {
             type: Number,

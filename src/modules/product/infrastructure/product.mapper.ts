@@ -36,8 +36,8 @@ export const ProductMapper = {
                 doc.disclaimer.isDisclaimer,
                 (doc.disclaimer.disclaimers || []).map((value) => ({
                     name: Name.create(value.name),
-                    title: Title.rehydrate(value.title)
-                }))
+                    title: Title.rehydrate(value.title),
+                })),
             ),
 
             ImagesVO.rehydrate(
@@ -76,7 +76,7 @@ export const ProductMapper = {
             description: product.description.value,
             ingredient: {
                 isIngredients: product.ingredients.isIngredients,
-                ingredients: product.ingredients.value.map((value) => (value.value)),
+                ingredients: product.ingredients.value.map((value) => value.value),
             },
             disclaimer: {
                 isDisclaimer: product.disclaimer.isDisclaimer,
@@ -86,7 +86,7 @@ export const ProductMapper = {
                 })),
             },
             image: {
-                images: product.images.value.map((value) => (value.toObject())),
+                images: product.images.value.map((value) => value.toObject()),
             },
             deleted: {
                 deleted: product.delete.deleted,

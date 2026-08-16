@@ -29,17 +29,19 @@ export class UserInternalService extends BaseService {
         return true;
     }
 
-    async ensureActiveUserGetById(userId: Id): Promise<{ user: UserReadModel | null; active: boolean }> {
+    async ensureActiveUserGetById(
+        userId: Id,
+    ): Promise<{ user: UserReadModel | null; active: boolean }> {
         const user = await this.getById(userId);
-        if (!user) return { user: null, active: false }
+        if (!user) return { user: null, active: false };
         if (
-
             user.isBlocked ||
             user.isBlocked ||
             user.isDeleted ||
             (user.bannedUntil !== null && user.bannedUntil > new Date())
-        ) return { user: user, active: false }
+        )
+            return { user: user, active: false };
 
-        return { user, active: true }
+        return { user, active: true };
     }
 }

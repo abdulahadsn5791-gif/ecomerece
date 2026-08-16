@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { urlSchema } from '../../../../../shared/dtos/url-schema';
 import { altSchema } from '../../../../../shared/dtos/alt-schema';
 import { booleanSchema } from '../../../../../shared/dtos/boolean-schema';
+import { urlSchema } from '../../../../../shared/dtos/url-schema';
 
 export const ProductImageDto = z.object({
     url: urlSchema,
@@ -29,7 +29,6 @@ export const ImageInfoDto = z.object({
 });
 
 export const CreateMyProductDtoSchema = z.object({
-
     title: z.string().trim().min(1),
     appearance: z.enum(['public', 'private']),
     description: z.string().trim().min(1),

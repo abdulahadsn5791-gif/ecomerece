@@ -1,41 +1,52 @@
-import { IQueryBus } from "../../../core/domain/query/query-bus.interface";
-import { AltVO } from "../../../core/domain/value-objects/alt.vo";
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { ImageVO } from "../../../core/domain/value-objects/image.vo";
-import { UrlVO } from "../../../core/domain/value-objects/url.vo";
-import { BaseService } from "../../../core/services/base.services";
-import { UserPersistence } from "../../user/infrastructure/user.models";
-import { GetVendorByUserIdQuery } from "../../vendor/application/queries/get-vendor-by-user-id.query";
-import { ProductAggregate } from "../domain/product.aggregate";
-import { ImagesVO } from "../domain/value-objects/product-images.vo";
-import { CreateMyProductDto } from "../presentation/dto/create-product.dto";
-import { Title } from "../../../core/domain/value-objects/title.vo";
-import { Description } from "../../../core/domain/value-objects/description.vo";
-import { IngredientsVO } from "../domain/value-objects/ingredients.vo";
-import { DisclaimerVO } from "../domain/value-objects/disclaimer.vo";
-import { Name } from "../../../core/domain/value-objects/name.vo";
-import { ProductRepository } from "../infrastructure/product.repository";
-
-import { productMessages, productMessagesType } from "../presentation/product.messages";
-import { Reason } from "../../../core/domain/value-objects/reason.vo";
-import { recoverProductDtoType, softDeleteMyProductDtoType } from "../presentation/dto/delete-product.dto";
-import { blockLiftProductDtoType, blockProductDtoType } from "../presentation/dto/block-product.dto";
-import { productAppereanceDtoType } from "../presentation/dto/product-appereance.dto";
-import { updateProductMetaDtoType } from "../presentation/dto/product-meta.dto";
-import { disclaimerItemsDtoType, toggleDiscalimerDtoType } from "../presentation/dto/product-discalimer.dto";
-import { deafultImageDtoType, imagesDtoType } from "../presentation/dto/product-image.dto";
-import { ingredientsDtotype, toggleIngredientsDtoType } from "../presentation/dto/product-ingredients.dto";
-import { Quantity } from "../../../core/domain/value-objects/quantity.vo";
-
-import { ProductResponseReadModel } from "../domain/read-models/product.response-read-model";
-import { ProductMapper } from "../infrastructure/product.mapper";
-
-
+import type { IQueryBus } from '../../../core/domain/query/query-bus.interface';
+import { AltVO } from '../../../core/domain/value-objects/alt.vo';
+import { Description } from '../../../core/domain/value-objects/description.vo';
+import { Id } from '../../../core/domain/value-objects/id.vo';
+import { ImageVO } from '../../../core/domain/value-objects/image.vo';
+import { Name } from '../../../core/domain/value-objects/name.vo';
+import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
+import { Reason } from '../../../core/domain/value-objects/reason.vo';
+import { Title } from '../../../core/domain/value-objects/title.vo';
+import { UrlVO } from '../../../core/domain/value-objects/url.vo';
+import { BaseService } from '../../../core/services/base.services';
+import type { UserPersistence } from '../../user/infrastructure/user.models';
+import { GetVendorByUserIdQuery } from '../../vendor/application/queries/get-vendor-by-user-id.query';
+import { ProductAggregate } from '../domain/product.aggregate';
+import type { ProductResponseReadModel } from '../domain/read-models/product.response-read-model';
+import { DisclaimerVO } from '../domain/value-objects/disclaimer.vo';
+import { IngredientsVO } from '../domain/value-objects/ingredients.vo';
+import { ImagesVO } from '../domain/value-objects/product-images.vo';
+import { ProductMapper } from '../infrastructure/product.mapper';
+import type { ProductRepository } from '../infrastructure/product.repository';
+import type {
+    blockLiftProductDtoType,
+    blockProductDtoType,
+} from '../presentation/dto/block-product.dto';
+import type { CreateMyProductDto } from '../presentation/dto/create-product.dto';
+import type {
+    recoverProductDtoType,
+    softDeleteMyProductDtoType,
+} from '../presentation/dto/delete-product.dto';
+import type { productAppereanceDtoType } from '../presentation/dto/product-appereance.dto';
+import type {
+    disclaimerItemsDtoType,
+    toggleDiscalimerDtoType,
+} from '../presentation/dto/product-discalimer.dto';
+import type { deafultImageDtoType, imagesDtoType } from '../presentation/dto/product-image.dto';
+import type {
+    ingredientsDtotype,
+    toggleIngredientsDtoType,
+} from '../presentation/dto/product-ingredients.dto';
+import type { updateProductMetaDtoType } from '../presentation/dto/product-meta.dto';
+import { productMessages, type productMessagesType } from '../presentation/product.messages';
 
 export class ProductApplicationService extends BaseService {
-    constructor(private readonly queryBus: IQueryBus,
-        private readonly productRepo: ProductRepository
-    ) { super(); }
+    constructor(
+        private readonly queryBus: IQueryBus,
+        private readonly productRepo: ProductRepository,
+    ) {
+        super();
+    }
 
     async getProductById(id: string): Promise<ProductResponseReadModel> {
         const productId = Id.create(id);
@@ -43,17 +54,35 @@ export class ProductApplicationService extends BaseService {
         return ProductMapper.aggregateToResponseReadModel(product);
     }
 
-    async createMyProduct(data: CreateMyProductDto, actor: UserPersistence): Promise<productMessagesType> {
-
+    async createMyProduct(
+        data: CreateMyProductDto,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const id = Id.create();
         const actorId = Id.create(actor._id);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
-        const images = ImagesVO.create(data.image.images.map((val) => ImageVO.create(UrlVO.create(val.url), AltVO.create(val.alt), val.default)));
+        const images = ImagesVO.create(
+            data.image.images.map((val) =>
+                ImageVO.create(UrlVO.create(val.url), AltVO.create(val.alt), val.default),
+            ),
+        );
         const title = Title.create(data.title);
         const description = Description.create(data.description);
-        const ingredients = IngredientsVO.create({ isIngredients: data.ingredient.isIngredients, items: data.ingredient.ingredients.map((val) => Title.create(val)) })
-        const disclaimer = DisclaimerVO.create({ isDisclaimer: data.disclaimer.isDisclaimer, items: data.disclaimer.disclaimers.map((val) => ({ name: Name.create(val.name), title: Title.create(val.title) })) });
+        const ingredients = IngredientsVO.create({
+            isIngredients: data.ingredient.isIngredients,
+            items: data.ingredient.ingredients.map((val) => Title.create(val)),
+        });
+        const disclaimer = DisclaimerVO.create({
+            isDisclaimer: data.disclaimer.isDisclaimer,
+            items: data.disclaimer.disclaimers.map((val) => ({
+                name: Name.create(val.name),
+                title: Title.create(val.title),
+            })),
+        });
         const product = ProductAggregate.create({
             id: id,
             vendorId: vendorId,
@@ -61,17 +90,22 @@ export class ProductApplicationService extends BaseService {
             title: title,
             description: description,
             ingredients: ingredients,
-            disclaimer: disclaimer
-        })
+            disclaimer: disclaimer,
+        });
         await this.productRepo.Create(product);
         return productMessages.productCreated(id, vendorId);
     }
 
-
-    async softDeleteMyProduct(data: softDeleteMyProductDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async softDeleteMyProduct(
+        data: softDeleteMyProductDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         const reason = Reason.create(data.reason);
@@ -80,10 +114,16 @@ export class ProductApplicationService extends BaseService {
         return productMessages.productDeleted(productId, actorId, reason);
     }
 
-    async recoverMyProduct(data: recoverProductDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async recoverMyProduct(
+        data: recoverProductDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.recoverProduct();
@@ -91,7 +131,10 @@ export class ProductApplicationService extends BaseService {
         return productMessages.productRecovered(productId, actorId);
     }
 
-    async blockProduct(data: blockProductDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async blockProduct(
+        data: blockProductDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
         const reason = Reason.create(data.reason);
@@ -101,19 +144,27 @@ export class ProductApplicationService extends BaseService {
         return productMessages.productBlocked(productId, actorId, reason);
     }
 
-    async unBlockProduct(data: blockLiftProductDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async unBlockProduct(
+        data: blockLiftProductDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
         const product = await this.productRepo.FindByIdOrThrow(productId);
         product.unBlockProduct(actorId);
         await this.productRepo.Save(product);
         return productMessages.productUnBlocked(productId, actorId);
-
     }
 
-    async makeMyProductPublic(data: productAppereanceDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async makeMyProductPublic(
+        data: productAppereanceDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const productId = Id.create(data.productId);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
@@ -122,9 +173,15 @@ export class ProductApplicationService extends BaseService {
         return productMessages.productPublic(productId, actorId);
     }
 
-    async makeMyProductPrivate(data: productAppereanceDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async makeMyProductPrivate(
+        data: productAppereanceDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const productId = Id.create(data.productId);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
@@ -133,12 +190,18 @@ export class ProductApplicationService extends BaseService {
         return productMessages.productPrivate(productId, actorId);
     }
 
-    async updateMyProductMeta(data: updateProductMetaDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async updateMyProductMeta(
+        data: updateProductMetaDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const title = Title.create(data.title);
         const description = Description.create(data.description);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.updateMeta(title, description, actorId);
@@ -146,10 +209,16 @@ export class ProductApplicationService extends BaseService {
         return productMessages.metaUpdated(productId, actorId);
     }
 
-    async toggleMyProductDisclaimer(data: toggleDiscalimerDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async toggleMyProductDisclaimer(
+        data: toggleDiscalimerDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         if (data.enable) product.enableDisclaimer(actorId);
@@ -159,10 +228,16 @@ export class ProductApplicationService extends BaseService {
         else return productMessages.disclaimerDisabled(productId, actorId);
     }
 
-    async addMyProductDisclaimers(data: disclaimerItemsDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async addMyProductDisclaimers(
+        data: disclaimerItemsDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.addDisclaimers(data.items, actorId);
@@ -170,10 +245,16 @@ export class ProductApplicationService extends BaseService {
         return productMessages.disclaimerUpdated(productId, actorId);
     }
 
-    async removeMyProductDisclaimers(data: disclaimerItemsDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async removeMyProductDisclaimers(
+        data: disclaimerItemsDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.removeDisclaimers(data.items, actorId);
@@ -181,21 +262,35 @@ export class ProductApplicationService extends BaseService {
         return productMessages.disclaimerUpdated(productId, actorId);
     }
 
-    async addMyProductImages(data: imagesDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async addMyProductImages(
+        data: imagesDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
-        const images = data.images.map((value) => (ImageVO.create(UrlVO.create(value.url), AltVO.create(value.alt), value.isDefault)));
+        const images = data.images.map((value) =>
+            ImageVO.create(UrlVO.create(value.url), AltVO.create(value.alt), value.isDefault),
+        );
         product.addImages(images, actorId);
         await this.productRepo.Save(product);
         return productMessages.imageUpdated(productId, actorId);
     }
-    async setMyProductDefaultImage(data: deafultImageDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async setMyProductDefaultImage(
+        data: deafultImageDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         const index = Quantity.create(data.index);
@@ -204,35 +299,53 @@ export class ProductApplicationService extends BaseService {
         return productMessages.imageDefault(index, productId, actorId);
     }
 
-    async removeMyProductImages(data: imagesDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async removeMyProductImages(
+        data: imagesDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
-        const urls = data.images.map((value) => (UrlVO.create(value.url)));
+        const urls = data.images.map((value) => UrlVO.create(value.url));
         product.removeImages(urls, actorId);
         await this.productRepo.Save(product);
         return productMessages.imageUpdated(productId, actorId);
     }
 
-    async toggleMyProductIngredients(data: toggleIngredientsDtoType, actor: UserPersistence): Promise<productMessagesType> {
+    async toggleMyProductIngredients(
+        data: toggleIngredientsDtoType,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         if (data.enable) product.enableIngredients(actorId);
-        else product.disableIngredients(actorId)
+        else product.disableIngredients(actorId);
         await this.productRepo.Save(product);
         if (data.enable) return productMessages.ingredientsEnabled(productId, actorId);
         else return productMessages.ingredientsDisabled(productId, actorId);
     }
 
-    async addMyProductIngredients(data: ingredientsDtotype, actor: UserPersistence): Promise<productMessagesType> {
+    async addMyProductIngredients(
+        data: ingredientsDtotype,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.addIngredients(data.items, actorId);
@@ -240,18 +353,20 @@ export class ProductApplicationService extends BaseService {
         return productMessages.ingredientsUpdated(productId, actorId);
     }
 
-    async removeMyProductIngredients(data: ingredientsDtotype, actor: UserPersistence): Promise<productMessagesType> {
+    async removeMyProductIngredients(
+        data: ingredientsDtotype,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
-        const vendor = this.ensureFound(await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })), "User don,t own an vendor");
+        const vendor = this.ensureFound(
+            await this.queryBus.execute(new GetVendorByUserIdQuery({ userId: actorId })),
+            'User don,t own an vendor',
+        );
         const vendorId = Id.create(vendor.id);
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.removeIngredients(data.items, actorId);
         await this.productRepo.Save(product);
         return productMessages.ingredientsUpdated(productId, actorId);
     }
-
-
 }
-
-

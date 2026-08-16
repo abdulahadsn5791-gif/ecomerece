@@ -1,6 +1,5 @@
 import type { Id } from '../../../../core/domain/value-objects/id.vo';
-import { ProductVariantAggregate } from '../product-variant.aggregate';
-;
+import type { ProductVariantAggregate } from '../product-variant.aggregate';
 
 export interface IProductVariantRepository {
     FindById(id: Id): Promise<ProductVariantAggregate | null>;
@@ -9,5 +8,5 @@ export interface IProductVariantRepository {
     EnsureOwnerShipGetByIdOrThrow(productId: Id, variantId: Id): Promise<ProductVariantAggregate>;
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;
-    Create(user: ProductVariantAggregate): Promise<void>
+    Create(user: ProductVariantAggregate): Promise<void>;
 }

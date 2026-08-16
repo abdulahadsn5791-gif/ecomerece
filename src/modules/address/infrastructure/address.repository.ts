@@ -1,14 +1,17 @@
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { MongoRepository } from "../../../core/repository/mongo.repository";
-import { BadRequestError, ConcurrencyError } from "../../../errors/app-error";
-import { AddressAggregate } from "../domain/address.aggregate";
-import { IAddressRepository } from "../domain/ports/i-address-repository";
-import { AddressMapper } from "./address.mapper";
-import { AddressModel, AddressPersistence } from "./address.models";
+import type { Id } from '../../../core/domain/value-objects/id.vo';
+import { MongoRepository } from '../../../core/repository/mongo.repository';
+import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
+import type { AddressAggregate } from '../domain/address.aggregate';
+import type { IAddressRepository } from '../domain/ports/i-address-repository';
+import { AddressMapper } from './address.mapper';
+import { AddressModel, type AddressPersistence } from './address.models';
 
-export class AddressRepository extends MongoRepository<AddressPersistence> implements IAddressRepository {
+export class AddressRepository
+    extends MongoRepository<AddressPersistence>
+    implements IAddressRepository
+{
     constructor() {
-        super(AddressModel)
+        super(AddressModel);
     }
 
     async FindById(id: Id): Promise<AddressAggregate | null> {
@@ -19,19 +22,18 @@ export class AddressRepository extends MongoRepository<AddressPersistence> imple
 
     async FindByIdOrThrow(id: Id): Promise<AddressAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError("Address not found with this id");
+        if (!doc) throw new BadRequestError('Address not found with this id');
         return AddressMapper.persistenceToAggregate(doc);
     }
 
     async FindByOwnerId(id: Id): Promise<AddressAggregate[] | null> {
         const docs = await super.find({
             ownerId: id.value,
-            "deleted.deleted": false
+            'deleted.deleted': false,
         });
         if (!docs || docs.length === 0) return null;
         return docs.map((doc) => AddressMapper.persistenceToAggregate(doc));
     }
-
 
     async Save(product: AddressAggregate): Promise<void> {
         const data = AddressMapper.aggregateToPersistence(product);
@@ -59,7 +61,7 @@ export class AddressRepository extends MongoRepository<AddressPersistence> imple
         const persistantProduct = AddressMapper.aggregateToPersistence(add);
         const productDoc = new AddressModel(persistantProduct);
 
-        await super.create(productDoc)
+        await super.create(productDoc);
     }
 
     async Exists(id: Id): Promise<boolean> {
@@ -67,5 +69,4 @@ export class AddressRepository extends MongoRepository<AddressPersistence> imple
             _id: id.value,
         }));
     }
-
 }

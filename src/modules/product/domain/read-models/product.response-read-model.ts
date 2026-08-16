@@ -1,8 +1,6 @@
 export interface ProductResponseReadModel {
     id: string;
 
-
-
     version: number;
 
     title: string;

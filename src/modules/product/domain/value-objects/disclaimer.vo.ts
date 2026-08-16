@@ -45,15 +45,16 @@ export class DisclaimerVO {
     addMany(data: DisclaimerItem[]): DisclaimerVO {
         if (!this.isDisclaimer) throw new BadRequestError('Disclaimer is disabled.');
         data.map((value) => {
-            if (this.has(value.name.value)) throw new BadRequestError(`Disclaimer "${value.name.value}" already exists.`);
-        })
+            if (this.has(value.name.value))
+                throw new BadRequestError(`Disclaimer "${value.name.value}" already exists.`);
+        });
         return new DisclaimerVO(true, [...this.items, ...data]);
     }
 
     removeMany(data: DisclaimerItem[]): DisclaimerVO {
         if (!this.isDisclaimer) throw new BadRequestError('Disclaimer is disabled.');
-        let items = this.items
-        data.map((value) => items = items.filter((item) => !item.name.equals(value.name)))
+        let items = this.items;
+        data.map((value) => (items = items.filter((item) => !item.name.equals(value.name))));
         return new DisclaimerVO(true, items);
     }
 
@@ -97,9 +98,9 @@ export class DisclaimerVO {
             this.items.map((item) =>
                 item.name.equals(nameVO)
                     ? {
-                        name: nameVO,
-                        title: titleVO,
-                    }
+                          name: nameVO,
+                          title: titleVO,
+                      }
                     : item,
             ),
         );
@@ -120,10 +121,7 @@ export class DisclaimerVO {
     }
 
     equals(other: DisclaimerVO): boolean {
-        if (
-            this.isDisclaimer !== other.isDisclaimer ||
-            this.items.length !== other.items.length
-        ) {
+        if (this.isDisclaimer !== other.isDisclaimer || this.items.length !== other.items.length) {
             return false;
         }
 

@@ -1,12 +1,15 @@
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { MongoRepository } from "../../../core/repository/mongo.repository";
-import { BadRequestError, ConcurrencyError } from "../../../errors/app-error";
-import { InventoryAggregate } from "../domain/inventory.aggregate";
-import { IIventoryRepository } from "../domain/ports/i-inventory-repository";
-import { InventoryMapper } from "./inventory.mapper";
-import { InventoryModel, InventoryPersistence } from "./inventory.model";
+import type { Id } from '../../../core/domain/value-objects/id.vo';
+import { MongoRepository } from '../../../core/repository/mongo.repository';
+import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
+import type { InventoryAggregate } from '../domain/inventory.aggregate';
+import type { IIventoryRepository } from '../domain/ports/i-inventory-repository';
+import { InventoryMapper } from './inventory.mapper';
+import { InventoryModel, type InventoryPersistence } from './inventory.model';
 
-export class InventoryReposityory extends MongoRepository<InventoryPersistence> implements IIventoryRepository {
+export class InventoryReposityory
+    extends MongoRepository<InventoryPersistence>
+    implements IIventoryRepository
+{
     constructor() {
         super(InventoryModel);
     }
@@ -25,16 +28,15 @@ export class InventoryReposityory extends MongoRepository<InventoryPersistence> 
 
     async FindByIdOrThrow(id: Id): Promise<InventoryAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError("Inventory not found with this id");
+        if (!doc) throw new BadRequestError('Inventory not found with this id');
         return InventoryMapper.persistenceToAggregate(doc);
     }
 
     async FindByVariantIdOrThrow(id: Id): Promise<InventoryAggregate> {
         const doc = await super.findOne({ variantId: id.value });
-        if (!doc) throw new BadRequestError("Variant dont own this id");
+        if (!doc) throw new BadRequestError('Variant dont own this id');
         return InventoryMapper.persistenceToAggregate(doc);
     }
-
 
     async Save(inventory: InventoryAggregate): Promise<void> {
         const data = InventoryMapper.aggregateToPersistence(inventory);
@@ -54,10 +56,9 @@ export class InventoryReposityory extends MongoRepository<InventoryPersistence> 
         }
     }
 
-
     async Delete(id: Id): Promise<void> {
         const doc = await super.findByIdAndDelete(id.value);
-        if (!doc) throw new BadRequestError("Inventory not found with this id");
+        if (!doc) throw new BadRequestError('Inventory not found with this id');
     }
 
     async Exists(id: Id): Promise<boolean> {
@@ -71,6 +72,4 @@ export class InventoryReposityory extends MongoRepository<InventoryPersistence> 
         const inventoryDoc = new InventoryModel(inventoryPersistence);
         await super.create(inventoryDoc);
     }
-
-
 }

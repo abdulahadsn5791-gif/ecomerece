@@ -1,10 +1,10 @@
 import type { ImageVO } from '../../../../core/domain/value-objects/image.vo';
-import { Quantity } from '../../../../core/domain/value-objects/quantity.vo';
+import type { Quantity } from '../../../../core/domain/value-objects/quantity.vo';
 import type { UrlVO } from '../../../../core/domain/value-objects/url.vo';
 import { BadRequestError } from '../../../../errors/app-error';
 
 export class ImagesVO {
-    private constructor(private readonly _images: readonly ImageVO[]) { }
+    private constructor(private readonly _images: readonly ImageVO[]) {}
 
     static create(images: ImageVO[]): ImagesVO {
         if (images.length === 0) {
@@ -36,11 +36,11 @@ export class ImagesVO {
 
     setDefault(index: Quantity) {
         const length = this._images.length;
-        if (!(index.value < length - 1) && index.value !== length - 1) throw new BadRequestError('Image does`t exists');
+        if (!(index.value < length - 1) && index.value !== length - 1)
+            throw new BadRequestError('Image does`t exists');
         for (let i = 0; i <= length - 1; i++) {
             this._images[i].setDefault(false);
         }
-
 
         return this._images[index.value].setDefault(true);
     }

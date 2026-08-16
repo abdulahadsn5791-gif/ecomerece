@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import usersRoutes from '../modules/user/presentation/user.routes';
-import vendorRoutes from '../modules/vendor/presentation/vendor.routes';
+import { AddressRoutes } from '../modules/address/presentation/address.route';
+import { inventoryRoutes } from '../modules/inventory/presentation/inventory.routes';
 import { productRoutes } from '../modules/product/presentation/product.routes';
 import { productVariantRoutes } from '../modules/product-variant/presentation/product-varaint.routes';
-import { inventoryRoutes } from '../modules/inventory/presentation/inventory.routes';
-import { AddressRoutes } from '../modules/address/presentation/address.route';
+import usersRoutes from '../modules/user/presentation/user.routes';
+import vendorRoutes from '../modules/vendor/presentation/vendor.routes';
 
 const routes = new Hono();
 

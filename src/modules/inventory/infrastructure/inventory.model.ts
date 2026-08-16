@@ -1,6 +1,5 @@
 import mongoose, { type HydratedDocument, type InferSchemaType, Schema } from 'mongoose';
 
-
 const deletedSchema = new mongoose.Schema(
     {
         deleted: { type: Boolean, default: false, required: true },
@@ -10,8 +9,6 @@ const deletedSchema = new mongoose.Schema(
     },
     { _id: false },
 );
-
-
 
 const InventoryModelSchema = new Schema(
     {
@@ -61,4 +58,7 @@ export type InventoryPersistence = InferSchemaType<typeof InventoryModelSchema>;
 
 export type InventoryDocument = HydratedDocument<InventoryPersistence>;
 
-export const InventoryModel = mongoose.model<InventoryPersistence>('Inventories', InventoryModelSchema);
+export const InventoryModel = mongoose.model<InventoryPersistence>(
+    'Inventories',
+    InventoryModelSchema,
+);

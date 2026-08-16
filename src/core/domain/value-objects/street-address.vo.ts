@@ -3,8 +3,6 @@ import { StringVO } from './string-vo';
 export class StreetAddressVO extends StringVO {
     protected override validate(value: string): void {
         super.validate(value);
-
-
     }
 
     static create(value: string): StreetAddressVO {
@@ -21,8 +19,6 @@ export class StreetAddressVO extends StringVO {
 export class CityVO extends StringVO {
     protected override validate(value: string): void {
         super.validate(value);
-
-
     }
 
     static create(value: string): CityVO {
@@ -39,8 +35,6 @@ export class CityVO extends StringVO {
 export class StateVO extends StringVO {
     protected override validate(value: string): void {
         super.validate(value);
-
-
     }
 
     static create(value: string): StateVO {
@@ -57,8 +51,6 @@ export class StateVO extends StringVO {
 export class PostalCodeVO extends StringVO {
     protected override validate(value: string): void {
         super.validate(value);
-
-
     }
 
     static create(value: string): PostalCodeVO {
@@ -75,11 +67,9 @@ export class PostalCodeVO extends StringVO {
 export class CountryVO extends StringVO {
     protected override validate(value: string): void {
         super.validate(value);
-
     }
 
     static create(value: string): CountryVO {
-
         if (value.length < 2 || value.length > 100) {
             throw new Error('Country must be between 2 and 100 characters.');
         }
@@ -93,8 +83,6 @@ export class CountryVO extends StringVO {
 export class FullAddressVO extends StringVO {
     protected override validate(value: string): void {
         super.validate(value);
-
-
     }
 
     static create(value: string): FullAddressVO {
@@ -114,7 +102,7 @@ export class AddressVO {
         public readonly state: StateVO,
         public readonly postalCode: PostalCodeVO,
         public readonly country: CountryVO,
-    ) { }
+    ) {}
 
     static create(
         streetAddress: StreetAddressVO,
@@ -125,7 +113,6 @@ export class AddressVO {
     ): AddressVO {
         return new AddressVO(streetAddress, city, state, postalCode, country);
     }
-
 
     static rehydrate(
         streetAddress: StreetAddressVO,

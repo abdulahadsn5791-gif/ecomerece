@@ -52,7 +52,6 @@ const IngredientSchema = new Schema(
 
         ingredients: {
             type: [String],
-
         },
     },
     {
@@ -89,7 +88,6 @@ const DisclaimerInfoSchema = new Schema(
 
         disclaimers: {
             type: [DisclaimerSchema],
-
         },
     },
     {
@@ -101,7 +99,6 @@ const ImageInfoSchema = new Schema(
     {
         images: {
             type: [ProductImageSchema],
-
         },
     },
     {
@@ -115,7 +112,6 @@ const ProductModelSchema = new Schema(
             type: String,
             required: true,
         },
-
 
         version: {
             type: Number,
@@ -158,13 +154,11 @@ const ProductModelSchema = new Schema(
         ingredient: {
             required: true,
             type: IngredientSchema,
-
         },
 
         disclaimer: {
             required: true,
             type: DisclaimerInfoSchema,
-
         },
 
         image: {

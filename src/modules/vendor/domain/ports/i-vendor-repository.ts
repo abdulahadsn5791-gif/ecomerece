@@ -6,7 +6,7 @@ export interface IVendorRepository {
     FindByIdOrThrow(id: Id): Promise<VendorAggregate>;
     FindByOwnerId(id: Id): Promise<VendorAggregate | null>;
     FindByOwnerIdOrThrow(id: Id): Promise<VendorAggregate>;
-    EnsureOwnershipOrThrow(vendorId: Id, userId: Id): Promise<VendorAggregate>
+    EnsureOwnershipOrThrow(vendorId: Id, userId: Id): Promise<VendorAggregate>;
     Create(user: VendorAggregate): Promise<void>;
     Save(user: VendorAggregate): Promise<void>;
     Delete(id: Id): Promise<void>;

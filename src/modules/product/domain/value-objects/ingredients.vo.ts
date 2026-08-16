@@ -10,16 +10,13 @@ export class IngredientsVO {
     private constructor(
         public readonly isIngredients: boolean,
         private items: readonly Title[],
-    ) {
-
-    }
+    ) {}
 
     static create(props: IngredientsProps): IngredientsVO {
         return new IngredientsVO(props.isIngredients, props.items);
     }
 
     static rehydrate(isIngredients: boolean, items: Title[]): IngredientsVO {
-
         return new IngredientsVO(isIngredients, items);
     }
 
@@ -50,8 +47,7 @@ export class IngredientsVO {
         if (this.has(title.value)) {
             throw new BadRequestError(`Ingredient "${title.value}" already exists.`);
         }
-        this.items = [...this.items, title]
-
+        this.items = [...this.items, title];
     }
 
     remove(item: string) {
@@ -61,9 +57,7 @@ export class IngredientsVO {
 
         const title = Title.create(item);
 
-
-        this.items = this.items.filter((i) => !i.equals(title))
-
+        this.items = this.items.filter((i) => !i.equals(title));
     }
 
     clear(): IngredientsVO {

@@ -9,5 +9,5 @@ export interface IProductRepository {
     Save(user: ProductAggregate): Promise<void>;
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;
-    Create(user: ProductAggregate): Promise<void>
+    Create(user: ProductAggregate): Promise<void>;
 }

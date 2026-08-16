@@ -8,7 +8,8 @@ import { ProductModel, type ProductPersistence } from './product.model';
 
 export class ProductRepository
     extends MongoRepository<ProductPersistence>
-    implements IProductRepository {
+    implements IProductRepository
+{
     constructor() {
         super(ProductModel);
     }
@@ -21,12 +22,11 @@ export class ProductRepository
         return ProductMapper.persistenceToAggregate(doc);
     }
 
-
     async EnsureOwnerShip(productId: Id, vendorId: Id): Promise<ProductAggregate | null> {
         const doc = await super.findOne({
             _id: productId,
             vendorId: vendorId,
-        })
+        });
         if (!doc) return null;
         return ProductMapper.persistenceToAggregate(doc);
     }
@@ -35,7 +35,7 @@ export class ProductRepository
         const doc = await super.findOne({
             _id: productId.value,
             vendorId: vendorId.value,
-        })
+        });
         if (!doc) throw new BadRequestError('User don`t own that product');
         return ProductMapper.persistenceToAggregate(doc);
     }
@@ -75,7 +75,6 @@ export class ProductRepository
     async Save(product: ProductAggregate): Promise<void> {
         const data = ProductMapper.aggregateToPersistence(product);
 
-
         const { version: _, ...updateData } = data;
 
         const result = await ProductModel.updateOne(
@@ -101,7 +100,7 @@ export class ProductRepository
         const persistantProduct = ProductMapper.aggregateToPersistence(product);
         const productDoc = new ProductModel(persistantProduct);
 
-        await super.create(productDoc)
+        await super.create(productDoc);
     }
     async Exists(id: Id): Promise<boolean> {
         return !!(await super.exists({

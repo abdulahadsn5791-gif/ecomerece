@@ -1,12 +1,12 @@
-import { EffectiveDate } from "../../../core/domain/value-objects/effective-date.vo";
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { Quantity } from "../../../core/domain/value-objects/quantity.vo";
-import { Reason } from "../../../core/domain/value-objects/reason.vo";
-import { DeleteInfoVO } from "../../user/domain/value-objects/delete-Info.vo";
-import { InventoryAggregate } from "../domain/inventory.aggregate";
-import { InventoryReadModel } from "../domain/read-models/inventory.read-model";
-import { InventoryResponseReadModel } from "../domain/read-models/inventory.response-read-model";
-import { InventoryPersistence } from "./inventory.model";
+import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
+import { Id } from '../../../core/domain/value-objects/id.vo';
+import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
+import { Reason } from '../../../core/domain/value-objects/reason.vo';
+import { DeleteInfoVO } from '../../user/domain/value-objects/delete-Info.vo';
+import { InventoryAggregate } from '../domain/inventory.aggregate';
+import type { InventoryReadModel } from '../domain/read-models/inventory.read-model';
+import type { InventoryResponseReadModel } from '../domain/read-models/inventory.response-read-model';
+import type { InventoryPersistence } from './inventory.model';
 
 export const InventoryMapper = {
     persistenceToAggregate(doc: InventoryPersistence): InventoryAggregate {
@@ -23,8 +23,8 @@ export const InventoryMapper = {
                 doc.deleted.reason ? Reason.create(doc.deleted.reason) : null,
             ),
             Quantity.rehydrate(doc.version),
-            EffectiveDate.rehydrate(doc.createdAt)
-        )
+            EffectiveDate.rehydrate(doc.createdAt),
+        );
     },
     aggregateToPersistence(inventory: InventoryAggregate) {
         return {
@@ -41,8 +41,7 @@ export const InventoryMapper = {
             },
             createdAt: inventory.createdAt.value,
             updatedAt: EffectiveDate.today().value,
-
-        }
+        };
     },
     aggregateToReadModel(inventory: InventoryAggregate): InventoryReadModel {
         return {
@@ -58,9 +57,7 @@ export const InventoryMapper = {
                 reason: inventory.delete.reason?.value ?? null,
             },
             createdAt: inventory.createdAt.value,
-
-
-        }
+        };
     },
 
     persistenceToReadModel(inventory: InventoryPersistence): InventoryReadModel {
@@ -77,7 +74,7 @@ export const InventoryMapper = {
                 reason: inventory.deleted.reason ?? null,
             },
             createdAt: inventory.createdAt,
-        }
+        };
     },
     aggregateToResponseReadModel(inventory: InventoryAggregate): InventoryResponseReadModel {
         return {
@@ -87,10 +84,6 @@ export const InventoryMapper = {
             reserved: inventory.reserved.value,
             lowStockThreshold: inventory.lowStockThreshold.value,
             createdAt: inventory.createdAt.value,
-
-
-        }
-    }
-
-
-}
+        };
+    },
+};

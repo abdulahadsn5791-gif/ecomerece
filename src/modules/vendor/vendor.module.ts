@@ -1,10 +1,10 @@
 import { InMemoryEventBus } from '../../core/domain/infrastructure/in-memory-event-bus';
 import { queryBus } from '../../core/domain/infrastructure/in-memory-query-bus';
-import { EnsureActiveVendorGetByIdQuery } from './application/queries/ensure-active-vendor-get-by-id.query';
 import { EnsureActiveVendorQuery } from './application/queries/ensure-active-vendor.query';
+import { EnsureActiveVendorGetByIdQuery } from './application/queries/ensure-active-vendor-get-by-id.query';
 import { GetVendorByUserIdQuery } from './application/queries/get-vendor-by-user-id.query';
-import { EnsureActiveVendorGetByIdHandler } from './application/query-handlers/ensure-active-vendor-get-by-id.query-handler';
 import { EnsureActiveVendorHandler } from './application/query-handlers/ensure-active-vendor.query-handler';
+import { EnsureActiveVendorGetByIdHandler } from './application/query-handlers/ensure-active-vendor-get-by-id.query-handler';
 import { GetVendorByUserIdHandler } from './application/query-handlers/get-vendor-by-user-id.query-handler';
 import { VendorAppService } from './application/vendor.app.service';
 import { VendorInternalService } from './application/vendor.internal.service';
@@ -16,9 +16,12 @@ export function CreateVendorModule() {
     const eventBus = new InMemoryEventBus();
     const internalService = new VendorInternalService(repo, queryBus);
 
-    queryBus.register(EnsureActiveVendorGetByIdQuery, new EnsureActiveVendorGetByIdHandler(internalService));
+    queryBus.register(
+        EnsureActiveVendorGetByIdQuery,
+        new EnsureActiveVendorGetByIdHandler(internalService),
+    );
     queryBus.register(EnsureActiveVendorQuery, new EnsureActiveVendorHandler(internalService));
-    queryBus.register(GetVendorByUserIdQuery, new GetVendorByUserIdHandler(internalService))
+    queryBus.register(GetVendorByUserIdQuery, new GetVendorByUserIdHandler(internalService));
     const appService = new VendorAppService(repo, eventBus, internalService);
     const vendorController = new VendorController(appService);
 

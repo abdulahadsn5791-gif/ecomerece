@@ -29,4 +29,4 @@ export class InMemoryEventBus implements IEventBus {
 
 const eventBus = new InMemoryEventBus();
 
-export { eventBus }
+export { eventBus };

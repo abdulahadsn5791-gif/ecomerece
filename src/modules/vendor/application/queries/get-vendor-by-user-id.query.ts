@@ -1,6 +1,6 @@
-import { IQuery } from "../../../../core/domain/query/query-bus.interface";
-import { Id } from "../../../../core/domain/value-objects/id.vo";
-import { VendorReadModel } from "../../domain/read-models/vendor-read-model";
+import type { IQuery } from '../../../../core/domain/query/query-bus.interface';
+import type { Id } from '../../../../core/domain/value-objects/id.vo';
+import type { VendorReadModel } from '../../domain/read-models/vendor-read-model';
 
 export class GetVendorByUserIdQuery implements IQuery<VendorReadModel | null> {
     readonly __result?: VendorReadModel | null;

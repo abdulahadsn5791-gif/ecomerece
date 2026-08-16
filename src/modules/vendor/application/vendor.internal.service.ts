@@ -4,7 +4,7 @@ import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
 import { EnsureActiveQuery } from '../../user/application/queries/ensure-active.query';
 import type { IVendorRepository } from '../domain/ports/i-vendor-repository';
-import { VendorReadModel } from '../domain/read-models/vendor-read-model';
+import type { VendorReadModel } from '../domain/read-models/vendor-read-model';
 import { VendorMapper } from '../infrastructure/vendor.mapper';
 
 export class VendorInternalService extends BaseService {
@@ -28,7 +28,6 @@ export class VendorInternalService extends BaseService {
     }
 
     async ensureActiveVendor(userId: Id, vendorId: Id): Promise<VendorReadModel> {
-
         const user = await this.queryBus.execute(new EnsureActiveQuery({ userId: userId }));
         if (!user) throw new BadRequestError('User is not active');
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
@@ -36,11 +35,11 @@ export class VendorInternalService extends BaseService {
         if (vendor.delete.isDeleted) throw new BadRequestError('Vendor was removed');
         if (!vendor.verification.isVerified) throw new BadRequestError('Vendor is not verified');
         return VendorMapper.aggregateToReadModel(vendor);
-
     }
 
-    async ensureActiveVendorGetById(vendorId: Id): Promise<{ vendor: VendorReadModel | null; active: boolean }> {
-
+    async ensureActiveVendorGetById(
+        vendorId: Id,
+    ): Promise<{ vendor: VendorReadModel | null; active: boolean }> {
         const vendor = await this.vendorRepo.FindById(vendorId);
 
         if (!vendor) return { vendor: null, active: false };
@@ -49,9 +48,8 @@ export class VendorInternalService extends BaseService {
             vendor.delete.isDeleted ||
             !vendor.verification.isVerified ||
             vendor.verification.isRejected
-        ) return { vendor: VendorMapper.aggregateToReadModel(vendor), active: false };
+        )
+            return { vendor: VendorMapper.aggregateToReadModel(vendor), active: false };
         return { vendor: VendorMapper.aggregateToReadModel(vendor), active: true };
-
     }
-
 }

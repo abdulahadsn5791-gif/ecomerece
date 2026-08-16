@@ -1,24 +1,23 @@
-import { AggregateRoot } from "../../../core/domain/aggregate-root";
-import { EffectiveDate } from "../../../core/domain/value-objects/effective-date.vo";
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { Money } from "../../../core/domain/value-objects/money.vo";
-import { Quantity } from "../../../core/domain/value-objects/quantity.vo";
-import { Reason } from "../../../core/domain/value-objects/reason.vo";
-import { Title } from "../../../core/domain/value-objects/title.vo";
-import { BadRequestError } from "../../../errors/app-error";
-import { DeleteInfoVO } from "../../user/domain/value-objects/delete-Info.vo";
+import { AggregateRoot } from '../../../core/domain/aggregate-root';
+import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
+import type { Id } from '../../../core/domain/value-objects/id.vo';
+import type { Money } from '../../../core/domain/value-objects/money.vo';
+import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
+import type { Reason } from '../../../core/domain/value-objects/reason.vo';
+import type { Title } from '../../../core/domain/value-objects/title.vo';
+import { BadRequestError } from '../../../errors/app-error';
+import { DeleteInfoVO } from '../../user/domain/value-objects/delete-Info.vo';
 
 export type createVarientProps = {
-    id: Id,
-    productId: Id,
-    discountedPrice: Money,
-    price: Money,
-    title: Title,
-    active: boolean
-}
+    id: Id;
+    productId: Id;
+    discountedPrice: Money;
+    price: Money;
+    title: Title;
+    active: boolean;
+};
 
 export class ProductVariantAggregate extends AggregateRoot {
-
     constructor(
         private readonly _id: Id,
         private readonly _productId: Id,
@@ -30,8 +29,9 @@ export class ProductVariantAggregate extends AggregateRoot {
         private _delete: DeleteInfoVO,
         private _version: Quantity,
         private readonly _createdAt: EffectiveDate,
-
-    ) { super() }
+    ) {
+        super();
+    }
     get id() {
         return this._id;
     }
@@ -62,7 +62,8 @@ export class ProductVariantAggregate extends AggregateRoot {
     }
 
     static create(data: createVarientProps): ProductVariantAggregate {
-        if (data.price.value < data.discountedPrice.value) throw new BadRequestError('Discount must be smaller than actual price');
+        if (data.price.value < data.discountedPrice.value)
+            throw new BadRequestError('Discount must be smaller than actual price');
         return new ProductVariantAggregate(
             data.id,
             data.productId,
@@ -73,7 +74,8 @@ export class ProductVariantAggregate extends AggregateRoot {
             data.title,
             DeleteInfoVO.none(),
             Quantity.none(),
-            EffectiveDate.today());
+            EffectiveDate.today(),
+        );
     }
 
     static rehydrate(
@@ -86,7 +88,8 @@ export class ProductVariantAggregate extends AggregateRoot {
         _title: Title,
         _delete: DeleteInfoVO,
         _version: Quantity,
-        _createdAt: EffectiveDate) {
+        _createdAt: EffectiveDate,
+    ) {
         return new ProductVariantAggregate(
             _id,
             _productId,
@@ -97,7 +100,8 @@ export class ProductVariantAggregate extends AggregateRoot {
             _title,
             _delete,
             _version,
-            _createdAt);
+            _createdAt,
+        );
     }
 
     updateMeta(title: Title, actorId: Id) {
@@ -105,17 +109,17 @@ export class ProductVariantAggregate extends AggregateRoot {
     }
 
     activate(actorId: Id) {
-        if (this._active === true) throw new BadRequestError("Variant was already active");
+        if (this._active === true) throw new BadRequestError('Variant was already active');
         this._active = true;
     }
     deActivate(actorId: Id) {
-        if (this._active === false) throw new BadRequestError("Variant was already deActive");
+        if (this._active === false) throw new BadRequestError('Variant was already deActive');
         this._active = false;
     }
 
-
     updatePrice(price: Money, discountedPrice: Money, actorId: Id) {
-        if (price < discountedPrice) throw new BadRequestError('Discount must be smaller than actual price');
+        if (price < discountedPrice)
+            throw new BadRequestError('Discount must be smaller than actual price');
         this._price = price;
         this._discountedPrice = discountedPrice;
     }
@@ -126,9 +130,8 @@ export class ProductVariantAggregate extends AggregateRoot {
     }
 
     recoverProduct(actorId: Id) {
-        if (!this._delete.deleted) throw new BadRequestError('Product Variant was already recovered');
+        if (!this._delete.deleted)
+            throw new BadRequestError('Product Variant was already recovered');
         this._delete = DeleteInfoVO.none();
     }
-
-
 }

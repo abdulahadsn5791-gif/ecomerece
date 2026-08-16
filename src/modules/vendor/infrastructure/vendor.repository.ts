@@ -10,7 +10,8 @@ import { VendorModel, type VendorPersistence } from './vendor.models';
 
 export class VendorRepository
     extends MongoRepository<VendorPersistence>
-    implements IVendorRepository {
+    implements IVendorRepository
+{
     constructor() {
         super(VendorModel);
     }

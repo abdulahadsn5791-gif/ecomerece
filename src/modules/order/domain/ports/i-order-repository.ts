@@ -1,4 +1,4 @@
-import { Id } from "../../../../core/domain/value-objects/id.vo";
+import type { Id } from '../../../../core/domain/value-objects/id.vo';
 
 export interface IOrderRepository {
     FindById(id: Id): Promise<InventoryAggregate | null>;
@@ -8,5 +8,5 @@ export interface IOrderRepository {
     Save(user: InventoryAggregate): Promise<void>;
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;
-    Create(user: InventoryAggregate): Promise<void>
+    Create(user: InventoryAggregate): Promise<void>;
 }

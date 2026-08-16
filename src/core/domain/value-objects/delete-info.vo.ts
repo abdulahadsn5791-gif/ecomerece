@@ -1,6 +1,6 @@
-import { EffectiveDate } from "./effective-date.vo";
-import { Id } from "./id.vo";
-import { Reason } from "./reason.vo";
+import { EffectiveDate } from './effective-date.vo';
+import type { Id } from './id.vo';
+import type { Reason } from './reason.vo';
 
 export class DeleteInfoVO {
     private constructor(
@@ -8,7 +8,7 @@ export class DeleteInfoVO {
         readonly deleted: boolean,
         readonly from: EffectiveDate | null,
         readonly reason: Reason | null,
-    ) { }
+    ) {}
 
     static create(deletedBy: Id, reason: Reason) {
         return new DeleteInfoVO(deletedBy, true, new EffectiveDate(new Date()), reason);

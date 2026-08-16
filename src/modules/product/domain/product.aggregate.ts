@@ -1,4 +1,4 @@
-import { desclaimerItem } from '../../../../shared/types/disclaimer-type';
+import type { desclaimerItem } from '../../../../shared/types/disclaimer-type';
 import { AggregateRoot } from '../../../core/domain/aggregate-root';
 import { AppearanceVO } from '../../../core/domain/value-objects/appearance.vo';
 
@@ -169,7 +169,6 @@ export class ProductAggregate extends AggregateRoot {
         this._appearance = this._appearance.makePrivate();
     }
     updateMeta(title: Title, description: Description, actorId: Id): void {
-
         this._title = title;
         this._description = description;
     }
@@ -183,12 +182,18 @@ export class ProductAggregate extends AggregateRoot {
     }
 
     addDisclaimers(data: desclaimerItem[], actorId: Id) {
-        const items = data.map((value) => ({ name: Name.create(value.name), title: Title.create(value.title) }))
+        const items = data.map((value) => ({
+            name: Name.create(value.name),
+            title: Title.create(value.title),
+        }));
         this._disclaimer = this._disclaimer.addMany(items);
     }
 
     removeDisclaimers(data: desclaimerItem[], actorId: Id) {
-        const items = data.map((value) => ({ name: Name.create(value.name), title: Title.create(value.title) }))
+        const items = data.map((value) => ({
+            name: Name.create(value.name),
+            title: Title.create(value.title),
+        }));
         this._disclaimer = this._disclaimer.removeMany(items);
     }
 
@@ -242,26 +247,22 @@ export class ProductAggregate extends AggregateRoot {
         this._ingredients = this._ingredients.disable();
     }
     addIngredients(items: string | string[], actorId: Id): void {
-
-
         const ingredientList = Array.isArray(items) ? items : [items];
 
-        ingredientList.forEach(ingredient => {
+        ingredientList.forEach((ingredient) => {
             if (ingredient && ingredient.trim()) {
-
                 this._ingredients.add(ingredient);
             }
         });
-        console.log(this._ingredients.value)
+        console.log(this._ingredients.value);
     }
     removeIngredients(items: string | string[], actorId: Id): void {
         const ingredientList = Array.isArray(items) ? items : [items];
-        ingredientList.forEach(ingredient => {
+        ingredientList.forEach((ingredient) => {
             if (ingredient && ingredient.trim()) {
                 this._ingredients.remove(ingredient);
             }
         });
-
     }
 
     clearIngredients(actorId: Id): void {

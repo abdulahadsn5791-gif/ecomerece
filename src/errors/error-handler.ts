@@ -9,7 +9,6 @@ function sanitizeStatus(code: unknown): number {
     return 500;
 }
 
-
 export function registerErrorHandler(app: any) {
     app.onError((err: unknown, c: Context) => {
         const isDev = process.env.NODE_ENV !== 'production';

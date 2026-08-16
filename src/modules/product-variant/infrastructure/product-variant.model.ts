@@ -1,4 +1,4 @@
-import mongoose, { HydratedDocument, type InferSchemaType, model, Schema } from 'mongoose';
+import mongoose, { type HydratedDocument, type InferSchemaType, model, Schema } from 'mongoose';
 
 const deletedSchema = new mongoose.Schema(
     {
@@ -9,7 +9,6 @@ const deletedSchema = new mongoose.Schema(
     },
     { _id: false },
 );
-
 
 const productVariantSchema = new Schema(
     {
@@ -74,5 +73,5 @@ export type ProductVariantPersistence = InferSchemaType<typeof productVariantSch
 export type ProductVariantDocument = HydratedDocument<ProductVariantPersistence>;
 export const ProductVariantModel = mongoose.model<ProductVariantPersistence>(
     'ProductVariant',
-    productVariantSchema
+    productVariantSchema,
 );

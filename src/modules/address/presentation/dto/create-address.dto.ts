@@ -10,4 +10,4 @@ export const createMyAddressDto = z.object({
     country: nameSchema,
 });
 
-export type createMyAddressDtoType = z.infer<typeof createMyAddressDto>
+export type createMyAddressDtoType = z.infer<typeof createMyAddressDto>;

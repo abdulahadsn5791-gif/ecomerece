@@ -88,7 +88,6 @@ export const VendorSchema = new Schema(
             required: true,
         },
 
-
         verification: {
             type: verificationSchema,
             required: true,

@@ -1,5 +1,5 @@
-import { Id } from "../../../../core/domain/value-objects/id.vo";
-import { AddressAggregate } from "../address.aggregate";
+import type { Id } from '../../../../core/domain/value-objects/id.vo';
+import type { AddressAggregate } from '../address.aggregate';
 
 export interface IAddressRepository {
     FindById(id: Id): Promise<AddressAggregate | null>;

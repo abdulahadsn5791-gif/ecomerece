@@ -6,7 +6,7 @@ export class ImageVO {
         readonly url: UrlVO,
         readonly alt: AltVO,
         public isDefault: boolean,
-    ) { }
+    ) {}
 
     static create(url: UrlVO, alt: AltVO, isDefault: boolean): ImageVO {
         return new ImageVO(url, alt, isDefault ?? false);

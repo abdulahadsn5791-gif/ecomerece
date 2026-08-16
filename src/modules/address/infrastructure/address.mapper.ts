@@ -1,13 +1,20 @@
-import { DeleteInfoVO } from "../../../core/domain/value-objects/delete-info.vo";
-import { EffectiveDate } from "../../../core/domain/value-objects/effective-date.vo";
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { Quantity } from "../../../core/domain/value-objects/quantity.vo";
-import { Reason } from "../../../core/domain/value-objects/reason.vo";
-import { AddressVO, CityVO, CountryVO, PostalCodeVO, StateVO, StreetAddressVO } from "../../../core/domain/value-objects/street-address.vo";
-import { AddressAggregate } from "../domain/address.aggregate";
-import { AddressReadModel } from "../domain/read-models/address.read-models";
-import { AddressResponseReadModel } from "../domain/read-models/address.response-read-models";
-import { AddressPersistence } from "./address.models";
+import { DeleteInfoVO } from '../../../core/domain/value-objects/delete-info.vo';
+import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
+import { Id } from '../../../core/domain/value-objects/id.vo';
+import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
+import { Reason } from '../../../core/domain/value-objects/reason.vo';
+import {
+    AddressVO,
+    CityVO,
+    CountryVO,
+    PostalCodeVO,
+    StateVO,
+    StreetAddressVO,
+} from '../../../core/domain/value-objects/street-address.vo';
+import { AddressAggregate } from '../domain/address.aggregate';
+import type { AddressReadModel } from '../domain/read-models/address.read-models';
+import type { AddressResponseReadModel } from '../domain/read-models/address.response-read-models';
+import type { AddressPersistence } from './address.models';
 
 export const AddressMapper = {
     persistenceToAggregate(doc: AddressPersistence): AddressAggregate {
@@ -20,7 +27,8 @@ export const AddressMapper = {
                 CityVO.rehydrate(doc.city),
                 StateVO.rehydrate(doc.state),
                 PostalCodeVO.rehydrate(doc.postalCode),
-                CountryVO.rehydrate(doc.country)),
+                CountryVO.rehydrate(doc.country),
+            ),
             DeleteInfoVO.rehydrate(
                 doc.deleted.deletedBy ? Id.create(doc.deleted.deletedBy) : null,
                 doc.deleted.deleted,
@@ -28,8 +36,7 @@ export const AddressMapper = {
                 doc.deleted.reason ? Reason.create(doc.deleted.reason) : null,
             ),
             Quantity.rehydrate(doc.version),
-            EffectiveDate.rehydrate(doc.createdAt)
-
+            EffectiveDate.rehydrate(doc.createdAt),
         );
     },
     aggregateToPersistence(address: AddressAggregate) {
@@ -51,7 +58,7 @@ export const AddressMapper = {
             },
             createdAt: address.createdAt.value,
             updatedAt: EffectiveDate.today().value,
-        }
+        };
     },
     aggregateToReadModel(address: AddressAggregate): AddressReadModel {
         return {
@@ -71,8 +78,7 @@ export const AddressMapper = {
                 reason: address.delete.reason?.value ?? null,
             },
             createdAt: address.createdAt.value,
-
-        }
+        };
     },
     aggregateToResponseReadModel(address: AddressAggregate): AddressResponseReadModel {
         return {
@@ -86,10 +92,6 @@ export const AddressMapper = {
             country: address.country.value,
             fullAddress: address.fullAddress.value,
             createdAt: address.createdAt.value,
-
-        }
+        };
     },
-
-
-
-}
+};

@@ -15,5 +15,4 @@ export interface AddressReadModel {
         reason: string | null;
     };
     createdAt: NativeDate;
-
 }

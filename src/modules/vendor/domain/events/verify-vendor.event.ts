@@ -1,4 +1,5 @@
 import type { IEvent } from '../../../../core/domain/events/event-bus.interface';
+import { EffectiveDate } from '../../../../core/domain/value-objects/effective-date.vo';
 import type { Id } from '../../../../core/domain/value-objects/id.vo';
 import type { VerificationInfoVO } from '../value-objects/verification-info.vo';
 
@@ -9,7 +10,7 @@ export interface VendorVerificationPayload {
 
 export class VendorVerifiedEvent implements IEvent<VendorVerificationPayload> {
     readonly type = 'vendor.verified';
-    readonly occurredOn = new Date();
+    readonly occurredOn = EffectiveDate.today()
 
-    constructor(public readonly payload: VendorVerificationPayload) {}
+    constructor(public readonly payload: VendorVerificationPayload) { }
 }

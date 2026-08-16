@@ -1,7 +1,9 @@
+import { EffectiveDate } from "../value-objects/effective-date.vo";
+
 export interface IEvent<T = unknown> {
     readonly type: string;
     readonly payload: T;
-    readonly occurredOn: Date;
+    readonly occurredOn: EffectiveDate;
 }
 
 export interface IEventHandler<T = unknown> {

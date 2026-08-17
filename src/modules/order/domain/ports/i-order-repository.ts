@@ -1,12 +1,13 @@
 import type { Id } from '../../../../core/domain/value-objects/id.vo';
+import { OrderAggregate } from '../order.aggregate';
 
 export interface IOrderRepository {
-    FindById(id: Id): Promise<InventoryAggregate | null>;
-    FindByVariantId(id: Id): Promise<InventoryAggregate | null>;
-    FindByIdOrThrow(id: Id): Promise<InventoryAggregate>;
-    FindByVariantIdOrThrow(id: Id): Promise<InventoryAggregate>;
-    Save(user: InventoryAggregate): Promise<void>;
+    FindById(id: Id): Promise<OrderAggregate | null>;
+    FindByVariantId(id: Id): Promise<OrderAggregate | null>;
+    FindByIdOrThrow(id: Id): Promise<OrderAggregate>;
+    FindByVariantIdOrThrow(id: Id): Promise<OrderAggregate>;
+    Save(user: OrderAggregate): Promise<void>;
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;
-    Create(user: InventoryAggregate): Promise<void>;
+    Create(user: OrderAggregate): Promise<void>;
 }

@@ -15,11 +15,16 @@ export type StatusType = typeof StatusEnum[keyof typeof StatusEnum];
 export class StatusVo extends StringVO {
 
     private constructor(value: StatusType) {
-        super(value.trim());
+        super(value);
 
         if (!Object.values(StatusEnum).includes(this.value as StatusType)) {
             throw new BadRequestError(`Invalid order status: "${this.value}"`);
         }
+
+    }
+
+    static rehydrate(value: StatusType): StatusVo {
+        return new StatusVo(value);
     }
 
     static pending(): StatusVo {
@@ -45,6 +50,9 @@ export class StatusVo extends StringVO {
     static cancelled(): StatusVo {
         return new StatusVo(StatusEnum.CANCELLED);
     }
+    toStatusType(): StatusType {
+        return this.value as StatusType;
+    }
 
     confirm(): StatusVo {
         if (this.value !== StatusEnum.PENDING) {
@@ -68,6 +76,28 @@ export class StatusVo extends StringVO {
     }
 
 
+
+    return(): StatusVo {
+        if (this.value !== StatusEnum.CONFIRMED && this.value !== StatusEnum.COMPLETED) {
+            throw new BadRequestError(`Cannot return a status that is not confirmed or completed (current: ${this.value})`);
+        }
+        return StatusVo.returned();
+    }
+
+    refund(): StatusVo {
+        if (this.value === StatusEnum.REFUNDED) {
+            throw new BadRequestError(`Cannot refund a status that is already refunded (current: ${this.value})`);
+        }
+        if (
+            this.value !== StatusEnum.CONFIRMED &&
+            this.value !== StatusEnum.COMPLETED &&
+            this.value !== StatusEnum.RETURNED
+        ) {
+            throw new BadRequestError(`Cannot refund a status that is not confirmed, completed, or returned (current: ${this.value})`);
+        }
+        return StatusVo.refunded();
+    }
+
     isPending(): boolean {
         return this.value === StatusEnum.PENDING;
     }
@@ -80,7 +110,15 @@ export class StatusVo extends StringVO {
         return this.value === StatusEnum.COMPLETED;
     }
 
-
+    isReturned(): boolean {
+        return this.value === StatusEnum.RETURNED;
+    }
+    isRefunded(): boolean {
+        return this.value === StatusEnum.REFUNDED;
+    }
+    isCancelled(): boolean {
+        return this.value === StatusEnum.CANCELLED;
+    }
 
     toString(): string {
         return this.value;

@@ -7,26 +7,26 @@ import { Reason } from '../../../core/domain/value-objects/reason.vo';
 import type { FullAddressVO } from '../../../core/domain/value-objects/street-address.vo';
 import { OrderCancelledEvent } from './events/order-cancelled.event';
 import { OrderCompletedEvent } from './events/order-completed.event';
+import { OrderConfirmedEvent } from './events/order-confirm.event';
 import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderRefundedEvent } from './events/order-refunded.event';
 import { OrderReturnedEvent } from './events/order-returned.event';
+import { OrderItem } from './value-objects/order-item.vo';
 import { StatusVo } from './value-objects/status.vo';
 
 export type createOrderPros = {
     id: Id;
-    variantId: Id;
+    items: OrderItem[];
     buyerId: Id;
-    price: Quantity;
-    status: StatusVo;
     address: FullAddressVO;
 };
 
 export class OrderAggregate extends AggregateRoot {
     constructor(
         private readonly _id: Id,
-        private readonly _variantId: Id,
         private readonly _buyerId: Id,
-        private _price: Quantity,
+        private _items: OrderItem[],
+        private _totalPrice: Quantity,
         private _status: StatusVo,
         private _address: FullAddressVO,
         private _delete: DeleteInfoVO,
@@ -36,56 +36,42 @@ export class OrderAggregate extends AggregateRoot {
         super();
     }
 
-    get id() {
-        return this._id;
-    }
-    get variantId() {
-        return this._variantId;
-    }
-    get buyerId() {
-        return this._buyerId;
-    }
-    get price() {
-        return this._price;
-    }
-    get status() {
-        return this._status;
-    }
-    get address() {
-        return this._address;
-    }
-    get delete() {
-        return this._delete;
-    }
-    get version() {
-        return this._version;
-    }
-    get createdAt() {
-        return this._createdAt;
-    }
+    get id() { return this._id; }
+    get buyerId() { return this._buyerId; }
+    get items() { return this._items; }
+    get totalPrice() { return this._totalPrice; }
+    get status() { return this._status; }
+    get address() { return this._address; }
+    get delete() { return this._delete; }
+    get version() { return this._version; }
+    get createdAt() { return this._createdAt; }
 
-    create(data: createOrderPros): OrderAggregate {
-        this.raise(new OrderCreatedEvent({ orderId: data.id, actorId: data.buyerId }))
+    static create(data: createOrderPros): OrderAggregate {
+        const total = data.items.reduce(
+            (sum, item) => new Quantity(sum.value + item.totalPrice.value),
+            new Quantity(0)
+        );
+
+
         return new OrderAggregate(
             data.id,
-            data.variantId,
             data.buyerId,
-            data.price,
-            data.status,
+            data.items,
+            total,
+            StatusVo.pending(),
             data.address,
             DeleteInfoVO.none(),
             Quantity.none(),
-
             EffectiveDate.today(),
         );
 
     }
 
-    rehydrate(
+    static rehydrate(
         _id: Id,
-        _variantId: Id,
         _buyerId: Id,
-        _price: Quantity,
+        _items: OrderItem[],
+        _totalPrice: Quantity,
         _status: StatusVo,
         _address: FullAddressVO,
         _delete: DeleteInfoVO,
@@ -94,9 +80,9 @@ export class OrderAggregate extends AggregateRoot {
     ): OrderAggregate {
         return new OrderAggregate(
             _id,
-            _variantId,
             _buyerId,
-            _price,
+            _items,
+            _totalPrice,
             _status,
             _address,
             _delete,
@@ -104,21 +90,31 @@ export class OrderAggregate extends AggregateRoot {
             _createdAt,
         );
     }
-
+    createOrder() {
+        this.raise(new OrderCreatedEvent({ orderId: this.id, actorId: this.buyerId }))
+    }
     cancelOrder(actorId: Id, reason: Reason) {
-        this.raise(new OrderCancelledEvent({ orderId: this._id, actorId: actorId, reason: reason }));
+        this._status = this._status.cancel();
+        this.raise(new OrderCancelledEvent({ orderId: this._id, actorId, reason }));
     }
+
     confirmOrder(actorId: Id) {
-        this.raise(new OrderCo)
+        this._status = this._status.confirm();
+        this.raise(new OrderConfirmedEvent({ orderId: this._id, actorId }));
     }
+
     returnOrder(actorId: Id, reason: Reason) {
-        this.raise(new OrderReturnedEvent({ orderId: this._id, actorId: actorId, reason: reason }))
+        this._status = this._status.return();
+        this.raise(new OrderReturnedEvent({ orderId: this._id, actorId, reason }));
     }
+
     refundOrder(actorId: Id, reason: Reason) {
-        this.raise(new OrderRefundedEvent({ orderId: this._id, actorId: actorId, reason: reason }))
+        this._status = this._status.refund();
+        this.raise(new OrderRefundedEvent({ orderId: this._id, actorId, reason }));
     }
-    completeOrder(actroId: Id) {
-        this.raise(new OrderCompletedEvent({ orderId: this._id, actorId: actorId, reason: reason }))
+
+    completeOrder(actorId: Id) {
+        this._status = this._status.complete();
+        this.raise(new OrderCompletedEvent({ orderId: this._id, actorId }));
     }
 }
-

@@ -1,0 +1,68 @@
+import mongoose, { HydratedDocument, InferSchemaType, Schema } from "mongoose";
+
+
+
+const deletedSchema = new mongoose.Schema(
+    {
+        deleted: { type: Boolean, default: false, required: true },
+        deletedFrom: { type: Date, default: null },
+        deletedBy: { type: String, default: null },
+        reason: { type: String, default: null },
+    },
+    { _id: false },
+);
+
+const itemSchema = new mongoose.Schema(
+    {
+        variantId: { type: String, required: true },
+        quantity: { type: Number, required: true, },
+        unitPrice: { type: Number, required: true, },
+    }, { _id: false }
+);
+
+const OrderModelSchema = new Schema(
+    {
+        _id: { type: String, required: true, },
+        version: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
+        buyerId: {
+            type: String,
+            required: true,
+        },
+        totalPrice: {
+            type: Number,
+            required: true,
+
+        },
+        status: {
+            type: String,
+            enum: ["pending", "confirmed", "completed", "returned", "refunded", "cancelled"],
+            required: true
+        },
+        address: {
+            type: String,
+            required: true,
+        },
+        deleted: {
+            type: deletedSchema,
+            required: true,
+
+        },
+        items: {
+            type: [itemSchema],
+            required: true,
+
+        },
+    },
+    {
+        timestamps: true,
+        versionKey: false,
+    },
+);
+
+export type OrderPersistence = InferSchemaType<typeof OrderModelSchema>;
+export type OrderDocument = HydratedDocument<OrderPersistence>;
+export const OrderModel = mongoose.model<OrderPersistence>('Order', OrderModelSchema);

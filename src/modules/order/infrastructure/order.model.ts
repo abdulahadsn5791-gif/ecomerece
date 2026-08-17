@@ -1,4 +1,5 @@
-import mongoose, { HydratedDocument, InferSchemaType, Schema } from "mongoose";
+import mongoose, { Document, HydratedDocument, InferSchemaType, Schema } from "mongoose";
+import { idType } from "../../../../shared/dtos/id-schema";
 
 
 
@@ -23,6 +24,9 @@ const itemSchema = new mongoose.Schema(
 const OrderModelSchema = new Schema(
     {
         _id: { type: String, required: true, },
+
+        idempotentKey: { type: String, required: true, unique: true },
+
         version: {
             type: Number,
             required: true,
@@ -62,7 +66,28 @@ const OrderModelSchema = new Schema(
         versionKey: false,
     },
 );
+export interface OrderPersistence {
+    _id: string;
+    idempotentKey: string,
+    version: number;
+    buyerId: string;
+    totalPrice: number;
+    status: 'pending' | 'confirmed' | 'completed' | 'returned' | 'refunded' | 'cancelled';
+    address: string;
+    deleted: {
+        deleted: boolean;
+        deletedFrom?: Date | null;
+        deletedBy?: string | null;
+        reason?: string | null;
+    };
+    items: Array<{
+        variantId: string;
+        quantity: number;
+        unitPrice: number;
+    }>;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
-export type OrderPersistence = InferSchemaType<typeof OrderModelSchema>;
 export type OrderDocument = HydratedDocument<OrderPersistence>;
 export const OrderModel = mongoose.model<OrderPersistence>('Order', OrderModelSchema);

@@ -1,11 +1,14 @@
 
 export interface OrderResponseReadModel {
-    id: string,
-    variantId: string,
-    buyerId: string,
-    price: number,
-    status: string,
-    address: string,
-    version: number,
-    createdAt: Date,
+    id: string;
+    buyerId: string;
+    totalPrice: number;
+    status: 'pending' | 'confirmed' | 'completed' | 'returned' | 'refunded' | 'cancelled';
+    address: string;
+    items: Array<{
+        variantId: string;
+        quantity: number;
+        unitPrice: number;
+    }>;
+    createdAt: Date;
 }

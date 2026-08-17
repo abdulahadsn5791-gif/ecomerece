@@ -1,7 +1,6 @@
 import { Id } from "../../../core/domain/value-objects/id.vo";
 import { MongoRepository } from "../../../core/repository/mongo.repository";
 import { BadRequestError, ConcurrencyError } from "../../../errors/app-error";
-import { OrderApplicationService } from "../application/order.app.service";
 import { OrderAggregate } from "../domain/order.aggregate";
 import { IOrderRepository } from "../domain/ports/i-order-repository";
 import { OrderMapper } from "./order.mapper";
@@ -27,23 +26,18 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
 
     async Save(product: OrderAggregate): Promise<void> {
         const data = OrderMapper.aggregateToPersistence(product);
-
-
-
         const result = await super.updateOne(
             {
                 _id: product.id.value,
                 version: product.version.value,
             },
             {
-                $set: updateData,
+                $set: data,
                 $inc: { version: 1 },
             },
         );
+        if (result.modifiedCount === 0) throw new ConcurrencyError();
 
-        if (result.modifiedCount === 0) {
-            throw new ConcurrencyError();
-        }
     }
     async Delete(id: Id): Promise<void> {
         await super.findByIdAndDelete(id.value);
@@ -55,6 +49,7 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
 
         await super.create(productDoc);
     }
+
     async Exists(id: Id): Promise<boolean> {
         return !!(await super.exists({
             _id: id.value,

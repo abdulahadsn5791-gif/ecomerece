@@ -16,6 +16,7 @@ import { StatusVo } from './value-objects/status.vo';
 
 export type createOrderPros = {
     id: Id;
+    idempotentKey: Id,
     items: OrderItem[];
     buyerId: Id;
     address: FullAddressVO;
@@ -23,6 +24,7 @@ export type createOrderPros = {
 
 export class OrderAggregate extends AggregateRoot {
     constructor(
+        private readonly _idempotentKey: Id,
         private readonly _id: Id,
         private readonly _buyerId: Id,
         private _items: OrderItem[],
@@ -35,7 +37,7 @@ export class OrderAggregate extends AggregateRoot {
     ) {
         super();
     }
-
+    get idempotentKey() { return this._idempotentKey; }
     get id() { return this._id; }
     get buyerId() { return this._buyerId; }
     get items() { return this._items; }
@@ -54,6 +56,7 @@ export class OrderAggregate extends AggregateRoot {
 
 
         return new OrderAggregate(
+            data.idempotentKey,
             data.id,
             data.buyerId,
             data.items,
@@ -68,6 +71,7 @@ export class OrderAggregate extends AggregateRoot {
     }
 
     static rehydrate(
+        _idempotentKey: Id,
         _id: Id,
         _buyerId: Id,
         _items: OrderItem[],
@@ -79,6 +83,7 @@ export class OrderAggregate extends AggregateRoot {
         _createdAt: EffectiveDate,
     ): OrderAggregate {
         return new OrderAggregate(
+            _idempotentKey,
             _id,
             _buyerId,
             _items,

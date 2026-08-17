@@ -1,7 +1,7 @@
 export interface AddressResponseReadModel {
     id: string;
     ownerId: string;
-    defaultDate: Date;
+    defaultDate: Date | null;
     streetAddress: string;
     city: string;
     state: string;

@@ -5,6 +5,8 @@ import { Quantity } from "../../../core/domain/value-objects/quantity.vo";
 import { Reason } from "../../../core/domain/value-objects/reason.vo";
 import { FullAddressVO } from "../../../core/domain/value-objects/street-address.vo";
 import { OrderAggregate } from "../domain/order.aggregate";
+import { OrderReadModel } from "../domain/read-models/order.read-models";
+import { OrderResponseReadModel } from "../domain/read-models/order.response-read-model";
 import { OrderItem } from "../domain/value-objects/order-item.vo";
 import { StatusVo } from "../domain/value-objects/status.vo";
 import { OrderPersistence } from "./order.model";
@@ -13,6 +15,7 @@ export const OrderMapper = {
 
     persistenceToAggregate(doc: OrderPersistence): OrderAggregate {
         return OrderAggregate.rehydrate(
+            Id.create(doc.idempotentKey),
             Id.create(doc._id),
             Id.create(doc.buyerId),
             doc.items.map((value) => OrderItem.rehydrate(
@@ -33,9 +36,28 @@ export const OrderMapper = {
 
         )
     },
-    aggregateToPersistence(order: OrderAggregate): OrderPersistence {
+    aggregateToPersistence(order: OrderAggregate) {
         return {
             _id: order.id.value,
+            idempotentKey: order.idempotentKey.value,
+            buyerId: order.buyerId.value,
+            totalPrice: order.totalPrice.value,
+            status: order.status.toStatusType(),
+            address: order.address.value,
+            deleted: {
+                deleted: order.delete.deleted,
+                deletedFrom: order.delete.from?.value ?? null,
+                deletedBy: order.delete.performedBy?.value ?? null,
+                reason: order.delete.reason?.value ?? null,
+            },
+            items: order.items.map((value) => ({ variantId: value.variantId.value, quantity: value.quantity.value, unitPrice: value._unitPrice.value })),
+            createdAt: order.createdAt.value,
+            updatedAt: EffectiveDate.today().value,
+        }
+    },
+    aggregateToReadModel(order: OrderAggregate): OrderReadModel {
+        return {
+            id: order.id.value,
             version: order.version.value,
             buyerId: order.buyerId.value,
             totalPrice: order.totalPrice.value,
@@ -47,9 +69,56 @@ export const OrderMapper = {
                 deletedBy: order.delete.performedBy?.value ?? null,
                 reason: order.delete.reason?.value ?? null,
             },
-            items: order.items.map((value) -=),
-            version: order.version.value,
+            items: order.items.map((value) => ({
+                variantId: value.variantId.value,
+                quantity: value.quantity.value,
+                unitPrice: value._unitPrice.value
+            })),
             createdAt: order.createdAt.value,
-            updatedAt: EffectiveDate.today().value,
+
+
         }
     }
+    ,
+    persistenceToReadModel(doc: OrderPersistence): OrderReadModel {
+        return {
+            id: doc._id,
+            version: doc.version,
+            buyerId: doc.buyerId,
+            totalPrice: doc.totalPrice,
+            status: doc.status,
+            address: doc.address,
+            deleted: {
+                deleted: doc.deleted.deleted,
+                deletedFrom: doc.deleted.deletedFrom ?? null,
+                deletedBy: doc.deleted.deletedBy ?? null,
+                reason: doc.deleted.reason ?? null,
+            },
+            items: doc.items.map((value) => ({
+                variantId: value.variantId,
+                quantity: value.quantity,
+                unitPrice: value.unitPrice
+            })),
+            createdAt: doc.createdAt,
+
+        }
+    }
+    ,
+    aggregateToResponseReadModel(order: OrderAggregate): OrderResponseReadModel {
+        return {
+            id: order.id.value,
+            buyerId: order.buyerId.value,
+            totalPrice: order.totalPrice.value,
+            status: order.status.toStatusType(),
+            address: order.address.value,
+            items: order.items.map((value) => ({
+                variantId: value.variantId.value,
+                quantity: value.quantity.value,
+                unitPrice: value._unitPrice.value
+            })),
+            createdAt: order.createdAt.value,
+
+
+        }
+    }
+}

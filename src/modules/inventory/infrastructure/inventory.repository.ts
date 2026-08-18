@@ -8,8 +8,7 @@ import { InventoryModel, type InventoryPersistence } from './inventory.model';
 
 export class InventoryReposityory
     extends MongoRepository<InventoryPersistence>
-    implements IIventoryRepository
-{
+    implements IIventoryRepository {
     constructor() {
         super(InventoryModel);
     }
@@ -18,6 +17,11 @@ export class InventoryReposityory
         const doc = await super.findById(id.value);
         if (!doc) return null;
         return InventoryMapper.persistenceToAggregate(doc);
+    }
+    async FindByVariantIds(ids: Id[]): Promise<InventoryAggregate[]> {
+        const variantIdValues = ids.map(id => id.value);
+        const docs = await super.find({ variantId: { $in: variantIdValues } });
+        return docs.map(doc => InventoryMapper.persistenceToAggregate(doc));
     }
 
     async FindByVariantId(id: Id): Promise<InventoryAggregate | null> {

@@ -4,6 +4,7 @@ import type { ProductAggregate } from '../product.aggregate';
 export interface IProductRepository {
     FindById(id: Id): Promise<ProductAggregate | null>;
     FindByVendorId(id: Id): Promise<ProductAggregate | null>;
+    FindByIds(id: Id[]): Promise<ProductAggregate[]>
     FindByIdOrThrow(id: Id): Promise<ProductAggregate>;
     FindByVendorIdOrThrow(id: Id): Promise<ProductAggregate>;
     Save(user: ProductAggregate): Promise<void>;

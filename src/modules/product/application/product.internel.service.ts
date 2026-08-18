@@ -20,4 +20,24 @@ export class ProductInternelService extends BaseService {
             return { product: ProductReadModel, active: false };
         return { product: ProductReadModel, active: true };
     }
+
+    async verifyProductAndGet(ids: Id[]): Promise<{
+        validIds: Id[], invalidIds: Id[], products: ProductReadModel[]
+    }> {
+        const products = await this.productRepo.FindByIds(ids);
+        const foundIds = new Set(products.map(p => p.id));
+
+        const validProducts = products.filter(p =>
+            !p.delete.deleted && !p.block.blocked
+        );
+        const validIds = validProducts.map((value) => (value.id));
+        const notFound = products.filter(id => !foundIds.has(id.id));
+        const notFoundIds = notFound.map((value) => (value.id));
+        const deletedIds = products.filter(p => p.delete.deleted).map(p => p.id);
+        const bannedIds = products.filter(p => p.block.blocked).map(p => p.id);
+        const invalidIds = [...notFoundIds, ...deletedIds, ...bannedIds];
+
+        return { validIds, invalidIds, products: products.map((value) => ProductMapper.aggregateToReadModel(value)) }
+    }
+
 }

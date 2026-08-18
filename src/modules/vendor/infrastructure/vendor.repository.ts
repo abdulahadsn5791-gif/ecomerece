@@ -10,8 +10,7 @@ import { VendorModel, type VendorPersistence } from './vendor.models';
 
 export class VendorRepository
     extends MongoRepository<VendorPersistence>
-    implements IVendorRepository
-{
+    implements IVendorRepository {
     constructor() {
         super(VendorModel);
     }
@@ -33,6 +32,12 @@ export class VendorRepository
 
         return VendorMapper.persistenceToAggregate(doc);
     }
+    async FindByIds(ids: Id[]): Promise<VendorAggregate[]> {
+        const vendorIds = ids.map((value) => (value.value));
+        const docs = await super.find(vendorIds);
+        return docs.map((value) => VendorMapper.persistenceToAggregate(value));
+    }
+
 
     async FindByIdOrThrow(id: Id): Promise<VendorAggregate> {
         const doc = await super.findById(id.value);

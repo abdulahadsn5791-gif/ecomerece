@@ -52,4 +52,7 @@ export class VendorInternalService extends BaseService {
             return { vendor: VendorMapper.aggregateToReadModel(vendor), active: false };
         return { vendor: VendorMapper.aggregateToReadModel(vendor), active: true };
     }
+    async verifyVendorAndGet(ids: Id[]) {
+
+    }
 }

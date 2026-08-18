@@ -7,6 +7,8 @@ import { BaseService } from "../../../core/services/base.services";
 import { BadRequestError } from "../../../errors/app-error";
 import { EnsureActiveAddressGetByIdQuery } from "../../address/application/queries/ensure-active-address-get-by-it.query";
 import { AddressPersistence } from "../../address/infrastructure/address.models";
+import { VerifyVariantsAndGetQuery } from "../../product-variant/application/queries/verify-variants-and-get.query";
+import { VerifyProductAndGetQuery } from "../../product/application/queries/verify-product-and-get.query";
 import { EnsureActiveUserGetByIdQuery } from "../../user/application/queries/ensure-active-user-get-by-id.query";
 import { UserPersistence } from "../../user/infrastructure/user.models";
 import { OrderAggregate } from "../domain/order.aggregate";
@@ -25,10 +27,15 @@ export class OrderApplicationService extends BaseService {
 
 
     async canCreateOrder(userId: Id, addressId: Id, orderItems: OrderItem[]) {
-        const [address, user] = await Promise.all([
-            this.queryBus.execute(new EnsureActiveAddressGetByIdQuery({ addressId: addressId })),
-            this.queryBus.execute(new EnsureActiveUserGetByIdQuery({ userId: userId })),
-        ]);
+        const variantIds = orderItems.map((value) => (value._variantId))
+
+        const address = await this.queryBus.execute(new EnsureActiveAddressGetByIdQuery({ addressId: addressId }));
+        const user = await this.queryBus.execute(new EnsureActiveUserGetByIdQuery({ userId: userId }));
+        const variants = await this.queryBus.execute(new VerifyVariantsAndGetQuery({ ids: variantIds }));
+        const productsIds = variants.variantReadModel.map((value) => (value.productId));
+        const products = await this.queryBus.execute(new VerifyProductAndGetQuery({ ids: productsIds }));
+        const vendorIds = products.products.map((value) => (value.vendorId));
+
 
         if (!address.active) throw new BadRequestError("Address is not active");
         if (!address.address || !address) throw new BadRequestError("Address not found");

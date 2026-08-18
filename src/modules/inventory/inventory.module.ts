@@ -1,5 +1,5 @@
 import { queryBus } from '../../core/domain/infrastructure/in-memory-query-bus';
-import { VerifyInventoriesItemsGetQueryHander } from './application/event-handlers/verify-inventories-items-get.query-handler';
+import { VerifyInventoriesItemsGetQueryHander } from './application/query-handlers/verify-inventories-items-get.query-handler';
 import { InventoryApplicationService } from './application/inventory.app.service';
 import { InventoryInternalServcie } from './application/inventory.internal.service';
 import { VerifyInventoriesItemsGetQuery } from './application/queries/verify-inventories-items-get.query';

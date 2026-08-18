@@ -9,8 +9,7 @@ import { ProductVariantModel, type ProductVariantPersistence } from './product-v
 
 export class ProductVariantRepository
     extends MongoRepository<ProductVariantPersistence>
-    implements IProductVariantRepository
-{
+    implements IProductVariantRepository {
     constructor() {
         super(ProductVariantModel);
     }
@@ -19,6 +18,12 @@ export class ProductVariantRepository
         const doc = await super.findById(id.value);
         if (!doc) return null;
         return productVariantMapper.persistenceToAggregate(doc);
+    }
+
+    async FindByIds(id: Id[]): Promise<ProductVariantAggregate[]> {
+        const ids = id.map((value) => (value.toString()));
+        const docs = await super.find(ids);
+        return docs.map((value) => (productVariantMapper.persistenceToAggregate(value)));
     }
 
     async FindByIdOrThrow(id: Id): Promise<ProductVariantAggregate> {

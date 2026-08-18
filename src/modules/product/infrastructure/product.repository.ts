@@ -8,8 +8,7 @@ import { ProductModel, type ProductPersistence } from './product.model';
 
 export class ProductRepository
     extends MongoRepository<ProductPersistence>
-    implements IProductRepository
-{
+    implements IProductRepository {
     constructor() {
         super(ProductModel);
     }
@@ -21,6 +20,14 @@ export class ProductRepository
 
         return ProductMapper.persistenceToAggregate(doc);
     }
+
+    async FindByIds(id: Id[]): Promise<ProductAggregate[]> {
+
+        const ids = id.map((value) => (value.value));
+        const products = await super.find({ id: { $in: ids } });
+        return products.map((value) => (ProductMapper.persistenceToAggregate(value)));
+    }
+
 
     async EnsureOwnerShip(productId: Id, vendorId: Id): Promise<ProductAggregate | null> {
         const doc = await super.findOne({

@@ -57,7 +57,8 @@ export class VendorInternalService extends BaseService {
 
         const existingVendorIds = new Set(vendors.map(variant => variant.id.value));
         const validIds = ids.filter(id => existingVendorIds.has(id.value));
-        const invalidIds = ids.filter(id => !existingVendorIds.has(id.value));
+        const notFoundIds = ids.filter(id => !existingVendorIds.has(id.value));
+        const blockedIds = vendors.filter(p => p.delete.).map(p => p.id);
         const vendorReadModel = vendors.map((value) => (VendorMapper.aggregateToReadModel(value)));
         return { validIds, invalidIds, vendorReadModel }
 

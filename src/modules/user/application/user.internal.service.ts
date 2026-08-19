@@ -49,8 +49,12 @@ export class UserInternalService extends BaseService {
         const users = await this.userRepo.FindByIds(ids);
         const existingUserIds = new Set(users.map(variant => variant.id.value));
         const validIds = ids.filter(id => existingUserIds.has(id.value));
-        const invalidIds = ids.filter(id => !existingUserIds.has(id.value));
+        const notFoundIds = ids.filter(id => !existingUserIds.has(id.value));
+        const bannedIds = users.filter(p => p.ban.isBan).map(p => p.id);
+        const blockedIds = users.filter(p => p.block.isBlocked).map(p => p.id);
+        const deletedIds = users.filter(p => p.deleted.deleted).map(p => p.id);
         const usersReadModel = users.map((value) => (UserMapper.aggregateToReadModel(value)));
+        const invalidIds = [...notFoundIds, ...bannedIds, ...blockedIds, ...deletedIds];
         return { validIds, invalidIds, usersReadModel }
     }
 }

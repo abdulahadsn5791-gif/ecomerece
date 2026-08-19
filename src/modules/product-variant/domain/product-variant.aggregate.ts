@@ -127,6 +127,7 @@ export class ProductVariantAggregate extends AggregateRoot {
     deleteProduct(actorId: Id, reason: Reason) {
         if (this._delete.deleted) throw new BadRequestError('Product Variant was already removed');
         this._delete = DeleteInfoVO.create(actorId, reason);
+        this._active = false;
     }
 
     recoverProduct(actorId: Id) {

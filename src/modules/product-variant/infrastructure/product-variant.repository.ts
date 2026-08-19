@@ -21,8 +21,12 @@ export class ProductVariantRepository
     }
 
     async FindByIds(id: Id[]): Promise<ProductVariantAggregate[]> {
-        const ids = id.map((value) => (value.toString()));
-        const docs = await super.find(ids);
+        const ids = id.map((value) => (value.value));
+        const filter = {
+            _id: { $in: ids }
+        };
+
+        const docs = await super.find(filter);
         return docs.map((value) => (productVariantMapper.persistenceToAggregate(value)));
     }
 

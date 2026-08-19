@@ -44,4 +44,13 @@ export class UserInternalService extends BaseService {
 
         return { user, active: true };
     }
+
+    async verifyUserAndGet(ids: Id[]): Promise<{ validIds: Id[], invalidIds: Id[], usersReadModel: UserReadModel[] }> {
+        const users = await this.userRepo.FindByIds(ids);
+        const existingUserIds = new Set(users.map(variant => variant.id.value));
+        const validIds = ids.filter(id => existingUserIds.has(id.value));
+        const invalidIds = ids.filter(id => !existingUserIds.has(id.value));
+        const usersReadModel = users.map((value) => (UserMapper.aggregateToReadModel(value)));
+        return { validIds, invalidIds, usersReadModel }
+    }
 }

@@ -10,6 +10,8 @@ import { VendorAppService } from './application/vendor.app.service';
 import { VendorInternalService } from './application/vendor.internal.service';
 import { VendorRepository } from './infrastructure/vendor.repository';
 import { VendorController } from './presentation/vendor.controller';
+import { VerifyVendorAndGetHandler } from './application/query-handlers/verify-vendor-and-get.query-handler';
+import { VerifyVendorAndGetQuery } from './application/queries/verify-vendor-and-get.query';
 
 export function CreateVendorModule() {
     const repo = new VendorRepository();
@@ -20,6 +22,11 @@ export function CreateVendorModule() {
         EnsureActiveVendorGetByIdQuery,
         new EnsureActiveVendorGetByIdHandler(internalService),
     );
+    queryBus.register(
+        VerifyVendorAndGetQuery,
+        new VerifyVendorAndGetHandler(internalService),
+    );
+
     queryBus.register(EnsureActiveVendorQuery, new EnsureActiveVendorHandler(internalService));
     queryBus.register(GetVendorByUserIdQuery, new GetVendorByUserIdHandler(internalService));
     const appService = new VendorAppService(repo, eventBus, internalService);

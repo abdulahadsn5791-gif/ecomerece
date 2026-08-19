@@ -29,12 +29,15 @@ export class VendorRepository
     async FindById(id: Id): Promise<VendorAggregate | null> {
         const doc = await super.findById(id.value);
         if (!doc) return null;
-
         return VendorMapper.persistenceToAggregate(doc);
     }
-    async FindByIds(ids: Id[]): Promise<VendorAggregate[]> {
-        const vendorIds = ids.map((value) => (value.value));
-        const docs = await super.find(vendorIds);
+    async FindByIds(id: Id[]): Promise<VendorAggregate[]> {
+        const ids = id.map((value) => (value.value));
+        const filter = {
+            _id: { $in: ids }
+        };
+
+        const docs = await super.find(filter);
         return docs.map((value) => VendorMapper.persistenceToAggregate(value));
     }
 

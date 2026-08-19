@@ -52,7 +52,14 @@ export class VendorInternalService extends BaseService {
             return { vendor: VendorMapper.aggregateToReadModel(vendor), active: false };
         return { vendor: VendorMapper.aggregateToReadModel(vendor), active: true };
     }
-    async verifyVendorAndGet(ids: Id[]) {
+    async verifyVendorAndGet(ids: Id[]): Promise<{ validIds: Id[], invalidIds: Id[], vendorReadModel: VendorReadModel[] }> {
+        const vendors = await this.vendorRepo.FindByIds(ids);
+
+        const existingVendorIds = new Set(vendors.map(variant => variant.id.value));
+        const validIds = ids.filter(id => existingVendorIds.has(id.value));
+        const invalidIds = ids.filter(id => !existingVendorIds.has(id.value));
+        const vendorReadModel = vendors.map((value) => (VendorMapper.aggregateToReadModel(value)));
+        return { validIds, invalidIds, vendorReadModel }
 
     }
 }

@@ -17,6 +17,16 @@ export class UserRepository extends MongoRepository<UserPersistence> implements 
         return UserMapper.persistenceToAggregate(doc);
     }
 
+    async FindByIds(id: Id[]): Promise<UserAggregate[]> {
+        const ids = id.map((value) => (value.value));
+        const filter = {
+            _id: { $in: ids }
+        };
+
+        const docs = await super.find(filter);
+        return docs.map((value) => UserMapper.persistenceToAggregate(value));
+    }
+
     async FindByEmail(email: EmailVO): Promise<UserAggregate | null> {
         const doc = await super.findOne({ email: email.value });
         if (!doc) return null;

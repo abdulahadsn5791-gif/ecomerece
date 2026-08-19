@@ -27,7 +27,7 @@ export class productVariantInternalService extends BaseService {
         const variants = await this.variantRepo.FindByIds(ids);
         const existingVariantIds = new Set(variants.map(variant => variant.id.value));
         const validIds = ids.filter(id => existingVariantIds.has(id.value));
-        const invalidIds = ids.filter(id => !existingVariantIds.has(id.value));
+        const NotfoundIds = ids.filter(id => !existingVariantIds.has(id.value));
         const variantReadModel = variants.map((value) => (productVariantMapper.aggregateToReadModel(value)));
         return {
             validIds,

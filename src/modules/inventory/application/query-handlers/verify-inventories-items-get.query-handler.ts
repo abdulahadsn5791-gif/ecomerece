@@ -11,7 +11,7 @@ export class VerifyInventoriesItemsGetQueryHander {
     constructor(private readonly internalService: InventoryInternalServcie) { }
     async handle(
         query: VerifyInventoriesItemsGetQuery,
-    ): Promise<{ invalidIds: Id[], validIds: Id[], availableStockIds: Id[], buyableIds: Id[], inventoriesReadModel: InventoryReadModel[] }> {
+    ): Promise<{ validIds: Id[]; notFoundIds: Id[]; deletedIds: Id[]; availableStockIds: Id[]; buyableIds: Id[]; inventoriesReadModel: InventoryReadModel[]; }> {
         return await this.internalService.verifyInventoriesItemsGet(query.payload.inventoryItems);
     }
 }

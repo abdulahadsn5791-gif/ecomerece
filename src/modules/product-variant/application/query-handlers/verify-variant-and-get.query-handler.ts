@@ -8,7 +8,13 @@ export class VerifyVariantsAndGetHandler {
     constructor(private readonly internalService: productVariantInternalService) { }
     async handle(
         query: VerifyVariantsAndGetQuery,
-    ): Promise<{ validIds: Id[], invalidIds: Id[], variantReadModel: ProductVariantReadModel[] }> {
+    ): Promise<{
+        validIds: Id[],
+        notFoundIds: Id[],
+        deletedIds: Id[],
+        nonActiveIds: Id[],
+        variantReadModel: ProductVariantReadModel[]
+    }> {
         return await this.internalService.verifyVariantsAndGet(query.payload.ids);
     }
 }

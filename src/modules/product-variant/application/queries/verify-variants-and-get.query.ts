@@ -3,8 +3,20 @@ import { Id } from "../../../../core/domain/value-objects/id.vo";
 import { ProductVariantReadModel } from "../../domain/read-models/product-variant.read-model";
 
 export class VerifyVariantsAndGetQuery
-    implements IQuery<{ validIds: Id[], invalidIds: Id[], variantReadModel: ProductVariantReadModel[] }> {
-    readonly __result?: { validIds: Id[], invalidIds: Id[], variantReadModel: ProductVariantReadModel[] }
+    implements IQuery<{
+        validIds: Id[],
+        notFoundIds: Id[],
+        deletedIds: Id[],
+        nonActiveIds: Id[],
+        variantReadModel: ProductVariantReadModel[]
+    }> {
+    readonly __result?: {
+        validIds: Id[],
+        notFoundIds: Id[],
+        deletedIds: Id[],
+        nonActiveIds: Id[],
+        variantReadModel: ProductVariantReadModel[]
+    }
     readonly type = 'VerifyVariantsAndGetQuery';
     public readonly payload: { ids: Id[] };
 

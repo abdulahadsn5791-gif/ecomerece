@@ -22,22 +22,29 @@ export class ProductInternelService extends BaseService {
     }
 
     async verifyProductAndGet(ids: Id[]): Promise<{
-        validIds: Id[], invalidIds: Id[], products: ProductReadModel[]
+        validIds: Id[],
+        notFoundIds: Id[],
+        deletedIds: Id[],
+        blockedIds: Id[],
+        productReadModel: ProductReadModel[]
     }> {
         const products = await this.productRepo.FindByIds(ids);
-        const foundIds = new Set(products.map(p => p.id));
-
-        const validProducts = products.filter(p =>
-            !p.delete.deleted && !p.block.blocked
-        );
-        const validIds = validProducts.map((value) => (value.id));
-        const notFound = products.filter(id => !foundIds.has(id.id));
-        const notFoundIds = notFound.map((value) => (value.id));
+        const validProducts = products.filter(p => !p.delete.deleted && !p.block.blocked);
+        const validIdValues = new Set(validProducts.map(p => p.id.value));
+        const existingProductIds = new Set(products.map(p => p.id.value));
+        const foundIds = ids.filter(id => existingProductIds.has(id.value));
+        const notFoundIds = ids.filter(id => !existingProductIds.has(id.value));
         const deletedIds = products.filter(p => p.delete.deleted).map(p => p.id);
-        const bannedIds = products.filter(p => p.block.blocked).map(p => p.id);
-        const invalidIds = [...notFoundIds, ...deletedIds, ...bannedIds];
-
-        return { validIds, invalidIds, products: products.map((value) => ProductMapper.aggregateToReadModel(value)) }
+        const blockedIds = products.filter(p => p.block.blocked).map(p => p.id);
+        const validIds = foundIds.filter(id => validIdValues.has(id.value));
+        const productReadModel = validProducts.map(p => ProductMapper.aggregateToReadModel(p));
+        return {
+            validIds,
+            notFoundIds,
+            deletedIds,
+            blockedIds,
+            productReadModel
+        };
     }
 
 }

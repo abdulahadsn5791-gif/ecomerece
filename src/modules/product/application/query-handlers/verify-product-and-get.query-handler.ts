@@ -10,7 +10,13 @@ export class VerifyProductAndGetHandler {
     constructor(private readonly internalService: ProductInternelService) { }
     async handle(
         query: VerifyProductAndGetQuery,
-    ): Promise<{ validIds: Id[], invalidIds: Id[], products: ProductReadModel[] }> {
+    ): Promise<{
+        validIds: Id[],
+        notFoundIds: Id[],
+        deletedIds: Id[],
+        blockedIds: Id[],
+        productReadModel: ProductReadModel[]
+    }> {
         return await this.internalService.verifyProductAndGet(query.payload.ids);
     }
 }

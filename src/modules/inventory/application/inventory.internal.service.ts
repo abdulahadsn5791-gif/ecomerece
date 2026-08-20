@@ -8,19 +8,38 @@ import { InventoryReposityory } from "../infrastructure/inventory.repository";
 export class InventoryInternalServcie extends BaseService {
     constructor(private readonly inventoryRepo: InventoryReposityory) { super(); }
 
-    async verifyInventoriesItemsGet(inventoryItems: OrderItem[]): Promise<{ invalidIds: Id[], validIds: Id[], availableStockIds: Id[], buyableIds: Id[], inventoriesReadModel: InventoryReadModel[] }> {
+    async verifyInventoriesItemsGet(
+        inventoryItems: OrderItem[]
+    ): Promise<{
+        validIds: Id[];
+        notFoundIds: Id[];
+        deletedIds: Id[];
+        availableStockIds: Id[];
+        buyableIds: Id[];
+        inventoriesReadModel: InventoryReadModel[];
+    }> {
         const variantIds = inventoryItems.map(item => Id.create(item.variantId.value));
         const inventories = await this.inventoryRepo.FindByVariantIds(variantIds);
-        const inventoryVariantIdSet = new Set(inventories.map(inv => inv.variantId.value));
-        const invalidIds = variantIds.filter(id => !inventoryVariantIdSet.has(id.value));
-        const validIds = variantIds.filter(id => inventoryVariantIdSet.has(id.value));
-        const availableStockIds = [...new Set(inventories
+        const validInventories = inventories.filter(inv => !inv.delete.deleted);
+        const validIdValues = new Set(validInventories.map(inv => inv.variantId.value));
+        const existingInventoryVariantIds = new Set(inventories.map(inv => inv.variantId.value));
+        const foundIds = variantIds.filter(id => existingInventoryVariantIds.has(id.value));
+        const notFoundIds = variantIds.filter(id => !existingInventoryVariantIds.has(id.value));
+        const deletedIds = inventories.filter(inv => inv.delete.deleted).map(inv => Id.create(inv.variantId.value));
+        const validIds = foundIds.filter(id => validIdValues.has(id.value));
+        const availableStockIds = validInventories
             .filter(inv => inv.available.value > 0)
-            .map(inv => Id.create(inv.variantId.value))
-        )];
+            .map(inv => Id.create(inv.variantId.value));
         const buyableIds = availableStockIds;
-        const inventoriesReadModel = inventories.map((value) => (InventoryMapper.aggregateToReadModel(value)));
-        return { invalidIds, validIds, availableStockIds, buyableIds, inventoriesReadModel };
+        const inventoriesReadModel = validInventories.map(inv => InventoryMapper.aggregateToReadModel(inv));
+        return {
+            validIds,
+            notFoundIds,
+            deletedIds,
+            availableStockIds,
+            buyableIds,
+            inventoriesReadModel,
+        };
     }
 
 }

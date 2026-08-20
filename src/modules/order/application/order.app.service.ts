@@ -35,18 +35,59 @@ export class OrderApplicationService extends BaseService {
     ) { super() }
 
     getReport(
-        variants: { validIds: Id[]; invalidIds: Id[]; variantReadModel: ProductVariantReadModel[] },
-        products: { validIds: Id[]; invalidIds: Id[]; products: ProductReadModel[] },
-        vendors: { validIds: Id[]; invalidIds: Id[]; vendorReadModel: VendorReadModel[] },
-        owners: { validIds: Id[]; invalidIds: Id[]; usersReadModel: UserReadModel[] }
+        variants: {
+            validIds: Id[];
+            notFoundIds: Id[];
+            deletedIds: Id[];
+            nonActiveIds: Id[];
+            variantReadModel: ProductVariantReadModel[];
+        },
+        products: {
+            validIds: Id[];
+            notFoundIds: Id[];
+            deletedIds: Id[];
+            blockedIds: Id[];
+            productReadModel: ProductReadModel[];
+        },
+        vendors: {
+            validIds: Id[];
+            notFoundIds: Id[];
+            deletedIds: Id[];
+            nonVerifiedIds: Id[];
+            vendorReadModel: VendorReadModel[];
+        },
+        owners: {
+            validIds: Id[];
+            notFoundIds: Id[];
+            bannedIds: Id[];
+            blockedIds: Id[];
+            deletedIds: Id[];
+            userReadModel: UserReadModel[];
+        }
     ) {
-        // 1. Convert invalid IDs to their string values (Sets of strings)
-        const invalidVariants = new Set(variants.invalidIds.map(id => id.value));
-        const invalidProducts = new Set(products.invalidIds.map(id => id.value));
-        const invalidVendors = new Set(vendors.invalidIds.map(id => id.value));
-        const invalidOwners = new Set(owners.invalidIds.map(id => id.value));
+        // ----- 1. Build direct error maps (ID → error code) -----
+        const ownerErrors = new Map<string, string>();
+        owners.notFoundIds.forEach(id => ownerErrors.set(id.value, 'NOT_FOUND'));
+        owners.bannedIds.forEach(id => ownerErrors.set(id.value, 'BANNED'));
+        owners.blockedIds.forEach(id => ownerErrors.set(id.value, 'BLOCKED'));
+        owners.deletedIds.forEach(id => ownerErrors.set(id.value, 'DELETED'));
 
-        // 2. Build parent → child relationships using Maps with string keys
+        const vendorErrors = new Map<string, string>();
+        vendors.notFoundIds.forEach(id => vendorErrors.set(id.value, 'NOT_FOUND'));
+        vendors.deletedIds.forEach(id => vendorErrors.set(id.value, 'DELETED'));
+        vendors.nonVerifiedIds.forEach(id => vendorErrors.set(id.value, 'UNVERIFIED'));
+
+        const productErrors = new Map<string, string>();
+        products.notFoundIds.forEach(id => productErrors.set(id.value, 'NOT_FOUND'));
+        products.deletedIds.forEach(id => productErrors.set(id.value, 'DELETED'));
+        products.blockedIds.forEach(id => productErrors.set(id.value, 'BLOCKED'));
+
+        const variantErrors = new Map<string, string>();
+        variants.notFoundIds.forEach(id => variantErrors.set(id.value, 'NOT_FOUND'));
+        variants.deletedIds.forEach(id => variantErrors.set(id.value, 'DELETED'));
+        variants.nonActiveIds.forEach(id => variantErrors.set(id.value, 'INACTIVE'));
+
+        // ----- 2. Build parent → child relationships (ID string → string[]) -----
         const productToVariants = new Map<string, string[]>();
         for (const v of variants.variantReadModel) {
             const key = Id.create(v.productId).value;
@@ -56,7 +97,7 @@ export class OrderApplicationService extends BaseService {
         }
 
         const vendorToProducts = new Map<string, string[]>();
-        for (const p of products.products) {
+        for (const p of products.productReadModel) {
             const key = Id.create(p.vendorId).value;
             const list = vendorToProducts.get(key) || [];
             list.push(Id.create(p.id).value);
@@ -71,23 +112,40 @@ export class OrderApplicationService extends BaseService {
             ownerToVendors.set(key, list);
         }
 
-        // 3. Propagate invalidity top‑down (owner → vendor → product → variant)
-        for (const ownerId of invalidOwners) {
+        // ----- 3. Propagate errors TOP‑DOWN (only if child doesn't already have a direct error) -----
+        // Owner → Vendor
+        for (const [ownerId, error] of ownerErrors) {
             const vendorsList = ownerToVendors.get(ownerId) || [];
-            for (const vid of vendorsList) invalidVendors.add(vid);
-        }
-        for (const vendorId of invalidVendors) {
-            const productsList = vendorToProducts.get(vendorId) || [];
-            for (const pid of productsList) invalidProducts.add(pid);
-        }
-        for (const productId of invalidProducts) {
-            const variantsList = productToVariants.get(productId) || [];
-            for (const vid of variantsList) invalidVariants.add(vid);
+            for (const vendorId of vendorsList) {
+                if (!vendorErrors.has(vendorId)) {
+                    vendorErrors.set(vendorId, `OWNER_${error}`);
+                }
+            }
         }
 
-        // 4. Quick lookup Maps for product / vendor details (string keys)
+        // Vendor → Product
+        for (const [vendorId, error] of vendorErrors) {
+            const productsList = vendorToProducts.get(vendorId) || [];
+            for (const productId of productsList) {
+                if (!productErrors.has(productId)) {
+                    productErrors.set(productId, `VENDOR_${error}`);
+                }
+            }
+        }
+
+        // Product → Variant
+        for (const [productId, error] of productErrors) {
+            const variantsList = productToVariants.get(productId) || [];
+            for (const variantId of variantsList) {
+                if (!variantErrors.has(variantId)) {
+                    variantErrors.set(variantId, `PRODUCT_${error}`);
+                }
+            }
+        }
+
+        // ----- 4. Quick lookup Maps for product / vendor details (optional, for validation) -----
         const productMap = new Map<string, ProductReadModel>();
-        for (const p of products.products) {
+        for (const p of products.productReadModel) {
             productMap.set(Id.create(p.id).value, p);
         }
 
@@ -96,42 +154,30 @@ export class OrderApplicationService extends BaseService {
             vendorMap.set(Id.create(v.id).value, v);
         }
 
-        // 5. Generate report for each variant
+        // ----- 5. Generate report for each variant -----
         const report = [];
         for (const v of variants.variantReadModel) {
-            let reason: string | null = null;
             const vid = Id.create(v.id).value;
             const pid = Id.create(v.productId).value;
 
-            if (invalidVariants.has(vid)) {
-                reason = 'variant';
-            } else {
-                const product = productMap.get(pid);
-                if (!product || invalidProducts.has(Id.create(product.id).value)) {
-                    reason = 'product';
-                } else {
-                    const vendor = vendorMap.get(Id.create(product.vendorId).value);
-                    if (!vendor || invalidVendors.has(Id.create(vendor.id).value)) {
-                        reason = 'vendor';
-                    } else if (invalidOwners.has(Id.create(vendor.ownerId).value)) {
-                        reason = 'owner';
-                    }
-                }
-            }
+            // Check if the variant has a final error (direct or propagated)
+            let finalError = variantErrors.get(vid);
 
+            // If no error, it's valid.
+            const valid = !finalError;
+
+            // Optional: If you still want to know which parent failed (for debugging),
+            // you can keep the `reason` as the specific error code.
             report.push({
                 id: v.id,
                 productId: v.productId,
-                valid: reason === null,
-                reason,
+                valid,
+                reason: finalError || null, // e.g., 'BLOCKED', 'VENDOR_DELETED', 'OWNER_BANNED', etc.
             });
         }
 
         return report;
     }
-
-
-
 
 
     async canCreateOrder(userId: Id, addressId: Id, orderItems: OrderItem[]) {
@@ -142,7 +188,7 @@ export class OrderApplicationService extends BaseService {
         const variants = await this.queryBus.execute(new VerifyVariantsAndGetQuery({ ids: variantIds }));
         const productsIds = variants.variantReadModel.map((value) => (value.productId));
         const products = await this.queryBus.execute(new VerifyProductAndGetQuery({ ids: productsIds }));
-        const vendorIds = products.products.map((value) => Id.create((value.vendorId)));
+        const vendorIds = products.productReadModel.map((value) => Id.create((value.vendorId)));
         const vendors = await this.queryBus.execute(new VerifyVendorAndGetQuery({ ids: vendorIds }));
         const ownerIds = vendors.vendorReadModel.map((value) => Id.create((value.id)));
         const owners = await this.queryBus.execute(new VerifyUserAndGetQuery({ ids: ownerIds }));

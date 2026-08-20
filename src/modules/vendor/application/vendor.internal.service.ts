@@ -52,15 +52,20 @@ export class VendorInternalService extends BaseService {
             return { vendor: VendorMapper.aggregateToReadModel(vendor), active: false };
         return { vendor: VendorMapper.aggregateToReadModel(vendor), active: true };
     }
-    async verifyVendorAndGet(ids: Id[]): Promise<{ validIds: Id[], invalidIds: Id[], vendorReadModel: VendorReadModel[] }> {
-        const vendors = await this.vendorRepo.FindByIds(ids);
 
-        const existingVendorIds = new Set(vendors.map(variant => variant.id.value));
-        const validIds = ids.filter(id => existingVendorIds.has(id.value));
+    async verifyVendorAndGet(ids: Id[]): Promise<{ validIds: Id[], notFoundIds: Id[], deletedIds: Id[], nonVerifiedIds: Id[], vendorReadModel: VendorReadModel[] }> {
+        const vendors = await this.vendorRepo.FindByIds(ids);
+        const validVendors = vendors.filter(v => !v.delete.isDeleted && v.verification.isVerified);
+        const validIdValues = new Set(validVendors.map(v => v.id.value));
+        const existingVendorIds = new Set(vendors.map(v => v.id.value));
+        const foundIds = ids.filter(id => existingVendorIds.has(id.value));
         const notFoundIds = ids.filter(id => !existingVendorIds.has(id.value));
-        const blockedIds = vendors.filter(p => p.delete.).map(p => p.id);
-        const vendorReadModel = vendors.map((value) => (VendorMapper.aggregateToReadModel(value)));
-        return { validIds, invalidIds, vendorReadModel }
+        const deletedIds = vendors.filter(v => v.delete.isDeleted).map(v => v.id);
+        const nonVerifiedIds = vendors.filter(v => !v.verification.isVerified).map(v => v.id);
+        const validIds = foundIds.filter(id => validIdValues.has(id.value));
+        const vendorReadModel = validVendors.map(v => VendorMapper.aggregateToReadModel(v));
+        return { validIds, notFoundIds, deletedIds, nonVerifiedIds, vendorReadModel }
 
     }
+
 }

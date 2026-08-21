@@ -10,7 +10,7 @@ export interface VendorDeletedPayload {
 
 export class VendorDeletedEvent implements IEvent<VendorDeletedPayload> {
     readonly type = 'vendor.deleted';
-    readonly occurredOn = EffectiveDate.today()
+    readonly occurredOn = EffectiveDate.today();
 
-    constructor(public readonly payload: VendorDeletedPayload) { }
+    constructor(public readonly payload: VendorDeletedPayload) {}
 }

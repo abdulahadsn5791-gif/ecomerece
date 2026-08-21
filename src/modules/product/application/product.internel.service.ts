@@ -22,29 +22,28 @@ export class ProductInternelService extends BaseService {
     }
 
     async verifyProductAndGet(ids: Id[]): Promise<{
-        validIds: Id[],
-        notFoundIds: Id[],
-        deletedIds: Id[],
-        blockedIds: Id[],
-        productReadModel: ProductReadModel[]
+        validIds: Id[];
+        notFoundIds: Id[];
+        deletedIds: Id[];
+        blockedIds: Id[];
+        productReadModel: ProductReadModel[];
     }> {
         const products = await this.productRepo.FindByIds(ids);
-        const validProducts = products.filter(p => !p.delete.deleted && !p.block.blocked);
-        const validIdValues = new Set(validProducts.map(p => p.id.value));
-        const existingProductIds = new Set(products.map(p => p.id.value));
-        const foundIds = ids.filter(id => existingProductIds.has(id.value));
-        const notFoundIds = ids.filter(id => !existingProductIds.has(id.value));
-        const deletedIds = products.filter(p => p.delete.deleted).map(p => p.id);
-        const blockedIds = products.filter(p => p.block.blocked).map(p => p.id);
-        const validIds = foundIds.filter(id => validIdValues.has(id.value));
-        const productReadModel = validProducts.map(p => ProductMapper.aggregateToReadModel(p));
+        const validProducts = products.filter((p) => !p.delete.deleted && !p.block.blocked);
+        const validIdValues = new Set(validProducts.map((p) => p.id.value));
+        const existingProductIds = new Set(products.map((p) => p.id.value));
+        const foundIds = ids.filter((id) => existingProductIds.has(id.value));
+        const notFoundIds = ids.filter((id) => !existingProductIds.has(id.value));
+        const deletedIds = products.filter((p) => p.delete.deleted).map((p) => p.id);
+        const blockedIds = products.filter((p) => p.block.blocked).map((p) => p.id);
+        const validIds = foundIds.filter((id) => validIdValues.has(id.value));
+        const productReadModel = validProducts.map((p) => ProductMapper.aggregateToReadModel(p));
         return {
             validIds,
             notFoundIds,
             deletedIds,
             blockedIds,
-            productReadModel
+            productReadModel,
         };
     }
-
 }

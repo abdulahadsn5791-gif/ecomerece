@@ -1,7 +1,5 @@
-import mongoose, { Document, HydratedDocument, InferSchemaType, Schema } from "mongoose";
-import { idType } from "../../../../shared/dtos/id-schema";
-
-
+import mongoose, { Document, type HydratedDocument, InferSchemaType, Schema } from 'mongoose';
+import { idType } from '../../../../shared/dtos/id-schema';
 
 const deletedSchema = new mongoose.Schema(
     {
@@ -16,14 +14,15 @@ const deletedSchema = new mongoose.Schema(
 const itemSchema = new mongoose.Schema(
     {
         variantId: { type: String, required: true },
-        quantity: { type: Number, required: true, },
-        unitPrice: { type: Number, required: true, },
-    }, { _id: false }
+        quantity: { type: Number, required: true },
+        unitPrice: { type: Number, required: true },
+    },
+    { _id: false },
 );
 
 const OrderModelSchema = new Schema(
     {
-        _id: { type: String, required: true, },
+        _id: { type: String, required: true },
 
         idempotentKey: { type: String, required: true, unique: true },
 
@@ -39,12 +38,15 @@ const OrderModelSchema = new Schema(
         totalPrice: {
             type: Number,
             required: true,
-
+        },
+        waitingTime: {
+            type: Date,
+            required: true,
         },
         status: {
             type: String,
-            enum: ["pending", "confirmed", "completed", "returned", "refunded", "cancelled"],
-            required: true
+            enum: ['pending', 'confirmed', 'completed', 'returned', 'refunded', 'cancelled'],
+            required: true,
         },
         address: {
             type: String,
@@ -53,12 +55,10 @@ const OrderModelSchema = new Schema(
         deleted: {
             type: deletedSchema,
             required: true,
-
         },
         items: {
             type: [itemSchema],
             required: true,
-
         },
     },
     {
@@ -68,7 +68,7 @@ const OrderModelSchema = new Schema(
 );
 export interface OrderPersistence {
     _id: string;
-    idempotentKey: string,
+    idempotentKey: string;
     version: number;
     buyerId: string;
     totalPrice: number;
@@ -85,6 +85,7 @@ export interface OrderPersistence {
         quantity: number;
         unitPrice: number;
     }>;
+    waitingTime: Date;
     createdAt: Date;
     updatedAt: Date;
 }

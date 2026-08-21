@@ -9,7 +9,10 @@ import { AddressController } from './presentation/address.controller';
 export function createAddressModule() {
     const addressRepo = new AddressRepository();
     const addressInternalService = new AddressInternalService(addressRepo);
-    queryBus.register(EnsureActiveAddressGetByIdQuery, new EnsureActiveAddressGetByIdQueryHandler(addressInternalService),);
+    queryBus.register(
+        EnsureActiveAddressGetByIdQuery,
+        new EnsureActiveAddressGetByIdQueryHandler(addressInternalService),
+    );
     const addressApplicationService = new AddressApplicationService(addressRepo, queryBus);
     const addressController = new AddressController(addressApplicationService);
 

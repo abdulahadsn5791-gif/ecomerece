@@ -5,6 +5,6 @@ import type { BanInfoVO } from '../value-objects/ban-info.vo';
 
 export class UserBanLiftedEvent implements IEvent<{ userId: Id; banInfo: BanInfoVO }> {
     readonly type = 'user.ban-lifted';
-    readonly occurredOn = EffectiveDate.today()
-    constructor(public readonly payload: { userId: Id; banInfo: BanInfoVO }) { }
+    readonly occurredOn = EffectiveDate.today();
+    constructor(public readonly payload: { userId: Id; banInfo: BanInfoVO }) {}
 }

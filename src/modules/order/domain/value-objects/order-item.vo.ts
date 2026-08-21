@@ -1,5 +1,5 @@
-import { Id } from "../../../../core/domain/value-objects/id.vo";
-import { Quantity } from "../../../../core/domain/value-objects/quantity.vo";
+import type { Id } from '../../../../core/domain/value-objects/id.vo';
+import { Quantity } from '../../../../core/domain/value-objects/quantity.vo';
 
 export type OrderItemProps = {
     variantId: Id;
@@ -12,7 +12,7 @@ export class OrderItem {
         public readonly _variantId: Id,
         public readonly _quantity: Quantity,
         public readonly _unitPrice: Quantity,
-    ) { }
+    ) {}
 
     get totalPrice(): Quantity {
         return new Quantity(this._unitPrice.value * this._quantity.value);

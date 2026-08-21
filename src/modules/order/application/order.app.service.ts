@@ -1,38 +1,38 @@
-import { InMemoryEventBus } from "../../../core/domain/infrastructure/in-memory-event-bus";
-import { InMemoryQueryBus } from "../../../core/domain/infrastructure/in-memory-query-bus";
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { Quantity } from "../../../core/domain/value-objects/quantity.vo";
-import { FullAddressVO } from "../../../core/domain/value-objects/street-address.vo";
-import { BaseService } from "../../../core/services/base.services";
-import { BadRequestError } from "../../../errors/app-error";
-import { EnsureActiveAddressGetByIdQuery } from "../../address/application/queries/ensure-active-address-get-by-it.query";
-import { AddressPersistence } from "../../address/infrastructure/address.models";
-import { VerifyVariantsAndGetQuery } from "../../product-variant/application/queries/verify-variants-and-get.query";
-import { ProductVariantReadModel } from "../../product-variant/domain/read-models/product-variant.read-model";
-import { VerifyProductAndGetQuery } from "../../product/application/queries/verify-product-and-get.query";
-import { ProductReadModel } from "../../product/domain/read-models/product.read-model";
-import { EnsureActiveUserGetByIdQuery } from "../../user/application/queries/ensure-active-user-get-by-id.query";
-import { VerifyUserAndGetQuery } from "../../user/application/queries/verify-user-and-get.query";
-import { UserReadModel } from "../../user/domain/read-models/user.read-model";
-import { UserPersistence } from "../../user/infrastructure/user.models";
-import { VerifyVendorAndGetQuery } from "../../vendor/application/queries/verify-vendor-and-get.query";
-import { VendorReadModel } from "../../vendor/domain/read-models/vendor-read-model";
-import { OrderAggregate } from "../domain/order.aggregate";
-import { OrderItem } from "../domain/value-objects/order-item.vo";
-import { OrderMapper } from "../infrastructure/order.mapper";
-import { OrderRepository } from "../infrastructure/order.repository";
-import { createMyOrderDtoType } from "../presentation/dto/create-order.dto";
-import { OrderMessages } from "../presentation/order.messages";
-
-
-
+import type { InMemoryEventBus } from '../../../core/domain/infrastructure/in-memory-event-bus';
+import type { InMemoryQueryBus } from '../../../core/domain/infrastructure/in-memory-query-bus';
+import { ExpirationDate } from '../../../core/domain/value-objects/expiration-date.vo';
+import { Id } from '../../../core/domain/value-objects/id.vo';
+import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
+import { FullAddressVO } from '../../../core/domain/value-objects/street-address.vo';
+import { BaseService } from '../../../core/services/base.services';
+import { BadRequestError } from '../../../errors/app-error';
+import { EnsureActiveAddressGetByIdQuery } from '../../address/application/queries/ensure-active-address-get-by-it.query';
+import { AddressPersistence } from '../../address/infrastructure/address.models';
+import { VerifyProductAndGetQuery } from '../../product/application/queries/verify-product-and-get.query';
+import type { ProductReadModel } from '../../product/domain/read-models/product.read-model';
+import { VerifyVariantsAndGetQuery } from '../../product-variant/application/queries/verify-variants-and-get.query';
+import type { ProductVariantReadModel } from '../../product-variant/domain/read-models/product-variant.read-model';
+import { EnsureActiveUserGetByIdQuery } from '../../user/application/queries/ensure-active-user-get-by-id.query';
+import { VerifyUserAndGetQuery } from '../../user/application/queries/verify-user-and-get.query';
+import type { UserReadModel } from '../../user/domain/read-models/user.read-model';
+import type { UserPersistence } from '../../user/infrastructure/user.models';
+import { VerifyVendorAndGetQuery } from '../../vendor/application/queries/verify-vendor-and-get.query';
+import type { VendorReadModel } from '../../vendor/domain/read-models/vendor-read-model';
+import { OrderAggregate } from '../domain/order.aggregate';
+import { OrderItem } from '../domain/value-objects/order-item.vo';
+import { OrderMapper } from '../infrastructure/order.mapper';
+import type { OrderRepository } from '../infrastructure/order.repository';
+import type { createMyOrderDtoType } from '../presentation/dto/create-order.dto';
+import { OrderMessages } from '../presentation/order.messages';
 
 export class OrderApplicationService extends BaseService {
-
-    constructor(private readonly orderRepo: OrderRepository,
+    constructor(
+        private readonly orderRepo: OrderRepository,
         private readonly queryBus: InMemoryQueryBus,
-        private readonly eventBus: InMemoryEventBus
-    ) { super() }
+        private readonly eventBus: InMemoryEventBus,
+    ) {
+        super();
+    }
 
     getReport(
         variants: {
@@ -63,31 +63,31 @@ export class OrderApplicationService extends BaseService {
             blockedIds: Id[];
             deletedIds: Id[];
             userReadModel: UserReadModel[];
-        }
+        },
     ) {
         // ----- 1. Build direct error maps (ID → error code) -----
         const ownerErrors = new Map<string, string>();
-        owners.notFoundIds.forEach(id => ownerErrors.set(id.value, 'NOT_FOUND'));
-        owners.bannedIds.forEach(id => ownerErrors.set(id.value, 'BANNED'));
-        owners.blockedIds.forEach(id => ownerErrors.set(id.value, 'BLOCKED'));
-        owners.deletedIds.forEach(id => ownerErrors.set(id.value, 'DELETED'));
+        owners.notFoundIds.forEach((id) => ownerErrors.set(id.value, 'NOT_FOUND'));
+        owners.bannedIds.forEach((id) => ownerErrors.set(id.value, 'BANNED'));
+        owners.blockedIds.forEach((id) => ownerErrors.set(id.value, 'BLOCKED'));
+        owners.deletedIds.forEach((id) => ownerErrors.set(id.value, 'DELETED'));
 
         const vendorErrors = new Map<string, string>();
-        vendors.notFoundIds.forEach(id => vendorErrors.set(id.value, 'NOT_FOUND'));
-        vendors.deletedIds.forEach(id => vendorErrors.set(id.value, 'DELETED'));
-        vendors.nonVerifiedIds.forEach(id => vendorErrors.set(id.value, 'UNVERIFIED'));
+        vendors.notFoundIds.forEach((id) => vendorErrors.set(id.value, 'NOT_FOUND'));
+        vendors.deletedIds.forEach((id) => vendorErrors.set(id.value, 'DELETED'));
+        vendors.nonVerifiedIds.forEach((id) => vendorErrors.set(id.value, 'UNVERIFIED'));
 
         const productErrors = new Map<string, string>();
-        products.notFoundIds.forEach(id => productErrors.set(id.value, 'NOT_FOUND'));
-        products.deletedIds.forEach(id => productErrors.set(id.value, 'DELETED'));
-        products.blockedIds.forEach(id => productErrors.set(id.value, 'BLOCKED'));
+        products.notFoundIds.forEach((id) => productErrors.set(id.value, 'NOT_FOUND'));
+        products.deletedIds.forEach((id) => productErrors.set(id.value, 'DELETED'));
+        products.blockedIds.forEach((id) => productErrors.set(id.value, 'BLOCKED'));
 
         const variantErrors = new Map<string, string>();
-        variants.notFoundIds.forEach(id => variantErrors.set(id.value, 'NOT_FOUND'));
-        variants.deletedIds.forEach(id => variantErrors.set(id.value, 'DELETED'));
-        variants.nonActiveIds.forEach(id => variantErrors.set(id.value, 'INACTIVE'));
+        variants.notFoundIds.forEach((id) => variantErrors.set(id.value, 'NOT_FOUND'));
+        variants.deletedIds.forEach((id) => variantErrors.set(id.value, 'DELETED'));
+        variants.nonActiveIds.forEach((id) => variantErrors.set(id.value, 'INACTIVE'));
 
-        // ----- 2. Build parent → child relationships (ID string → string[]) -----
+        // ----- 2. Build parent → child relationships -----
         const productToVariants = new Map<string, string[]>();
         for (const v of variants.variantReadModel) {
             const key = Id.create(v.productId).value;
@@ -112,8 +112,7 @@ export class OrderApplicationService extends BaseService {
             ownerToVendors.set(key, list);
         }
 
-        // ----- 3. Propagate errors TOP‑DOWN (only if child doesn't already have a direct error) -----
-        // Owner → Vendor
+        // ----- 3. Propagate errors TOP-DOWN (only if child has no direct error) -----
         for (const [ownerId, error] of ownerErrors) {
             const vendorsList = ownerToVendors.get(ownerId) || [];
             for (const vendorId of vendorsList) {
@@ -123,7 +122,6 @@ export class OrderApplicationService extends BaseService {
             }
         }
 
-        // Vendor → Product
         for (const [vendorId, error] of vendorErrors) {
             const productsList = vendorToProducts.get(vendorId) || [];
             for (const productId of productsList) {
@@ -133,7 +131,6 @@ export class OrderApplicationService extends BaseService {
             }
         }
 
-        // Product → Variant
         for (const [productId, error] of productErrors) {
             const variantsList = productToVariants.get(productId) || [];
             for (const variantId of variantsList) {
@@ -143,68 +140,70 @@ export class OrderApplicationService extends BaseService {
             }
         }
 
-        // ----- 4. Quick lookup Maps for product / vendor details (optional, for validation) -----
-        const productMap = new Map<string, ProductReadModel>();
-        for (const p of products.productReadModel) {
-            productMap.set(Id.create(p.id).value, p);
-        }
-
-        const vendorMap = new Map<string, VendorReadModel>();
-        for (const v of vendors.vendorReadModel) {
-            vendorMap.set(Id.create(v.id).value, v);
-        }
-
-        // ----- 5. Generate report for each variant -----
-        const report = [];
+        // ----- 4. Build a map of variantId → productId (only for variants we have data for) -----
+        const variantProductMap = new Map<string, string>();
         for (const v of variants.variantReadModel) {
-            const vid = Id.create(v.id).value;
-            const pid = Id.create(v.productId).value;
+            variantProductMap.set(Id.create(v.id).value, Id.create(v.productId).value);
+        }
 
-            // Check if the variant has a final error (direct or propagated)
-            let finalError = variantErrors.get(vid);
+        // ----- 5. Combine ALL variant IDs (valid + all invalid categories) -----
+        const allVariantIds = new Set<string>([
+            ...variants.validIds.map((id) => id.value),
+            ...variants.notFoundIds.map((id) => id.value),
+            ...variants.deletedIds.map((id) => id.value),
+            ...variants.nonActiveIds.map((id) => id.value),
+        ]);
 
-            // If no error, it's valid.
-            const valid = !finalError;
+        // ----- 6. Generate report for EVERY requested variant -----
+        const report = [];
+        for (const variantId of allVariantIds) {
+            const error = variantErrors.get(variantId);
+            const productIdValue = variantProductMap.get(variantId) || null;
 
-            // Optional: If you still want to know which parent failed (for debugging),
-            // you can keep the `reason` as the specific error code.
             report.push({
-                id: v.id,
-                productId: v.productId,
-                valid,
-                reason: finalError || null, // e.g., 'BLOCKED', 'VENDOR_DELETED', 'OWNER_BANNED', etc.
+                id: Id.create(variantId),
+                productId: productIdValue ? Id.create(productIdValue) : null,
+                valid: !error,
+                reason: error || null,
             });
         }
 
         return report;
     }
 
-
     async canCreateOrder(userId: Id, addressId: Id, orderItems: OrderItem[]) {
-        const variantIds = orderItems.map((value) => (value._variantId))
-
-        const address = await this.queryBus.execute(new EnsureActiveAddressGetByIdQuery({ addressId: addressId }));
-        const user = await this.queryBus.execute(new EnsureActiveUserGetByIdQuery({ userId: userId }));
-        const variants = await this.queryBus.execute(new VerifyVariantsAndGetQuery({ ids: variantIds }));
-        const productsIds = variants.variantReadModel.map((value) => (value.productId));
-        const products = await this.queryBus.execute(new VerifyProductAndGetQuery({ ids: productsIds }));
-        const vendorIds = products.productReadModel.map((value) => Id.create((value.vendorId)));
-        const vendors = await this.queryBus.execute(new VerifyVendorAndGetQuery({ ids: vendorIds }));
-        const ownerIds = vendors.vendorReadModel.map((value) => Id.create((value.id)));
+        const variantIds = orderItems.map((value) => value._variantId);
+        const address = await this.queryBus.execute(
+            new EnsureActiveAddressGetByIdQuery({ addressId: addressId }),
+        );
+        const user = await this.queryBus.execute(
+            new EnsureActiveUserGetByIdQuery({ userId: userId }),
+        );
+        if (!address.active) throw new BadRequestError('Address is not active');
+        if (!address.address || !address) throw new BadRequestError('Address not found');
+        if (!user.active) throw new BadRequestError('User is not active');
+        if (!user.user) throw new BadRequestError('User not found');
+        if (!address.address.fullAddress)
+            throw new BadRequestError('Address details are incomplete');
+        const variants = await this.queryBus.execute(
+            new VerifyVariantsAndGetQuery({ ids: variantIds }),
+        );
+        const productsIds = variants.variantReadModel.map((value) => value.productId);
+        const products = await this.queryBus.execute(
+            new VerifyProductAndGetQuery({ ids: productsIds }),
+        );
+        const vendorIds = products.productReadModel.map((value) => Id.create(value.vendorId));
+        const vendors = await this.queryBus.execute(
+            new VerifyVendorAndGetQuery({ ids: vendorIds }),
+        );
+        const ownerIds = vendors.vendorReadModel.map((value) => Id.create(value.id));
         const owners = await this.queryBus.execute(new VerifyUserAndGetQuery({ ids: ownerIds }));
+
         const report = this.getReport(variants, products, vendors, owners);
 
-        console.log(report);
-
-        if (!address.active) throw new BadRequestError("Address is not active");
-        if (!address.address || !address) throw new BadRequestError("Address not found");
-        if (!user.active) throw new BadRequestError("User is not active");
-        if (!user.user) throw new BadRequestError("User not found");
-        if (!address.address.fullAddress) throw new BadRequestError("Address details are incomplete");
         const fullAddress = FullAddressVO.create(address.address.fullAddress);
 
-
-        return { fullAddress, user }
+        return { fullAddress, user, report };
     }
 
     async createMyOrder(data: createMyOrderDtoType, actor: UserPersistence) {
@@ -212,15 +211,24 @@ export class OrderApplicationService extends BaseService {
         const idempotentKey = Id.create(data.idempotentKey);
         const addressId = Id.create(data.addressId);
         const actorId = Id.create(actor._id);
-        const orderItems = data.items.map((value) => OrderItem.create({
-            variantId: Id.create(value.variantId),
-            quantity: Quantity.create(value.quantity),
-            unitPrice: Quantity.create(value.unitPrice)
-        }));
-        const { fullAddress, user } = await this.canCreateOrder(actorId, addressId, orderItems)
+        const waitingTime = ExpirationDate.create(data.waitingTime);
+        const orderItems = data.items.map((value) =>
+            OrderItem.create({
+                variantId: Id.create(value.variantId),
+                quantity: Quantity.create(value.quantity),
+                unitPrice: Quantity.create(value.unitPrice),
+            }),
+        );
+
+        const { fullAddress, user, report } = await this.canCreateOrder(
+            actorId,
+            addressId,
+            orderItems,
+        );
 
         const order = OrderAggregate.create({
             idempotentKey: idempotentKey,
+            waitingTime: waitingTime,
             id: orderId,
             items: orderItems,
             buyerId: actorId,
@@ -232,8 +240,6 @@ export class OrderApplicationService extends BaseService {
         const response = OrderMapper.aggregateToResponseReadModel(order);
         return OrderMessages.orderCreated(orderId, actorId, addressId, response);
     }
-
-
 }
 
 // createOrder()

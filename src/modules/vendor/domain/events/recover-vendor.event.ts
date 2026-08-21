@@ -9,7 +9,7 @@ export interface VendorRecoveredPayload {
 
 export class VendorRecoverEvent implements IEvent<VendorRecoveredPayload> {
     readonly type = 'vendor.recovered';
-    readonly occurredOn = EffectiveDate.today()
+    readonly occurredOn = EffectiveDate.today();
 
-    constructor(public readonly payload: VendorRecoveredPayload) { }
+    constructor(public readonly payload: VendorRecoveredPayload) {}
 }

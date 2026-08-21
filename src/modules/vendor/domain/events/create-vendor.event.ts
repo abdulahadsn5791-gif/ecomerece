@@ -13,7 +13,7 @@ export interface VendorCreatedPayload {
 
 export class VendorCreatedEvent implements IEvent<VendorCreatedPayload> {
     readonly type = 'vendor.created';
-    readonly occurredOn = EffectiveDate.today()
+    readonly occurredOn = EffectiveDate.today();
 
-    constructor(public readonly payload: VendorCreatedPayload) { }
+    constructor(public readonly payload: VendorCreatedPayload) {}
 }

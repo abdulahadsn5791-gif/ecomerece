@@ -23,7 +23,6 @@ export function createProductModule() {
         new VerifyProductAndGetHandler(productInternalService),
     );
 
-
     const productController = new ProductController(productApplicationService);
 
     return { productController, productInternalService };

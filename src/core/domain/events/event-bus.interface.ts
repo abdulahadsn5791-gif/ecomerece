@@ -1,4 +1,4 @@
-import { EffectiveDate } from "../value-objects/effective-date.vo";
+import type { EffectiveDate } from '../value-objects/effective-date.vo';
 
 export interface IEvent<T = unknown> {
     readonly type: string;

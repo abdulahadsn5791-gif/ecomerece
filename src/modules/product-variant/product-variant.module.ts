@@ -16,10 +16,7 @@ export function createProductVaraintModule() {
         EnsureActiveVariantGetByIdQuery,
         new EnsureActiveVariantGetByIdHandler(internalService),
     );
-    queryBus.register(
-        VerifyVariantsAndGetQuery,
-        new VerifyVariantsAndGetHandler(internalService),
-    );
+    queryBus.register(VerifyVariantsAndGetQuery, new VerifyVariantsAndGetHandler(internalService));
     const controller = new ProductVariantController(applicationService);
     return { repo, internalService, applicationService, controller };
 }

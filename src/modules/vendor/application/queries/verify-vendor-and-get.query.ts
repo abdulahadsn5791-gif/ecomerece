@@ -1,9 +1,24 @@
-import { IQuery } from "../../../../core/domain/query/query-bus.interface";
-import { Id } from "../../../../core/domain/value-objects/id.vo";
-import { VendorReadModel } from "../../domain/read-models/vendor-read-model";
+import type { IQuery } from '../../../../core/domain/query/query-bus.interface';
+import type { Id } from '../../../../core/domain/value-objects/id.vo';
+import type { VendorReadModel } from '../../domain/read-models/vendor-read-model';
 
-export class VerifyVendorAndGetQuery implements IQuery<{ validIds: Id[], notFoundIds: Id[], deletedIds: Id[], nonVerifiedIds: Id[], vendorReadModel: VendorReadModel[] }> {
-    readonly __result?: { validIds: Id[], notFoundIds: Id[], deletedIds: Id[], nonVerifiedIds: Id[], vendorReadModel: VendorReadModel[] };
+export class VerifyVendorAndGetQuery
+    implements
+        IQuery<{
+            validIds: Id[];
+            notFoundIds: Id[];
+            deletedIds: Id[];
+            nonVerifiedIds: Id[];
+            vendorReadModel: VendorReadModel[];
+        }>
+{
+    readonly __result?: {
+        validIds: Id[];
+        notFoundIds: Id[];
+        deletedIds: Id[];
+        nonVerifiedIds: Id[];
+        vendorReadModel: VendorReadModel[];
+    };
     readonly type = 'VerifyVendorAndGetQuery';
     public readonly payload: { ids: Id[] };
 

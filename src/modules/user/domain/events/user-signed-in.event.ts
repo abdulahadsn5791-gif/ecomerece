@@ -4,7 +4,7 @@ import type { Id } from '../../../../core/domain/value-objects/id.vo';
 
 export class UserSignedInEvent implements IEvent<{ userId: Id }> {
     readonly type = 'user.signed-in';
-    readonly occurredOn = EffectiveDate.today()
+    readonly occurredOn = EffectiveDate.today();
 
-    constructor(public readonly payload: { userId: Id }) { }
+    constructor(public readonly payload: { userId: Id }) {}
 }

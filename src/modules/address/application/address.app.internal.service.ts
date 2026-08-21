@@ -1,13 +1,17 @@
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { BaseService } from "../../../core/services/base.services";
-import { AddressReadModel } from "../domain/read-models/address.read-models";
-import { AddressMapper } from "../infrastructure/address.mapper";
-import { AddressRepository } from "../infrastructure/address.repository";
+import type { Id } from '../../../core/domain/value-objects/id.vo';
+import { BaseService } from '../../../core/services/base.services';
+import type { AddressReadModel } from '../domain/read-models/address.read-models';
+import { AddressMapper } from '../infrastructure/address.mapper';
+import type { AddressRepository } from '../infrastructure/address.repository';
 
 export class AddressInternalService extends BaseService {
-    constructor(private readonly addressRepo: AddressRepository) { super() }
+    constructor(private readonly addressRepo: AddressRepository) {
+        super();
+    }
 
-    async ensureActiveAddressGetById(addressId: Id): Promise<{ address: AddressReadModel | null; active: boolean }> {
+    async ensureActiveAddressGetById(
+        addressId: Id,
+    ): Promise<{ address: AddressReadModel | null; active: boolean }> {
         const address = await this.addressRepo.FindById(addressId);
         if (!address) return { address: null, active: false };
 
@@ -17,7 +21,4 @@ export class AddressInternalService extends BaseService {
 
         return { address: AddressReadModel, active: true };
     }
-
-
-
 }

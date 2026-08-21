@@ -16,5 +16,6 @@ export interface OrderReadModel {
         quantity: number;
         unitPrice: number;
     }>;
+    waitingTime: Date;
     createdAt: Date;
 }

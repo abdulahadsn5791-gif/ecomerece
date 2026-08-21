@@ -18,9 +18,9 @@ export class UserRepository extends MongoRepository<UserPersistence> implements 
     }
 
     async FindByIds(id: Id[]): Promise<UserAggregate[]> {
-        const ids = id.map((value) => (value.value));
+        const ids = id.map((value) => value.value);
         const filter = {
-            _id: { $in: ids }
+            _id: { $in: ids },
         };
 
         const docs = await super.find(filter);

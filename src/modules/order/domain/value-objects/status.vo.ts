@@ -1,26 +1,24 @@
-import { StringVO } from "../../../../core/domain/value-objects/string-vo";
-import { BadRequestError } from "../../../../errors/app-error";
+import { StringVO } from '../../../../core/domain/value-objects/string-vo';
+import { BadRequestError } from '../../../../errors/app-error';
 
 export const StatusEnum = {
-    PENDING: "pending",
-    CONFIRMED: "confirmed",
-    COMPLETED: "completed",
-    RETURNED: "returned",
-    REFUNDED: "refunded",
-    CANCELLED: "cancelled",
+    PENDING: 'pending',
+    CONFIRMED: 'confirmed',
+    COMPLETED: 'completed',
+    RETURNED: 'returned',
+    REFUNDED: 'refunded',
+    CANCELLED: 'cancelled',
 } as const;
 
-export type StatusType = typeof StatusEnum[keyof typeof StatusEnum];
+export type StatusType = (typeof StatusEnum)[keyof typeof StatusEnum];
 
 export class StatusVo extends StringVO {
-
     private constructor(value: StatusType) {
         super(value);
 
         if (!Object.values(StatusEnum).includes(this.value as StatusType)) {
             throw new BadRequestError(`Invalid order status: "${this.value}"`);
         }
-
     }
 
     static rehydrate(value: StatusType): StatusVo {
@@ -56,14 +54,18 @@ export class StatusVo extends StringVO {
 
     confirm(): StatusVo {
         if (this.value !== StatusEnum.PENDING) {
-            throw new BadRequestError(`Cannot confirm a status that is not pending (current: ${this.value})`);
+            throw new BadRequestError(
+                `Cannot confirm a status that is not pending (current: ${this.value})`,
+            );
         }
         return StatusVo.confirmed();
     }
 
     complete(): StatusVo {
         if (this.value !== StatusEnum.CONFIRMED) {
-            throw new BadRequestError(`Cannot complete a status that is not confirmed (current: ${this.value})`);
+            throw new BadRequestError(
+                `Cannot complete a status that is not confirmed (current: ${this.value})`,
+            );
         }
         return StatusVo.completed();
     }
@@ -75,25 +77,29 @@ export class StatusVo extends StringVO {
         return StatusVo.cancelled();
     }
 
-
-
     return(): StatusVo {
         if (this.value !== StatusEnum.CONFIRMED && this.value !== StatusEnum.COMPLETED) {
-            throw new BadRequestError(`Cannot return a status that is not confirmed or completed (current: ${this.value})`);
+            throw new BadRequestError(
+                `Cannot return a status that is not confirmed or completed (current: ${this.value})`,
+            );
         }
         return StatusVo.returned();
     }
 
     refund(): StatusVo {
         if (this.value === StatusEnum.REFUNDED) {
-            throw new BadRequestError(`Cannot refund a status that is already refunded (current: ${this.value})`);
+            throw new BadRequestError(
+                `Cannot refund a status that is already refunded (current: ${this.value})`,
+            );
         }
         if (
             this.value !== StatusEnum.CONFIRMED &&
             this.value !== StatusEnum.COMPLETED &&
             this.value !== StatusEnum.RETURNED
         ) {
-            throw new BadRequestError(`Cannot refund a status that is not confirmed, completed, or returned (current: ${this.value})`);
+            throw new BadRequestError(
+                `Cannot refund a status that is not confirmed, completed, or returned (current: ${this.value})`,
+            );
         }
         return StatusVo.refunded();
     }

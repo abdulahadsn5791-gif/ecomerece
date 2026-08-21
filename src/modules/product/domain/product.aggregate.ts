@@ -145,12 +145,12 @@ export class ProductAggregate extends AggregateRoot {
 
     recoverProduct(): void {
         if (!this._delete.deleted) throw new BadRequestError('Product was already recovered');
-        this._delete = this._delete.none();
+        this._delete = DeleteInfoVO.none();
     }
 
     deleteProduct(actor: Id, reason: Reason): void {
         if (this._delete.deleted) throw new BadRequestError('Product was already removed');
-        this._delete = this._delete.delete(actor, reason);
+        this._delete = DeleteInfoVO.create(actor, reason);
     }
     blockProduct(actor: Id, reason: Reason): void {
         if (this._block.isBlocked) throw new BadRequestError('Product was already blocked');

@@ -1,5 +1,5 @@
 import type { Id } from '../../../../core/domain/value-objects/id.vo';
-import { OrderAggregate } from '../order.aggregate';
+import type { OrderAggregate } from '../order.aggregate';
 
 export interface IOrderRepository {
     FindById(id: Id): Promise<OrderAggregate | null>;

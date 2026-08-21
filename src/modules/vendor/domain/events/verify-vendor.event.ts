@@ -10,7 +10,7 @@ export interface VendorVerificationPayload {
 
 export class VendorVerifiedEvent implements IEvent<VendorVerificationPayload> {
     readonly type = 'vendor.verified';
-    readonly occurredOn = EffectiveDate.today()
+    readonly occurredOn = EffectiveDate.today();
 
-    constructor(public readonly payload: VendorVerificationPayload) { }
+    constructor(public readonly payload: VendorVerificationPayload) {}
 }

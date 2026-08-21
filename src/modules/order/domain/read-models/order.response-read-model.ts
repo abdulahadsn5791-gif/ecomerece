@@ -1,4 +1,3 @@
-
 export interface OrderResponseReadModel {
     id: string;
     buyerId: string;
@@ -10,5 +9,6 @@ export interface OrderResponseReadModel {
         quantity: number;
         unitPrice: number;
     }>;
+    waitingTime: Date;
     createdAt: Date;
 }

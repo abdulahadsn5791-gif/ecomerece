@@ -1,17 +1,19 @@
-import { IQuery } from "../../../../core/domain/query/query-bus.interface";
-import { Id } from "../../../../core/domain/value-objects/id.vo";
-import { OrderItem } from "../../../order/domain/value-objects/order-item.vo";
-import { InventoryReadModel } from "../../domain/read-models/inventory.read-model";
+import type { IQuery } from '../../../../core/domain/query/query-bus.interface';
+import type { Id } from '../../../../core/domain/value-objects/id.vo';
+import type { OrderItem } from '../../../order/domain/value-objects/order-item.vo';
+import type { InventoryReadModel } from '../../domain/read-models/inventory.read-model';
 
 export class VerifyInventoriesItemsGetQuery
-    implements IQuery<{
-        validIds: Id[];
-        notFoundIds: Id[];
-        deletedIds: Id[];
-        availableStockIds: Id[];
-        buyableIds: Id[];
-        inventoriesReadModel: InventoryReadModel[];
-    }> {
+    implements
+        IQuery<{
+            validIds: Id[];
+            notFoundIds: Id[];
+            deletedIds: Id[];
+            availableStockIds: Id[];
+            buyableIds: Id[];
+            inventoriesReadModel: InventoryReadModel[];
+        }>
+{
     readonly __result?: {
         validIds: Id[];
         notFoundIds: Id[];

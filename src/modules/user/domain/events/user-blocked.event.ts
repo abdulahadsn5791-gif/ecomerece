@@ -5,6 +5,6 @@ import type { BlockInfoVO } from '../value-objects/block-info.vo';
 
 export class UserBlockedEvent implements IEvent<{ userId: Id; blockInfo: BlockInfoVO }> {
     readonly type = 'user.blocked';
-    readonly occurredOn = EffectiveDate.today()
-    constructor(public readonly payload: { userId: Id; blockInfo: BlockInfoVO }) { }
+    readonly occurredOn = EffectiveDate.today();
+    constructor(public readonly payload: { userId: Id; blockInfo: BlockInfoVO }) {}
 }

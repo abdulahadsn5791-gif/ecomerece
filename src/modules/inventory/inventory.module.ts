@@ -1,4 +1,7 @@
+import { commandBus, InMemoryCommandBus } from '../../core/domain/infrastructure/in-memory-command-bus';
 import { queryBus } from '../../core/domain/infrastructure/in-memory-query-bus';
+import { ReserveInventoryHandler } from './application/command-handlers/reserve-inventory.handler';
+import { ReserveInventoryCommand } from './application/commands/reserve-inventory.command';
 import { InventoryApplicationService } from './application/inventory.app.service';
 import { InventoryInternalServcie } from './application/inventory.internal.service';
 import { VerifyInventoriesItemsGetQuery } from './application/queries/verify-inventories-items-get.query';
@@ -9,10 +12,8 @@ import { InventoryController } from './presentation/inventory.controller';
 export function createInventoryModule() {
     const inventoryRepo = new InventoryReposityory();
     const inventoryInternalServcie = new InventoryInternalServcie(inventoryRepo);
-    queryBus.register(
-        VerifyInventoriesItemsGetQuery,
-        new VerifyInventoriesItemsGetQueryHander(inventoryInternalServcie),
-    );
+    queryBus.register(VerifyInventoriesItemsGetQuery, new VerifyInventoriesItemsGetQueryHander(inventoryInternalServcie));
+    commandBus.register(ReserveInventoryCommand.name, new ReserveInventoryHandler(inventoryInternalServcie),);
     const inventoryApplicationService = new InventoryApplicationService(inventoryRepo, queryBus);
     const inventoryController = new InventoryController(inventoryApplicationService);
 

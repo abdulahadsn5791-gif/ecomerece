@@ -8,8 +8,7 @@ import { InventoryModel, type InventoryPersistence } from './inventory.model';
 
 export class InventoryReposityory
     extends MongoRepository<InventoryPersistence>
-    implements IIventoryRepository
-{
+    implements IIventoryRepository {
     constructor() {
         super(InventoryModel);
     }
@@ -60,7 +59,33 @@ export class InventoryReposityory
             throw new ConcurrencyError();
         }
     }
+    async SaveMany(inventories: InventoryAggregate[]): Promise<void> {
 
+        if (inventories.length === 0) return;
+        const bulkOps = [];
+        for (const inventory of inventories) {
+            const data = InventoryMapper.aggregateToPersistence(inventory);
+            bulkOps.push({
+                updateOne: {
+                    filter: {
+                        _id: inventory.id.value,
+                        version: inventory.version.value,
+                    },
+                    update: {
+                        $set: data,
+                        $inc: { version: 1 },
+                    },
+                },
+            });
+        }
+        // const result = await super.updateMany(bulkOps, { ordered: false });
+
+
+        // if (result.modifiedCount !== inventories.length) throw new ConcurrencyError(
+        //     'One or more inventories were concurrently modified.'
+        // );
+
+    }
     async Delete(id: Id): Promise<void> {
         const doc = await super.findByIdAndDelete(id.value);
         if (!doc) throw new BadRequestError('Inventory not found with this id');

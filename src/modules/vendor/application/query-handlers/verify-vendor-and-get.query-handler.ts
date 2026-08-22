@@ -6,9 +6,7 @@ import type { VendorInternalService } from '../vendor.internal.service';
 export class VerifyVendorAndGetHandler {
     readonly type = 'VerifyVendorAndGetQuery';
     constructor(private readonly internalService: VendorInternalService) {}
-    async handle(
-        query: VerifyVendorAndGetQuery,
-    ): Promise<{
+    async handle(query: VerifyVendorAndGetQuery): Promise<{
         validIds: Id[];
         notFoundIds: Id[];
         deletedIds: Id[];

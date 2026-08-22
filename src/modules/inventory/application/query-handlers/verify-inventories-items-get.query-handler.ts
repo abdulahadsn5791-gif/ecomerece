@@ -7,9 +7,7 @@ import type { VerifyInventoriesItemsGetQuery } from '../queries/verify-inventori
 export class VerifyInventoriesItemsGetQueryHander {
     readonly type = 'EnsureActiveAddressGetByIdQuery';
     constructor(private readonly internalService: InventoryInternalServcie) {}
-    async handle(
-        query: VerifyInventoriesItemsGetQuery,
-    ): Promise<{
+    async handle(query: VerifyInventoriesItemsGetQuery): Promise<{
         validIds: Id[];
         notFoundIds: Id[];
         deletedIds: Id[];

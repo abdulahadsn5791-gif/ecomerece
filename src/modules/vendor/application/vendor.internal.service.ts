@@ -53,9 +53,7 @@ export class VendorInternalService extends BaseService {
         return { vendor: VendorMapper.aggregateToReadModel(vendor), active: true };
     }
 
-    async verifyVendorAndGet(
-        ids: Id[],
-    ): Promise<{
+    async verifyVendorAndGet(ids: Id[]): Promise<{
         validIds: Id[];
         notFoundIds: Id[];
         deletedIds: Id[];

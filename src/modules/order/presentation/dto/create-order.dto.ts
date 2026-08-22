@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { dateSchema } from '../../../../../shared/dtos/date-schema';
 import { idSchema } from '../../../../../shared/dtos/id-schema';
 import { moneySchema } from '../../../../../shared/dtos/money-schema';
 import { positiveNumberSchema } from '../../../../../shared/dtos/positive-number-schema';
@@ -7,12 +6,11 @@ import { positiveNumberSchema } from '../../../../../shared/dtos/positive-number
 export const createMyOrderDto = z.object({
     idempotentKey: idSchema,
     addressId: idSchema,
-    waitingTime: dateSchema,
+    waitingTime: z.coerce.date(),
     items: z.array(
         z.object({
             variantId: idSchema,
             quantity: positiveNumberSchema,
-            unitPrice: moneySchema,
         }),
     ),
 });

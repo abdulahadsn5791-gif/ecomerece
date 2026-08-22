@@ -1,26 +1,18 @@
 import { AggregateRoot } from '../../../core/domain/aggregate-root';
 import { DeleteInfoVO } from '../../../core/domain/value-objects/delete-info.vo';
 import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
-import type { ExpirationDate } from '../../../core/domain/value-objects/expiration-date.vo';
 import type { Id } from '../../../core/domain/value-objects/id.vo';
+import { Money } from '../../../core/domain/value-objects/money.vo';
 import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
-import type { Reason } from '../../../core/domain/value-objects/reason.vo';
 import type { FullAddressVO } from '../../../core/domain/value-objects/street-address.vo';
-import { BadRequestError } from '../../../errors/app-error';
-import { OrderCancelledEvent } from './events/order-cancelled.event';
-import { OrderCompletedEvent } from './events/order-completed.event';
-import { OrderConfirmedEvent } from './events/order-confirm.event';
 import { OrderCreatedEvent } from './events/order-created.event';
-import { OrderRefundedEvent } from './events/order-refunded.event';
-import { OrderReturnedEvent } from './events/order-returned.event';
 import type { OrderItem } from './value-objects/order-item.vo';
-import { StatusVo } from './value-objects/status.vo';
+
 
 export type createOrderPros = {
     id: Id;
     idempotentKey: Id;
-    waitingTime: ExpirationDate;
-    items: OrderItem[];
+    totalPrice: Money;
     buyerId: Id;
     address: FullAddressVO;
 };
@@ -30,10 +22,7 @@ export class OrderAggregate extends AggregateRoot {
         private readonly _idempotentKey: Id,
         private readonly _id: Id,
         private readonly _buyerId: Id,
-        private _items: OrderItem[],
-        private _totalPrice: Quantity,
-        private _status: StatusVo,
-        private _waitingTime: ExpirationDate,
+        private _totalPrice: Money,
         private _address: FullAddressVO,
         private _delete: DeleteInfoVO,
         private readonly _version: Quantity,
@@ -50,14 +39,8 @@ export class OrderAggregate extends AggregateRoot {
     get buyerId() {
         return this._buyerId;
     }
-    get items() {
-        return this._items;
-    }
     get totalPrice() {
         return this._totalPrice;
-    }
-    get status() {
-        return this._status;
     }
     get address() {
         return this._address;
@@ -71,31 +54,15 @@ export class OrderAggregate extends AggregateRoot {
     get createdAt() {
         return this._createdAt;
     }
-    get waitingTime() {
-        return this._waitingTime;
-    }
 
     static create(data: createOrderPros): OrderAggregate {
-        const total = data.items.reduce(
-            (sum, item) => new Quantity(sum.value + item.totalPrice.value),
-            new Quantity(0),
-        );
-        const waitingTime = data.waitingTime;
-        if (waitingTime.remainingHours <= 0.9) {
-            throw new BadRequestError('Times is less than one hour');
-        }
-        if (waitingTime.remainingHours >= 4.2) {
-            throw new BadRequestError('Time is greater than 4 hours');
-        }
+
 
         return new OrderAggregate(
             data.idempotentKey,
             data.id,
             data.buyerId,
-            data.items,
-            total,
-            StatusVo.pending(),
-            data.waitingTime,
+            data.totalPrice,
             data.address,
             DeleteInfoVO.none(),
             Quantity.none(),
@@ -107,10 +74,7 @@ export class OrderAggregate extends AggregateRoot {
         _idempotentKey: Id,
         _id: Id,
         _buyerId: Id,
-        _items: OrderItem[],
-        _totalPrice: Quantity,
-        _status: StatusVo,
-        _waitingTime: ExpirationDate,
+        _totalPrice: Money,
         _address: FullAddressVO,
         _delete: DeleteInfoVO,
         _version: Quantity,
@@ -120,10 +84,7 @@ export class OrderAggregate extends AggregateRoot {
             _idempotentKey,
             _id,
             _buyerId,
-            _items,
             _totalPrice,
-            _status,
-            _waitingTime,
             _address,
             _delete,
             _version,
@@ -133,30 +94,7 @@ export class OrderAggregate extends AggregateRoot {
     createOrder() {
         this.raise(new OrderCreatedEvent({ orderId: this.id, actorId: this.buyerId }));
     }
-    cancelOrder(actorId: Id, reason: Reason) {
-        this._status = this._status.cancel();
-        this.raise(new OrderCancelledEvent({ orderId: this._id, actorId, reason }));
-    }
 
-    confirmOrder(actorId: Id) {
-        if (this._waitingTime.isFuture)
-            throw new BadRequestError('Order is still under waititng time');
-        this._status = this._status.confirm();
-        this.raise(new OrderConfirmedEvent({ orderId: this._id, actorId }));
-    }
 
-    returnOrder(actorId: Id, reason: Reason) {
-        this._status = this._status.return();
-        this.raise(new OrderReturnedEvent({ orderId: this._id, actorId, reason }));
-    }
 
-    refundOrder(actorId: Id, reason: Reason) {
-        this._status = this._status.refund();
-        this.raise(new OrderRefundedEvent({ orderId: this._id, actorId, reason }));
-    }
-
-    completeOrder(actorId: Id) {
-        this._status = this._status.complete();
-        this.raise(new OrderCompletedEvent({ orderId: this._id, actorId }));
-    }
 }

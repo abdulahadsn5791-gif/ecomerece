@@ -1,10 +1,14 @@
 import type { ICommand, ICommandBus, ICommandHandler } from '../command/i-command-bus';
-
 export class InMemoryCommandBus implements ICommandBus {
     private handlers = new Map<string, ICommandHandler<any, any>>();
-    register(commandName: string, handler: ICommandHandler<any, any>): void {
+
+    register(
+        commandName: string,
+        handler: ICommandHandler<any, any>,
+    ): void {
         this.handlers.set(commandName, handler);
     }
+
     async execute<TResult>(command: ICommand<TResult>): Promise<TResult> {
         const name = command.constructor.name;
         const handler = this.handlers.get(name);
@@ -14,3 +18,6 @@ export class InMemoryCommandBus implements ICommandBus {
         return handler.handle(command) as Promise<TResult>;
     }
 }
+const commandBus = new InMemoryCommandBus();
+
+export { commandBus };

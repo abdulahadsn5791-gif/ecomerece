@@ -23,7 +23,9 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
     }
 
     async Save(product: OrderAggregate): Promise<void> {
+
         const data = OrderMapper.aggregateToPersistence(product);
+
         const result = await super.updateOne(
             {
                 _id: product.id.value,
@@ -34,6 +36,7 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
                 $inc: { version: 1 },
             },
         );
+
         if (result.modifiedCount === 0) throw new ConcurrencyError();
     }
     async Delete(id: Id): Promise<void> {
@@ -41,10 +44,13 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
     }
 
     async Create(product: OrderAggregate): Promise<void> {
+        console.log('1')
         const persistantProduct = OrderMapper.aggregateToPersistence(product);
+        console.log('2')
         const productDoc = new OrderModel(persistantProduct);
-
+        console.log('3');
         await super.create(productDoc);
+        console.log('4')
     }
 
     async Exists(id: Id): Promise<boolean> {

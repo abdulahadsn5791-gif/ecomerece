@@ -1,5 +1,7 @@
+// src/core/database/unit-of-work.ts
 import mongoose, { type ClientSession } from 'mongoose';
 import { transactionContext } from './transaction-context';
+import { withRetry } from '../../utils/retry';
 
 export class UnitOfWork {
     async transaction<T>(callback: () => Promise<T>, retries = 3): Promise<T> {
@@ -9,48 +11,47 @@ export class UnitOfWork {
             return callback();
         }
 
-        let lastError: unknown;
-
-        for (let attempt = 1; attempt <= retries; attempt++) {
-            const session = await mongoose.startSession();
-
-            try {
-                session.startTransaction();
-
-                const result = await transactionContext.run({ session }, async () => callback());
-
-                await session.commitTransaction();
-
-                return result;
-            } catch (error: any) {
-                lastError = error;
-
-                await session.abortTransaction();
-
-                const transient = error?.errorLabels?.includes('TransientTransactionError');
-
-                if (!transient || attempt === retries) {
+        return withRetry(
+            async () => {
+                const session = await mongoose.startSession();
+                try {
+                    session.startTransaction();
+                    const result = await transactionContext.run({ session }, async () =>
+                        callback()
+                    );
+                    await session.commitTransaction();
+                    return result;
+                } catch (error) {
+                    await session.abortTransaction();
                     throw error;
+                } finally {
+                    await session.endSession();
                 }
-            } finally {
-                await session.endSession();
-            }
-        }
+            },
+            {
+                retries,
 
-        throw lastError;
+                shouldRetry: (error: unknown) =>
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'errorLabels' in error &&
+                    Array.isArray((error as any).errorLabels) &&
+                    (error as any).errorLabels.includes('TransientTransactionError'),
+
+                backoff: (attempt: number) => Math.min(100 * Math.pow(2, attempt - 1), 5000),
+            }
+        );
     }
 
     getSession(): ClientSession {
         const session = transactionContext.getStore()?.session;
-
         if (!session) {
             throw new Error('No active transaction');
         }
-
         return session;
     }
 
-    isInTransaction() {
+    isInTransaction(): boolean {
         return !!transactionContext.getStore();
     }
 }

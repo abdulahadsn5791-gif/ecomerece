@@ -48,6 +48,13 @@ export class StatusVo extends StringVO {
     static cancelled(): StatusVo {
         return new StatusVo(StatusEnum.CANCELLED);
     }
+
+    static fromString(value: string): StatusVo {
+        if (!Object.values(StatusEnum).includes(value as StatusType)) {
+            throw new BadRequestError(`Invalid order status: "${value}"`);
+        }
+        return new StatusVo(value as StatusType);
+    }
     toStatusType(): StatusType {
         return this.value as StatusType;
     }

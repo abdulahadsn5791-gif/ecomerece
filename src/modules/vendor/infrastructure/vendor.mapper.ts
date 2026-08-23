@@ -113,7 +113,7 @@ export const VendorMapper = {
 
             createdAt: vendor.createdAt.value,
 
-            updatedAt: EffectiveDate.today(),
+
         };
     },
 

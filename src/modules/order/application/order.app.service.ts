@@ -27,6 +27,7 @@ import { InMemoryCommandBus } from '../../../core/domain/infrastructure/in-memor
 import { ReserveInventoryCommand } from '../../inventory/application/commands/reserve-inventory.command';
 import { InventoryReadModel } from '../../inventory/domain/read-models/inventory.read-model';
 import { Money } from '../../../core/domain/value-objects/money.vo';
+import { CreateItemsCommand } from '../../order-items/application/commands/create-items-inventory.command';
 
 
 
@@ -375,27 +376,28 @@ export class OrderApplicationService extends BaseService {
     }
 
     async createMyOrder(data: createMyOrderDtoType, actor: UserPersistence) {
+        console.log('1')
         const orderId = Id.create();
+        console.log('2')
         const idempotentKey = Id.create(data.idempotentKey);
+        console.log('3')
         const addressId = Id.create(data.addressId);
+        console.log('4')
         const actorId = Id.create(actor._id);
+        console.log('5')
         const waitingTime = ExpirationDate.create(data.waitingTime);
+        console.log('6')
         const items = data.items.map((value) => ({
             variantId: Id.create(value.variantId),
             quantity: Quantity.create(value.quantity),
         }));
-        // const orderItems = data.items.map((value) =>
-        //     OrderItem.create({
-        //         variantId: Id.create(value.variantId),
-        //         quantity: Quantity.create(value.quantity),
-        //     }),
-        // );
-
+        console.log('7')
         const result = await this.verifyReport(actorId, addressId, actorId, items);
         const totalPrice = result.validOrderItems.reduce(
             (sum, ele) => sum + ele.quantity.value * ele.price,
             0
         );
+        console.log('8')
         const order = OrderAggregate.create({
             id: orderId,
             idempotentKey: idempotentKey,
@@ -403,22 +405,27 @@ export class OrderApplicationService extends BaseService {
             buyerId: actorId,
             address: result.fullAddress,
         });
-
-        // const orderItems = result.validOrderItems.map((element) => (
-        //     OrderItemsAggregate.create({
-        //         id: Id.create(),
-        //         orderId: orderId,
-        //         vendorId: element.vendorId,
-        //         variantId: element.variantId,
-        //         quantity: element.quantity,
-        //         waitingTime: waitingTime,
-        //         price: Money.create(element.price)
-        //     })
-        // ))
-
+        console.log('9')
+        const orderItems = result.validOrderItems.map((element) => (
+            {
+                id: Id.create(),
+                orderId: orderId,
+                vendorId: element.vendorId,
+                variantId: element.variantId,
+                quantity: element.quantity,
+                waitingTime: waitingTime,
+                price: Money.create(element.price)
+            }
+        ))
+        console.log('10')
+        await this.commandBus.execute(new CreateItemsCommand(orderItems));
+        console.log('11')
         order.createOrder();
+        console.log('12')
         await this.orderRepo.Create(order);
+        console.log('13')
         await this.eventBus.publish(order.pullEvents());
+        console.log('14')
         const response = OrderMapper.aggregateToResponseReadModel(order);
         return OrderMessages.orderCreated(orderId, actorId, addressId, response);
     }

@@ -13,7 +13,7 @@ export function createInventoryModule() {
     const inventoryRepo = new InventoryReposityory();
     const inventoryInternalServcie = new InventoryInternalServcie(inventoryRepo);
     queryBus.register(VerifyInventoriesItemsGetQuery, new VerifyInventoriesItemsGetQueryHander(inventoryInternalServcie));
-    commandBus.register(ReserveInventoryCommand.name, new ReserveInventoryHandler(inventoryInternalServcie),);
+    commandBus.register(ReserveInventoryCommand.name, new ReserveInventoryHandler(inventoryInternalServcie));
     const inventoryApplicationService = new InventoryApplicationService(inventoryRepo, queryBus);
     const inventoryController = new InventoryController(inventoryApplicationService);
 

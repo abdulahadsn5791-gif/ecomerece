@@ -78,12 +78,12 @@ export class InventoryReposityory
                 },
             });
         }
-        // const result = await super.updateMany(bulkOps, { ordered: false });
+        const result = await super.updateMany(bulkOps, { ordered: false });
 
 
-        // if (result.modifiedCount !== inventories.length) throw new ConcurrencyError(
-        //     'One or more inventories were concurrently modified.'
-        // );
+        if (result.modifiedCount !== inventories.length) throw new ConcurrencyError(
+            'One or more inventories were concurrently modified.'
+        );
 
     }
     async Delete(id: Id): Promise<void> {

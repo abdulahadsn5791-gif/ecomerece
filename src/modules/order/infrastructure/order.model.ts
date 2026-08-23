@@ -11,14 +11,6 @@ const deletedSchema = new mongoose.Schema(
     { _id: false },
 );
 
-const itemSchema = new mongoose.Schema(
-    {
-        variantId: { type: String, required: true },
-        quantity: { type: Number, required: true },
-        unitPrice: { type: Number, required: true },
-    },
-    { _id: false },
-);
 
 const OrderModelSchema = new Schema(
     {
@@ -39,15 +31,7 @@ const OrderModelSchema = new Schema(
             type: Number,
             required: true,
         },
-        waitingTime: {
-            type: Date,
-            required: true,
-        },
-        status: {
-            type: String,
-            enum: ['pending', 'confirmed', 'completed', 'returned', 'refunded', 'cancelled'],
-            required: true,
-        },
+
         address: {
             type: String,
             required: true,
@@ -56,10 +40,7 @@ const OrderModelSchema = new Schema(
             type: deletedSchema,
             required: true,
         },
-        items: {
-            type: [itemSchema],
-            required: true,
-        },
+
     },
     {
         timestamps: true,
@@ -72,7 +53,6 @@ export interface OrderPersistence {
     version: number;
     buyerId: string;
     totalPrice: number;
-    status: 'pending' | 'confirmed' | 'completed' | 'returned' | 'refunded' | 'cancelled';
     address: string;
     deleted: {
         deleted: boolean;
@@ -80,12 +60,7 @@ export interface OrderPersistence {
         deletedBy?: string | null;
         reason?: string | null;
     };
-    items: Array<{
-        variantId: string;
-        quantity: number;
-        unitPrice: number;
-    }>;
-    waitingTime: Date;
+
     createdAt: Date;
     updatedAt: Date;
 }

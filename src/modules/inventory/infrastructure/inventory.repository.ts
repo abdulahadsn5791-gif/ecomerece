@@ -59,8 +59,8 @@ export class InventoryReposityory
             throw new ConcurrencyError();
         }
     }
-    async SaveMany(inventories: InventoryAggregate[]): Promise<void> {
 
+    async SaveMany(inventories: InventoryAggregate[]): Promise<void> {
         if (inventories.length === 0) return;
         const bulkOps = [];
         for (const inventory of inventories) {
@@ -78,14 +78,14 @@ export class InventoryReposityory
                 },
             });
         }
-        const result = await super.updateMany(bulkOps, { ordered: false });
 
+        const result = await this.bulkWrite(bulkOps, { ordered: false });
 
-        if (result.modifiedCount !== inventories.length) throw new ConcurrencyError(
-            'One or more inventories were concurrently modified.'
-        );
-
+        if (result.modifiedCount !== inventories.length) {
+            throw new ConcurrencyError('One or more inventories were concurrently modified.');
+        }
     }
+
     async Delete(id: Id): Promise<void> {
         const doc = await super.findByIdAndDelete(id.value);
         if (!doc) throw new BadRequestError('Inventory not found with this id');

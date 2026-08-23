@@ -95,11 +95,11 @@ export class OrderItemsRepository
   async createMany(items: OrderItemsAggregate[]): Promise<void> {
     if (!items || items.length === 0) return;
 
-    return this.unitOfWork.transaction(async () => {
-      const persistentItems = items.map(OrderItemsMapper.aggregateToPersistence);
 
-      await Promise.all(persistentItems.map(item => super.create(item)));
-    }, 3);
+    const persistentItems = items.map(OrderItemsMapper.aggregateToPersistence);
+
+    await super.bulkCreate(persistentItems, { ordered: false });
+
   }
 
 }

@@ -16,6 +16,14 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
         if (!doc) return null;
         return OrderMapper.persistenceToAggregate(doc);
     }
+
+    async EnsureUniqueImpodentKey(key: Id): Promise<void> {
+        const doc = await super.findOne({ idempotentKey: key.value });
+        if (doc) {
+            throw new BadRequestError("This order was already created");
+        }
+    }
+
     async FindByIdOrThrow(id: Id): Promise<OrderAggregate> {
         const doc = await super.findById(id.value);
         if (!doc) throw new BadRequestError('Order not found with this id');
@@ -44,13 +52,9 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
     }
 
     async Create(product: OrderAggregate): Promise<void> {
-        console.log('1')
         const persistantProduct = OrderMapper.aggregateToPersistence(product);
-        console.log('2')
         const productDoc = new OrderModel(persistantProduct);
-        console.log('3');
         await super.create(productDoc);
-        console.log('4')
     }
 
     async Exists(id: Id): Promise<boolean> {

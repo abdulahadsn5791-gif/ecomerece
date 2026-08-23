@@ -1,4 +1,5 @@
-import type { FilterQuery, Model, QueryOptions, UpdateQuery } from 'mongoose';
+import type { FilterQuery, InsertManyOptions, Model, MongooseBulkWriteOptions, QueryOptions, UpdateQuery } from 'mongoose';
+
 
 import { getCurrentSession } from '../database/transaction-context';
 import { BaseRepository } from './base.repository';
@@ -93,6 +94,7 @@ export class MongoRepository<T> extends BaseRepository<T> {
     exists(filter: FilterQuery<T>) {
         return this.model.exists(filter).session(this.session ?? null);
     }
+
     async paginate(params: { filter?: FilterQuery<T>; page?: number; limit?: number }) {
         const { page, limit } = this.normalizePagination({
             page: params.page,
@@ -142,6 +144,7 @@ export class MongoRepository<T> extends BaseRepository<T> {
 
         return this.buildCursorMeta(docs, limit);
     }
+
     async upsert(filter: FilterQuery<T>, data: Partial<T>, setOnInsert: Partial<T> = {}) {
         return this.model
             .findOneAndUpdate(
@@ -159,5 +162,33 @@ export class MongoRepository<T> extends BaseRepository<T> {
                 },
             )
             .lean();
+    }
+
+    /**
+     * Execute a bulk write operation with an array of write operations.
+     * @param operations - Array of write operations (e.g., `{ insertOne: { document } }`, `{ updateOne: { filter, update } }`)
+     * @param options - Additional bulkWrite options (e.g., `{ ordered: false }`)
+     * @returns The result of the bulk write.
+     */
+    async bulkWrite(operations: any[], options: MongooseBulkWriteOptions = {}) {
+        return this.model.bulkWrite(operations, {
+            ...options,
+            session: this.session ?? undefined,
+        });
+    }
+
+    /**
+     * Insert many documents in a single batch.
+     * @param documents - Array of documents (partial objects) to insert.
+     * @param options - InsertMany options (e.g., `{ ordered: false }`)
+     * @returns The array of inserted documents as plain objects.
+     */
+    async bulkCreate(documents: Partial<T>[], options: InsertManyOptions = {}) {
+        const inserted = await this.model.insertMany(documents, {
+            ...options,
+            session: this.session ?? undefined,
+        });
+        // Return plain objects (lean)
+        return inserted.map(doc => doc.toObject());
     }
 }

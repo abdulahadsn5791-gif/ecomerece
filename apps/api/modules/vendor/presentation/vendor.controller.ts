@@ -1,12 +1,12 @@
 import type { Context } from 'hono';
 import { BaseController } from '../../../core/controller/base.controller';
 import type { VendorAppService } from '../application/vendor.app.service';
-import { CreateVendorDtoSchema } from './dto/create-vendorDto';
-import { DeleteMyVendorDtoSchema, DeleteVendorDtoSchema } from './dto/delete-vendor.dto';
-import { RecoverVendorDtoSchema } from './dto/recover-vendor.dto';
-import { RejectVendorDtoSchema } from './dto/reject-vendor.dto';
-import { VendorParamDtoSchema } from './dto/vendor-param.Dto';
-import { VerifyVendorDtoSchema } from './dto/verify-vendor.dto';
+import { CreateVendorDtoSchema } from '@ecomerece/shared';
+import { DeleteMyVendorDtoSchema, DeleteVendorDtoSchema } from '@ecomerece/shared';
+import { RecoverVendorDtoSchema } from '@ecomerece/shared';
+import { RejectVendorDtoSchema } from '@ecomerece/shared';
+import { VendorParamDtoSchema } from '@ecomerece/shared';
+import { VerifyVendorDtoSchema } from '@ecomerece/shared';
 
 export class VendorController extends BaseController<VendorAppService> {
     getVendorById = async (c: Context) => {

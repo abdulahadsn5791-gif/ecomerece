@@ -1,11 +1,11 @@
-import type { VendorReadModel } from '@ecomerece/domain/modules/address/read-models/vendor-read-model';
+import type { VendorReadModel } from '@ecomerece/domain';
 import type { EnsureActiveVendorGetByIdQuery } from '../queries/ensure-active-vendor-get-by-id.query';
 
 import type { VendorInternalService } from '../vendor.internal.service';
 
 export class EnsureActiveVendorGetByIdHandler {
     readonly type = 'EnsureActiveVendorGetByIdQuery';
-    constructor(private readonly internalService: VendorInternalService) {}
+    constructor(private readonly internalService: VendorInternalService) { }
     async handle(
         query: EnsureActiveVendorGetByIdQuery,
     ): Promise<{ vendor: VendorReadModel | null; active: boolean }> {

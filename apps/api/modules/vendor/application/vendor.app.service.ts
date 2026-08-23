@@ -1,4 +1,4 @@
-import type { InMemoryEventBus } from '@ecomerece/domain/infrastructure/in-memory-event-bus';
+
 
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
 import { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
@@ -18,19 +18,20 @@ import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
 import { BaseService } from '../../../core/services/base.services';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
-import type { IVendorRepository } from '@ecomerece/domain/modules/address/ports/i-vendor-repository';
-import type { VendorResponseReadModel } from '@ecomerece/domain/modules/address/read-models/vendor-response-read-model';
-import { ContactInfoVO } from '@ecomerece/domain/modules/address/value-objects/contact-info.vo';
-import { ImageInfoVO } from '@ecomerece/domain/modules/address/value-objects/image-info.vo';
-import { VendorAggregate } from '@ecomerece/domain/modules/address/vendor.aggregate';
+import type { IVendorRepository } from '@ecomerece/domain';
+import type { VendorResponseReadModel } from '@ecomerece/shared';
+import { ContactInfoVO } from '@ecomerece/domain';
+import { ImageInfoVO } from '@ecomerece/domain';
+import { VendorAggregate } from '@ecomerece/domain';
 import { VendorMapper } from '../infrastructure/vendor.mapper';
-import type { CreateVendorDto } from '../presentation/dto/create-vendorDto';
-import type { DeleteMyVendorDto, DeleteVendorDto } from '../presentation/dto/delete-vendor.dto';
-import type { RecoverVendorDto } from '../presentation/dto/recover-vendor.dto';
-import type { RejectVendorDto } from '../presentation/dto/reject-vendor.dto';
-import type { VerifyVendorDto } from '../presentation/dto/verify-vendor.dto';
+import type { CreateVendorDto } from '@ecomerece/shared';
+import type { DeleteMyVendorDto, DeleteVendorDto } from '@ecomerece/shared';
+import type { RecoverVendorDto } from '@ecomerece/shared';
+import type { RejectVendorDto } from '@ecomerece/shared';
+import type { VerifyVendorDto } from '@ecomerece/shared';
 import { VendorMessages, type VendorMessagesType } from '../presentation/vendor.messages';
 import type { VendorInternalService } from './vendor.internal.service';
+import { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
 
 export class VendorAppService extends BaseService {
     constructor(
@@ -79,7 +80,7 @@ export class VendorAppService extends BaseService {
         });
         newVendor.raiseCreated(id, actorId, tittle, slug);
         await this.vendorRepo.Create(newVendor);
-        await this.eventBus.publish(newVendor.pullEvents());
+
         return VendorMessages.createdVendor(id, actorId);
     }
 
@@ -95,7 +96,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByOwnerIdOrThrow(actorId);
         vendor.deleteVendor(actorId, reason);
         await this.vendorRepo.Save(vendor);
-        await this.eventBus.publish(vendor.pullEvents());
+
         return VendorMessages.deletedVendor(vendor.id, actorId);
     }
     async softDeleteVendor(data: DeleteVendorDto, actor: UserPersistence) {
@@ -105,7 +106,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.deleteVendor(actorId, reason);
         await this.vendorRepo.Save(vendor);
-        await this.eventBus.publish(vendor.pullEvents());
+
         return VendorMessages.deletedVendor(vendor.id, actorId);
     }
 
@@ -115,7 +116,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.recoverVendor(actorId);
         await this.vendorRepo.Save(vendor);
-        await this.eventBus.publish(vendor.pullEvents());
+
         return VendorMessages.recoveredVendor(vendor.id, actorId);
     }
 
@@ -125,7 +126,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.verifyVendor(actorId);
         await this.vendorRepo.Save(vendor);
-        await this.eventBus.publish(vendor.pullEvents());
+
         return VendorMessages.verifiedVendor(vendor.id, actorId);
     }
 
@@ -136,7 +137,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.rejectVerification(actorId, reason);
         await this.vendorRepo.Save(vendor);
-        await this.eventBus.publish(vendor.pullEvents());
+
         return VendorMessages.rejectVendorVerification(vendor.id, actorId);
     }
 }

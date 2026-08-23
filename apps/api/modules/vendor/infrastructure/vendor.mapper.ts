@@ -17,15 +17,15 @@ import {
 } from '@ecomerece/domain/value-objects/street-address.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
-import type { VendorReadModel } from '@ecomerece/domain/modules/address/read-models/vendor-read-model';
-import type { VendorResponseReadModel } from '@ecomerece/domain/modules/address/read-models/vendor-response-read-model';
+import type { VendorReadModel } from '@ecomerece/domain';
+import type { VendorResponseReadModel } from '@ecomerece/shared';
 
-import { ContactInfoVO } from '@ecomerece/domain/modules/address/value-objects/contact-info.vo';
-import { DeleteInfoVO } from '@ecomerece/domain/modules/address/value-objects/delete-info.vo';
-import { ImageInfoVO } from '@ecomerece/domain/modules/address/value-objects/image-info.vo';
+import { ContactInfoVO } from '@ecomerece/domain';
+import { DeleteInfoVO } from '@ecomerece/domain';
+import { ImageInfoVO } from '@ecomerece/domain';
 
-import { VerificationInfoVO } from '@ecomerece/domain/modules/address/value-objects/verification-info.vo';
-import { VendorAggregate } from '@ecomerece/domain/modules/address/vendor.aggregate';
+import { VerificationInfoVO } from '@ecomerece/domain';
+import { VendorAggregate } from '@ecomerece/domain';
 import type { VendorPersistenceWithId } from './vendor.models';
 
 export const VendorMapper = {

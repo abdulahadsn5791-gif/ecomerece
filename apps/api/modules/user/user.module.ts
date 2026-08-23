@@ -1,5 +1,4 @@
-import { eventBus } from '@ecomerece/domain/infrastructure/in-memory-event-bus';
-import { queryBus } from '@ecomerece/domain/infrastructure/in-memory-query-bus';
+
 import { UserSignedInHandler } from './application/event-handlers/user-signed-in.handler';
 import { EnsureActiveQuery } from './application/queries/ensure-active.query';
 import { EnsureActiveUserGetByIdQuery } from './application/queries/ensure-active-user-get-by-id.query';
@@ -13,6 +12,8 @@ import { UserAppService } from './application/user.app.service';
 import { UserInternalService } from './application/user.internal.service';
 import { UserRepository } from './infrastructure/user.repository';
 import { UserController } from './presentation/user.controller';
+import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
+import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 
 export function createUserModule() {
     const userRepo = new UserRepository();

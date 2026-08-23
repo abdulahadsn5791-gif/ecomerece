@@ -1,21 +1,22 @@
 
 
-import { BlockInfoVO, EffectiveDate, EmailVO, Id, PersonName, Reason, UrlVO, UserAggregate } from '@ecomerece/domain';
+import { BanInfoVO, BlockInfoVO, DeleteInfoVO, EffectiveDate, EmailVO, ExpirationDate, Id, NameInfoVO, PersonName, Quantity, Reason, RoleInfoVO, UrlVO, UserAggregate, UserReadModel, UserRoleVO } from '@ecomerece/domain';
 import type { UserPersistence } from './user.models';
+import { UserResponseReadModel } from '@ecomerece/shared';
 
 export const UserMapper = {
     persistenceToAggregate(doc: UserPersistence): UserAggregate {
         return UserAggregate.rehydrate(
             Id.create(doc._id),
-            NameInfoVo.create(
+            NameInfoVO.create(
                 PersonName.create(doc.name.firstName),
                 doc.name.middleName ? PersonName.create(doc.name.middleName) : null,
                 doc.name.lastName ? PersonName.create(doc.name.lastName) : null,
             ),
             EmailVO.create(doc.email),
             UrlVO.create(doc.image),
-            RoleInfoVo.rehydrate(
-                UserRoleVo.create(doc.role.role),
+            RoleInfoVO.rehydrate(
+                UserRoleVO.create(doc.role.role),
                 doc.role.from ? EffectiveDate.create(doc.role.from) : null,
                 doc.role.assignedBy ? Id.create(doc.role.assignedBy) : null,
                 doc.role.reason ? Reason.create(doc.role.reason) : null,

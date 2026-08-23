@@ -3,8 +3,8 @@ import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
 import { EnsureActiveQuery } from '../../user/application/queries/ensure-active.query';
-import type { IVendorRepository } from '@ecomerece/domain/modules/address/ports/i-vendor-repository';
-import type { VendorReadModel } from '@ecomerece/domain/modules/address/read-models/vendor-read-model';
+import type { IVendorRepository } from '@ecomerece/domain';
+import type { VendorReadModel } from '@ecomerece/domain';
 import { VendorMapper } from '../infrastructure/vendor.mapper';
 
 export class VendorInternalService extends BaseService {

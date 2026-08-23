@@ -1,5 +1,4 @@
-import { InMemoryEventBus } from '@ecomerece/domain/infrastructure/in-memory-event-bus';
-import { queryBus } from '@ecomerece/domain/infrastructure/in-memory-query-bus';
+
 import { EnsureActiveVendorQuery } from './application/queries/ensure-active-vendor.query';
 import { EnsureActiveVendorGetByIdQuery } from './application/queries/ensure-active-vendor-get-by-id.query';
 import { GetVendorByUserIdQuery } from './application/queries/get-vendor-by-user-id.query';
@@ -12,6 +11,8 @@ import { VendorAppService } from './application/vendor.app.service';
 import { VendorInternalService } from './application/vendor.internal.service';
 import { VendorRepository } from './infrastructure/vendor.repository';
 import { VendorController } from './presentation/vendor.controller';
+import { InMemoryEventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
+import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 
 export function CreateVendorModule() {
     const repo = new VendorRepository();

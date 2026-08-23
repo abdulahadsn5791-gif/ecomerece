@@ -1,6 +1,6 @@
 import type { IQuery } from '@ecomerece/domain/query/query-bus.interface';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
-import type { VendorReadModel } from '@ecomerece/domain/modules/address/read-models/vendor-read-model';
+import type { VendorReadModel } from '@ecomerece/domain';
 
 export class EnsureActiveVendorQuery implements IQuery<VendorReadModel> {
     readonly __result?: VendorReadModel;

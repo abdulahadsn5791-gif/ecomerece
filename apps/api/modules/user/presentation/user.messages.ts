@@ -1,5 +1,5 @@
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
-import type { UserRoleVO } from '@ecomerece/domain/modules/address/value-objects/role-info.vo';
+import type { UserRoleVO } from '@ecomerece/domain';
 
 export type UserMessagesType = { message: string };
 export const UserMessages = {

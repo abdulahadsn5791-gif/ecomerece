@@ -1,0 +1,65 @@
+import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import { MongoRepository } from '../../../core/repository/mongo.repository';
+import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
+
+import { OrderMapper } from './order.mapper';
+import { OrderModel, type OrderPersistence } from './order.model';
+import { IOrderRepository, OrderAggregate } from '@ecomerece/domain';
+
+export class OrderRepository extends MongoRepository<OrderPersistence> implements IOrderRepository {
+    constructor() {
+        super(OrderModel);
+    }
+
+    async FindById(id: Id): Promise<OrderAggregate | null> {
+        const doc = await super.findById(id.value);
+        if (!doc) return null;
+        return OrderMapper.persistenceToAggregate(doc);
+    }
+
+    async EnsureUniqueImpodentKey(key: Id): Promise<void> {
+        const doc = await super.findOne({ idempotentKey: key.value });
+        if (doc) {
+            throw new BadRequestError("This order was already created");
+        }
+    }
+
+    async FindByIdOrThrow(id: Id): Promise<OrderAggregate> {
+        const doc = await super.findById(id.value);
+        if (!doc) throw new BadRequestError('Order not found with this id');
+        return OrderMapper.persistenceToAggregate(doc);
+    }
+
+    async Save(product: OrderAggregate): Promise<void> {
+
+        const data = OrderMapper.aggregateToPersistence(product);
+
+        const result = await super.updateOne(
+            {
+                _id: product.id.value,
+                version: product.version.value,
+            },
+            {
+                $set: data,
+                $inc: { version: 1 },
+            },
+        );
+
+        if (result.modifiedCount === 0) throw new ConcurrencyError();
+    }
+    async Delete(id: Id): Promise<void> {
+        await super.findByIdAndDelete(id.value);
+    }
+
+    async Create(product: OrderAggregate): Promise<void> {
+        const persistantProduct = OrderMapper.aggregateToPersistence(product);
+        const productDoc = new OrderModel(persistantProduct);
+        await super.create(productDoc);
+    }
+
+    async Exists(id: Id): Promise<boolean> {
+        return !!(await super.exists({
+            _id: id.value,
+        }));
+    }
+}

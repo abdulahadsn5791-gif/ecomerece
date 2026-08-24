@@ -1,13 +1,7 @@
-import { AggregateRoot } from '../../../core/domain/aggregate-root';
-import type { DateVO } from '../../../core/domain/value-objects/date.vo';
-import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
-import type { EmailVO } from '../../../core/domain/value-objects/email.vo';
-import { ExpirationDate } from '../../../core/domain/value-objects/expiration-date.vo';
-import type { Id } from '../../../core/domain/value-objects/id.vo';
-import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
-import type { Reason } from '../../../core/domain/value-objects/reason.vo';
-import type { UrlVO } from '../../../core/domain/value-objects/url.vo';
-import { BadRequestError } from '../../../errors/app-error';
+
+import { BadRequestError } from '../../../../apps/api/errors/app-error';
+import { AggregateRoot } from '../../aggregate-root';
+import { BanInfoVO, BlockInfoVO, DateVO, DeleteInfoVO, EffectiveDate, EmailVO, ExpirationDate, Id, Quantity, Reason, UrlVO } from '../../value-objects';
 import { UserBanLiftedEvent } from './events/user-ban-lifted.event';
 import { UserBannedEvent } from './events/user-banned.event';
 import { UserUnBlockLiftedEvent } from './events/user-block-lifted.event';
@@ -18,9 +12,7 @@ import { UserLoggedInEvent } from './events/user-logged-in.event';
 import { UserRoleAssignedEvent } from './events/user-role-assigned.event';
 import { UserSignedInEvent } from './events/user-signed-in.event';
 
-import { BanInfoVO } from './value-objects/ban-info.vo';
-import { BlockInfoVO } from './value-objects/block-info.vo';
-import { DeleteInfoVO } from './value-objects/delete-Info.vo';
+
 import type { NameInfoVO } from './value-objects/name-info.vo';
 import { RoleInfoVO, type UserRoleVO } from './value-objects/role-info.vo';
 

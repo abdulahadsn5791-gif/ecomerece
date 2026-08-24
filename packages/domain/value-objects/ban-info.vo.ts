@@ -1,4 +1,4 @@
-import { BadRequestError } from '../../../errors/app-error';
+import { BadRequestError } from '../../../apps/api/errors/app-error';
 import type { EffectiveDate } from './effective-date.vo';
 import type { ExpirationDate } from './expiration-date.vo';
 import type { Id } from './id.vo';
@@ -10,7 +10,7 @@ export class BanInfoVO {
         readonly from: EffectiveDate | null,
         readonly until: ExpirationDate | null,
         readonly reason: Reason | null,
-    ) {}
+    ) { }
 
     ban(performedBy: Id, from: EffectiveDate, until: ExpirationDate, reason: Reason) {
         if (!until.after(from.value)) {
@@ -54,7 +54,14 @@ export class BanInfoVO {
             this.reason,
         );
     }
-
+    static create(
+        bannedBy: Id | null,
+        from: EffectiveDate | null,
+        bannedUntil: ExpirationDate | null,
+        reason: Reason | null,
+    ) {
+        return new BanInfoVO(bannedBy, from, bannedUntil, reason);
+    }
     static rehydrate(
         bannedBy: Id | null,
         from: EffectiveDate | null,

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { BadRequestError } from '../../../../errors/app-error';
+
 import { EnumVO } from '../enum.vo';
 import { EnumCollectionVO } from '../enum-collection.vo';
+import { BadRequestError } from '../../../../apps/api/errors/app-error';
 
 const TAGS = ['featured', 'sale', 'new'] as const;
 

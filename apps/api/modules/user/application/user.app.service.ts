@@ -70,7 +70,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.assignRole(role, actorId, reason);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.assignRole(id, role, actorId);
     }
 
@@ -79,7 +79,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.loginUser();
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.logIn(id);
     }
     async getMe(actor: UserPersistence): Promise<UserResponseReadModel> {
@@ -94,7 +94,7 @@ export class UserAppService extends BaseService {
         const reason = Reason.create(data.reason);
         user.deleteUser(actorId, reason);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.delete(id, actorId);
     }
 
@@ -104,7 +104,7 @@ export class UserAppService extends BaseService {
         const reason = Reason.create(data.reason);
         user.deleteUser(actorId, reason);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.delete(actorId, actorId);
     }
     async recoverUser(id: string, actor: UserPersistence): Promise<UserMessagesType> {
@@ -113,7 +113,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(userId);
         user.recoverUser(actorId);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.recover(userId, actorId);
     }
     async blockUser(data: BlockUserDTO, actor: UserPersistence): Promise<UserMessagesType> {
@@ -123,7 +123,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.blockUser(actorId, reason);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.block(id, actorId);
     }
     async blockLift(userId: string, actor: UserPersistence): Promise<UserMessagesType> {
@@ -136,7 +136,7 @@ export class UserAppService extends BaseService {
 
         await this.userRepo.Save(user);
 
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.blockLift(id, actorId);
     }
     async banUser(data: BanUserDTO, actor: UserPersistence): Promise<UserMessagesType> {
@@ -146,7 +146,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.banUser(actorId, data.forDays, reason);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.ban(id, actorId, data.forDays);
     }
     async banLift(userId: string, actor: UserPersistence): Promise<UserMessagesType> {
@@ -155,7 +155,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.unBanUser(actorId);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.banLift(id, actorId);
     }
     async extendBan(data: ExtendBanDTO, actor: UserPersistence): Promise<UserMessagesType> {
@@ -164,7 +164,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.extendBan(actorId, data.forDays);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.extendBan(id, actorId, data.forDays);
     }
     async shortenBan(data: ExtendBanDTO, actor: UserPersistence): Promise<UserMessagesType> {
@@ -173,7 +173,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.shortenBan(actorId, data.forDays);
         await this.userRepo.Save(user);
-        await this.eventBus.publish(user.pullEvents());
+
         return UserMessages.shortBan(id, actorId, data.forDays);
     }
 }

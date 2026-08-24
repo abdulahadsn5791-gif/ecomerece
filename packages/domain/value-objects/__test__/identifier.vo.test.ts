@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { BadRequestError } from '../../../../errors/app-error';
+
 import { Identifier } from '../identifier-vo';
+import { BadRequestError } from '../../../../apps/api/errors/app-error';
 
 class StringIdentifier extends Identifier<string> {
     constructor(value: string) {

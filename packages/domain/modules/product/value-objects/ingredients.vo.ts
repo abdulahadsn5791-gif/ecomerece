@@ -1,5 +1,5 @@
-import { Title } from '../../../../core/domain/value-objects/title.vo';
-import { BadRequestError } from '../../../../errors/app-error';
+import { BadRequestError } from "../../../../../apps/api/errors/app-error";
+import { Title } from "../../../value-objects";
 
 export interface IngredientsProps {
     isIngredients: boolean;
@@ -10,7 +10,7 @@ export class IngredientsVO {
     private constructor(
         public readonly isIngredients: boolean,
         private items: readonly Title[],
-    ) {}
+    ) { }
 
     static create(props: IngredientsProps): IngredientsVO {
         return new IngredientsVO(props.isIngredients, props.items);

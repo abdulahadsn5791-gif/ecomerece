@@ -1,9 +1,9 @@
-import type { IEvent } from '../../../../core/domain/events/event-bus.interface';
-import { EffectiveDate } from '../../../../core/domain/value-objects/effective-date.vo';
-import type { Id } from '../../../../core/domain/value-objects/id.vo';
-import type { DeleteInfoVO } from '../value-objects/delete-Info.vo';
+import { IEvent } from "../../../events/event-bus.interface";
+import { DeleteInfoVO, EffectiveDate, Id } from "../../../value-objects";
+
+
 export class UserDeleteLiftedEvent implements IEvent<{ userId: Id; recoverInfo: DeleteInfoVO }> {
     readonly type = 'user.delete-lifted';
     readonly occurredOn = EffectiveDate.today();
-    constructor(public readonly payload: { userId: Id; recoverInfo: DeleteInfoVO }) {}
+    constructor(public readonly payload: { userId: Id; recoverInfo: DeleteInfoVO }) { }
 }

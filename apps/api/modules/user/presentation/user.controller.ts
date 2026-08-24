@@ -2,12 +2,8 @@ import type { Context } from 'hono';
 import { BaseController } from '../../../core/controller/base.controller';
 import { clerkUserIdSchema } from '../../../shared/validation/clerkSchema';
 import type { UserAppService } from '../application/user.app.service';
-import { UserRoleDtoSchema } from './dto/assign-role.dto';
-import { BanUserDTOSchema } from './dto/ban-user.dto';
-import { BlockUserDTOSchema } from './dto/block-user.dto';
-import { DeleteMeDTOSchema, DeleteUserDTOSchema } from './dto/delete-user.dto';
-import { ExtendBanDTOSchema } from './dto/extend-ban.dto';
-import { ObjUserIdDTOSchema } from './dto/user-id.dto';
+import { BanUserDTOSchema, BlockUserDTOSchema, DeleteMeDTOSchema, DeleteUserDTOSchema, ExtendBanDTOSchema, ObjUserIdDTOSchema, UserRoleDtoSchema } from '@ecomerece/shared';
+
 
 export class UserController extends BaseController<UserAppService> {
     getUserById = async (c: Context) => {

@@ -8,7 +8,7 @@ export class BlockInfoVO {
         readonly blocked: boolean,
         readonly from: EffectiveDate | null,
         readonly reason: Reason | null,
-    ) {}
+    ) { }
 
     block(actor: Id, reason: Reason) {
         return new BlockInfoVO(actor, true, EffectiveDate.today(), reason);
@@ -20,6 +20,15 @@ export class BlockInfoVO {
     static none() {
         return new BlockInfoVO(null, false, null, null);
     }
+
+    static create(
+        blockedBy: Id | null,
+
+        blockedReason: Reason | null,
+    ) {
+        return new BlockInfoVO(blockedBy, true, EffectiveDate.today(), blockedReason);
+    }
+
 
     static rehydrate(
         blockedBy: Id | null,

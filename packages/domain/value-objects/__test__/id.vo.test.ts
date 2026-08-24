@@ -104,7 +104,7 @@ describe('Id', () => {
 
         it('equals() returns false for null', () => {
             const a = Id.create('abc123');
-            // @ts-expect-error – intentionally testing runtime null handling
+
             expect(a.equals(null)).toBe(false);
         });
 

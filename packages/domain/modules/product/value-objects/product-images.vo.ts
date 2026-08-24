@@ -1,10 +1,9 @@
-import type { ImageVO } from '../../../../core/domain/value-objects/image.vo';
-import type { Quantity } from '../../../../core/domain/value-objects/quantity.vo';
-import type { UrlVO } from '../../../../core/domain/value-objects/url.vo';
-import { BadRequestError } from '../../../../errors/app-error';
+import { BadRequestError } from "../../../../../apps/api/errors/app-error";
+import { ImageVO, Quantity, UrlVO } from "../../../value-objects";
+
 
 export class ImagesVO {
-    private constructor(private readonly _images: readonly ImageVO[]) {}
+    private constructor(private readonly _images: readonly ImageVO[]) { }
 
     static create(images: ImageVO[]): ImagesVO {
         if (images.length === 0) {

@@ -1,22 +1,9 @@
 
-import { desclaimerItem } from '../../../../../packages/shared/types/disclaimer-type';
-import { AggregateRoot } from '../../../core/domain/aggregate-root';
-import { AppearanceVO } from '../../../core/domain/value-objects/appearance.vo';
 
-import { BlockInfoVO } from '../../../core/domain/value-objects/block-info.vo';
-import { DeleteInfoVO } from '../../../core/domain/value-objects/delete-info.vo';
-import type { Description } from '../../../core/domain/value-objects/description.vo';
-import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
-
-import type { Id } from '../../../core/domain/value-objects/id.vo';
-import type { ImageVO } from '../../../core/domain/value-objects/image.vo';
-import { Name } from '../../../core/domain/value-objects/name.vo';
-import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
-import type { Reason } from '../../../core/domain/value-objects/reason.vo';
-import { Title } from '../../../core/domain/value-objects/title.vo';
-import type { UrlVO } from '../../../core/domain/value-objects/url.vo';
-import { BadRequestError } from '../../../errors/app-error';
-
+import { BadRequestError } from '../../../../apps/api/errors/app-error';
+import { desclaimerItem } from '../../../shared';
+import { AggregateRoot } from '../../aggregate-root';
+import { AppearanceVO, BlockInfoVO, DeleteInfoVO, Description, EffectiveDate, Id, ImageVO, Name, Quantity, Reason, Title, UrlVO } from '../../value-objects';
 import type { DisclaimerVO } from './value-objects/disclaimer.vo';
 import type { IngredientsVO } from './value-objects/ingredients.vo';
 import type { ImagesVO } from './value-objects/product-images.vo';

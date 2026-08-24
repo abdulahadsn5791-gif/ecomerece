@@ -1,20 +1,8 @@
-import { AggregateRoot } from '../../../core/domain/aggregate-root';
-import { DateVO } from '../../../core/domain/value-objects/date.vo';
-import { DeleteInfoVO } from '../../../core/domain/value-objects/delete-info.vo';
-import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
-import type { Id } from '../../../core/domain/value-objects/id.vo';
-import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
-import type { Reason } from '../../../core/domain/value-objects/reason.vo';
-import {
-    AddressVO,
-    type CityVO,
-    type CountryVO,
-    type FullAddressVO,
-    type PostalCodeVO,
-    type StateVO,
-    type StreetAddressVO,
-} from '../../../core/domain/value-objects/street-address.vo';
-import { BadRequestError } from '../../../errors/app-error';
+import { BadRequestError } from "../../../../apps/api/errors/app-error";
+import { AggregateRoot } from "../../aggregate-root";
+import { AddressVO, CityVO, CountryVO, DeleteInfoVO, EffectiveDate, FullAddressVO, Id, PostalCodeVO, Quantity, Reason, StateVO, StreetAddressVO } from "../../value-objects";
+
+
 
 export type createAddressProps = {
     _id: Id;

@@ -1,4 +1,5 @@
-import { Id } from "../../../../core/domain/value-objects/id.vo";
+
+import { Id } from "../../../value-objects";
 import { OrderItemsAggregate } from "../order-items.aggregate";
 
 export interface IOrderItemsRepository {

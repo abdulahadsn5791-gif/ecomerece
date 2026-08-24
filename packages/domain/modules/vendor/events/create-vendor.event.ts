@@ -1,8 +1,6 @@
-import type { IEvent } from '../../../../core/domain/events/event-bus.interface';
-import { EffectiveDate } from '../../../../core/domain/value-objects/effective-date.vo';
-import type { Id } from '../../../../core/domain/value-objects/id.vo';
-import type { Slug } from '../../../../core/domain/value-objects/slug.vo';
-import type { Title } from '../../../../core/domain/value-objects/title.vo';
+import { IEvent } from "../../../events/event-bus.interface";
+import { EffectiveDate, Id, Slug, Title } from "../../../value-objects";
+
 
 export interface VendorCreatedPayload {
     vendorId: Id;
@@ -15,5 +13,5 @@ export class VendorCreatedEvent implements IEvent<VendorCreatedPayload> {
     readonly type = 'vendor.created';
     readonly occurredOn = EffectiveDate.today();
 
-    constructor(public readonly payload: VendorCreatedPayload) {}
+    constructor(public readonly payload: VendorCreatedPayload) { }
 }

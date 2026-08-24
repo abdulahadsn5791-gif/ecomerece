@@ -1,4 +1,5 @@
-import type { Id } from '../../../../core/domain/value-objects/id.vo';
+
+import { Id } from '../../../value-objects';
 import type { InventoryAggregate } from '../inventory.aggregate';
 
 export interface IIventoryRepository {

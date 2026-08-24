@@ -1,12 +1,7 @@
-import { AggregateRoot } from '../../../core/domain/aggregate-root';
-import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
-import type { Id } from '../../../core/domain/value-objects/id.vo';
-import type { Money } from '../../../core/domain/value-objects/money.vo';
-import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
-import type { Reason } from '../../../core/domain/value-objects/reason.vo';
-import type { Title } from '../../../core/domain/value-objects/title.vo';
-import { BadRequestError } from '../../../errors/app-error';
-import { DeleteInfoVO } from '../../user/domain/value-objects/delete-Info.vo';
+import { BadRequestError } from "../../../../apps/api/errors/app-error";
+import { AggregateRoot } from "../../aggregate-root";
+import { DeleteInfoVO, EffectiveDate, Id, Money, Quantity, Reason, Title } from "../../value-objects";
+
 
 export type createVarientProps = {
     id: Id;

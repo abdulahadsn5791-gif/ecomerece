@@ -1,4 +1,5 @@
-import { BadRequestError } from '../../../errors/app-error';
+
+import { BadRequestError } from '../../../apps/api/errors/app-error';
 import { StringVO } from './string-vo';
 
 export class Title extends StringVO {

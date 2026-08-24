@@ -1,10 +1,11 @@
-import type { UrlVO } from '../../../../core/domain/value-objects/url.vo';
+import { UrlVO } from "../../../value-objects";
+
 
 export class ImageInfoVO {
     private constructor(
         readonly logo: UrlVO,
         readonly banner: UrlVO,
-    ) {}
+    ) { }
 
     static create(logo: UrlVO, banner: UrlVO): ImageInfoVO {
         return new ImageInfoVO(logo, banner);

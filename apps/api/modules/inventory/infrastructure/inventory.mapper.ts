@@ -2,7 +2,7 @@ import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
-import { DeleteInfoVO } from '@ecomerece/domain/modules/user/value-objects/delete-Info.vo';
+import { DeleteInfoVO } from '@ecomerece/domain';
 
 import type { InventoryPersistence } from './inventory.model';
 import { InventoryAggregate, InventoryReadModel } from '@ecomerece/domain';

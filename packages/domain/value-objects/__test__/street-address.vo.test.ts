@@ -94,7 +94,7 @@ describe('Address Value Objects', () => {
                 StateVO.create('Punjab'),
                 PostalCodeVO.create('54000'),
                 CountryVO.create('Pakistan'),
-                FullAddressVO.create('123 Main Street, Lahore, Punjab, 54000, Pakistan'),
+
             );
 
         it('creates a valid address', () => {
@@ -124,7 +124,7 @@ describe('Address Value Objects', () => {
                 StateVO.create('Sindh'),
                 PostalCodeVO.create('75000'),
                 CountryVO.create('Pakistan'),
-                FullAddressVO.create('456 Park Road, Karachi, Sindh, 75000, Pakistan'),
+
             );
 
             expect(address1.equals(address2)).toBe(false);

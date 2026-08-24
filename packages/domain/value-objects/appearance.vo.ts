@@ -1,4 +1,5 @@
-import { EnumVO } from '../../../core/domain/value-objects/enum.vo';
+import { EnumVO } from "./enum.vo";
+
 
 export const APPEARANCE = ['public', 'private'] as const;
 

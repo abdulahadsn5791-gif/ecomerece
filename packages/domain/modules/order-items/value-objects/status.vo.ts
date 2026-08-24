@@ -1,5 +1,5 @@
-import { StringVO } from '../../../../core/domain/value-objects/string-vo';
-import { BadRequestError } from '../../../../errors/app-error';
+import { BadRequestError } from "../../../../../apps/api/errors/app-error";
+import { StringVO } from "../../../value-objects";
 
 export const StatusEnum = {
     PENDING: 'pending',

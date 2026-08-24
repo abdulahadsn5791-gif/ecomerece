@@ -1,6 +1,6 @@
-import { Name } from '../../../../core/domain/value-objects/name.vo';
-import { Title } from '../../../../core/domain/value-objects/title.vo';
-import { BadRequestError } from '../../../../errors/app-error';
+import { BadRequestError } from "../../../../../apps/api/errors/app-error";
+import { Name, Title } from "../../../value-objects";
+
 
 export interface DisclaimerItem {
     name: Name;
@@ -98,9 +98,9 @@ export class DisclaimerVO {
             this.items.map((item) =>
                 item.name.equals(nameVO)
                     ? {
-                          name: nameVO,
-                          title: titleVO,
-                      }
+                        name: nameVO,
+                        title: titleVO,
+                    }
                     : item,
             ),
         );

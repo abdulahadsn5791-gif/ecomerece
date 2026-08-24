@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { BadRequestError } from '../../../../errors/app-error';
+
 import { Slug } from '../slug.vo';
+import { BadRequestError } from '../../../../apps/api/errors/app-error';
 
 describe('Slug', () => {
     describe('create', () => {

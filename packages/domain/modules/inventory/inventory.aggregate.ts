@@ -1,11 +1,7 @@
-import { create } from 'node:domain';
-import { AggregateRoot } from '../../../core/domain/aggregate-root';
-import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
-import type { Id } from '../../../core/domain/value-objects/id.vo';
-import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
-import type { Reason } from '../../../core/domain/value-objects/reason.vo';
-import { BadRequestError } from '../../../errors/app-error';
-import { DeleteInfoVO } from '../../user/domain/value-objects/delete-Info.vo';
+import { BadRequestError } from "../../../../apps/api/errors/app-error";
+import { AggregateRoot } from "../../aggregate-root";
+import { DeleteInfoVO, EffectiveDate, Id, Quantity, Reason } from "../../value-objects";
+
 
 type createInventoryProps = {
     id: Id;

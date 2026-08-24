@@ -1,4 +1,5 @@
-import type { Id } from '../../../../core/domain/value-objects/id.vo';
+
+import { Id } from '../../../value-objects';
 import type { ProductVariantAggregate } from '../product-variant.aggregate';
 
 export interface IProductVariantRepository {

@@ -1,10 +1,6 @@
-import { AggregateRoot } from "../../../core/domain/aggregate-root";
-import { DeleteInfoVO } from "../../../core/domain/value-objects/delete-info.vo";
-import { EffectiveDate } from "../../../core/domain/value-objects/effective-date.vo";
-import { ExpirationDate } from "../../../core/domain/value-objects/expiration-date.vo";
-import { Id } from "../../../core/domain/value-objects/id.vo";
-import { Money } from "../../../core/domain/value-objects/money.vo";
-import { Quantity } from "../../../core/domain/value-objects/quantity.vo";
+
+import { AggregateRoot } from "../../aggregate-root";
+import { DeleteInfoVO, EffectiveDate, ExpirationDate, Id, Money, Quantity } from "../../value-objects";
 import { StatusVo } from "./value-objects/status.vo";
 
 export type cretaeOrderProps = {

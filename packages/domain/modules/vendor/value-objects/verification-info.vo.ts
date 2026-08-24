@@ -1,13 +1,13 @@
-import type { EffectiveDate } from '../../../../core/domain/value-objects/effective-date.vo';
-import type { Reason } from '../../../../core/domain/value-objects/reason.vo';
-import { BadRequestError } from '../../../../errors/app-error';
+import { BadRequestError } from "../../../../../apps/api/errors/app-error";
+import { EffectiveDate, Reason } from "../../../value-objects";
+
 
 export class VerificationInfoVO {
     private constructor(
         readonly isVerified: boolean,
         readonly verifiedAt: EffectiveDate | null,
         readonly rejectedReason: Reason | null,
-    ) {}
+    ) { }
 
     static verified(verifiedAt: EffectiveDate): VerificationInfoVO {
         return new VerificationInfoVO(true, verifiedAt, null);

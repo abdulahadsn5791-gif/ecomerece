@@ -1,10 +1,6 @@
-import { AggregateRoot } from '../../../core/domain/aggregate-root';
-import { DeleteInfoVO } from '../../../core/domain/value-objects/delete-info.vo';
-import { EffectiveDate } from '../../../core/domain/value-objects/effective-date.vo';
-import type { Id } from '../../../core/domain/value-objects/id.vo';
-import { Money } from '../../../core/domain/value-objects/money.vo';
-import { Quantity } from '../../../core/domain/value-objects/quantity.vo';
-import type { FullAddressVO } from '../../../core/domain/value-objects/street-address.vo';
+;
+import { AggregateRoot } from '../../aggregate-root';
+import { DeleteInfoVO, EffectiveDate, FullAddressVO, Id, Money, Quantity } from '../../value-objects';
 import { OrderCreatedEvent } from './events/order-created.event';
 import type { OrderItem } from './value-objects/order-item.vo';
 

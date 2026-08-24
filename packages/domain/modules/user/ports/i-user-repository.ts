@@ -1,5 +1,5 @@
-import type { EmailVO } from '../../../../core/domain/value-objects/email.vo';
-import type { Id } from '../../../../core/domain/value-objects/id.vo';
+
+import { EmailVO, Id } from '../../../value-objects';
 import type { UserAggregate } from '../user.aggregate';
 
 export interface IUserRepository {

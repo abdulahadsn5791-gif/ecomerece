@@ -1,7 +1,6 @@
 
 
-import { PhoneNumber } from "@clerk/backend";
-import { AddressVO, EmailVO } from "../../../value-objects";
+import { AddressVO, EmailVO, PhoneNumber } from "../../../value-objects";
 
 export class ContactInfoVO {
     private constructor(

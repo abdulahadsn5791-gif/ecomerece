@@ -28,6 +28,18 @@ export const CategorySchema = new Schema(
             type: String,
             required: true,
         },
+
+        title: {
+            type: String,
+            unique: true,
+            required: true,
+        },
+
+        createdBy: {
+            type: String,
+            required: true,
+        },
+
         version: {
             type: Number,
             default: 0,
@@ -52,6 +64,7 @@ export const CategorySchema = new Schema(
     },
 );
 
-export type AddressPersistence = InferSchemaType<typeof CategorySchema>;
-export type AddressDocument = HydratedDocument<AddressPersistence>;
-export const AddressModel = mongoose.model<AddressPersistence>('Address', CategorySchema);
+export type CategoryPersistence = InferSchemaType<typeof CategorySchema>;
+export type CategoryDocument = HydratedDocument<CategoryPersistence>;
+export const CategoryModel = mongoose.model<CategoryPersistence>('Address', CategorySchema);
+

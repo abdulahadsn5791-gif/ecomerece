@@ -1,8 +1,8 @@
 
-import { PhoneNumber } from '@clerk/backend';
+
 import { BadRequestError } from '../../../../apps/api/errors/app-error';
 import { AggregateRoot } from '../../aggregate-root';
-import { AddressVO, DeleteInfoVO, Description, EffectiveDate, EmailVO, Id, Quantity, Reason, Slug, Title, UrlVO } from '../../value-objects';
+import { AddressVO, DeleteInfoVO, Description, EffectiveDate, EmailVO, Id, PhoneNumber, Quantity, Reason, Slug, Title, UrlVO } from '../../value-objects';
 import { VendorCreatedEvent } from './events/create-vendor.event';
 import { VendorDeletedEvent } from './events/delete-vendor.event';
 import { VendorRecoverEvent } from './events/recover-vendor.event';

@@ -11,4 +11,5 @@ export class PhoneNumber extends StringVO {
     static create(title: string) {
         return new PhoneNumber(title);
     }
+
 }

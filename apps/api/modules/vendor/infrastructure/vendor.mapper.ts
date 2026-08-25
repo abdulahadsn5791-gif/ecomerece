@@ -3,7 +3,6 @@ import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo
 import { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 
-import { PhoneNumber } from '@ecomerece/domain/value-objects/phone-no.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Slug } from '@ecomerece/domain/value-objects/slug.vo';
@@ -20,7 +19,7 @@ import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
 import type { VendorReadModel } from '@ecomerece/domain';
 import type { VendorResponseReadModel } from '@ecomerece/shared';
 
-import { ContactInfoVO } from '@ecomerece/domain';
+import { ContactInfoVO, PhoneNumber } from '@ecomerece/domain';
 import { DeleteInfoVO } from '@ecomerece/domain';
 import { ImageInfoVO } from '@ecomerece/domain';
 

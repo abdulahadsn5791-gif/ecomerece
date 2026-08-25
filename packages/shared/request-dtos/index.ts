@@ -5,5 +5,5 @@ export * from './inventory';
 export * from './product-variant';
 export * from './user';
 export * from './vendor';
-
+export * from './category'
 

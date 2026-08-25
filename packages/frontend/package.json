@@ -1,0 +1,13 @@
+{
+  "name": "@ecomerece/frontend",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "dependencies": {
+    "zustand": "^5.0.0",
+    "react": "^18.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}

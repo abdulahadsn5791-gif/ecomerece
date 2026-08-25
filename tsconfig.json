@@ -1,5 +1,13 @@
 {
     "compilerOptions": {
+        "paths": {
+            "@ecomerece/domain": [
+                "../../packages/domain/index.ts"
+            ],
+            "@ecomerece/shared": [
+                "../../packages/shared/index.ts"
+            ]
+        },
         "target": "ES2022",
         "lib": [
             "ES2022"

@@ -6,3 +6,4 @@ export * from './product.response-read-model';
 export * from './product-variant.response-read-model';
 export * from './user-response-read-models';
 export * from './vendor-response-read-model';
+export * from './category.response-read-models';

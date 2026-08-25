@@ -5,7 +5,7 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "bun run --filter api dev",
+        "dev": "bun run --filter api dev & bun run --filter web dev",
         "build": "bun run --filter api build",
         "typecheck": "bun run --filter '*' typecheck",
         "test": "bun test",
@@ -32,7 +32,7 @@
     "devDependencies": {
         "@biomejs/biome": "^2.5.2",
         "@eslint/js": "^10.0.1",
-        "@types/bun": "latest",
+        "@types/bun": "^1.4.0",
         "@types/node": "^25.9.1",
         "typescript": "5.9",
         "typescript-eslint": "^8.62.0"

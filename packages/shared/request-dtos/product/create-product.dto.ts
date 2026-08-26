@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { altSchema, booleanSchema, urlSchema } from '../../dtos';
+import { altSchema, booleanSchema, idSchema, titleSchema, urlSchema } from '../../dtos';
 
 
 export const ProductImageDto = z.object({
@@ -28,7 +28,8 @@ export const ImageInfoDto = z.object({
 });
 
 export const CreateMyProductDtoSchema = z.object({
-    title: z.string().trim().min(1),
+    title: titleSchema,
+    categoryId: idSchema,
     appearance: z.enum(['public', 'private']),
     description: z.string().trim().min(1),
     ingredient: IngredientDto,

@@ -21,7 +21,7 @@ export const ProductMapper = {
         return ProductAggregate.rehydrate(
             Id.create(doc._id.toString()),
             Id.create(doc.vendorId),
-
+            Id.create(doc.categoryId),
             Title.create(doc.title),
             Description.create(doc.description),
             IngredientsVO.rehydrate(
@@ -106,7 +106,7 @@ export const ProductMapper = {
     aggregateToReadModel(product: ProductAggregate): ProductReadModel {
         return {
             id: product.id.value,
-
+            categoryId: product.categoryId.value,
             version: product.version.value,
             title: product.title.value,
             appearance: product.appearance.value,
@@ -145,7 +145,7 @@ export const ProductMapper = {
     persistenceToReadModel(doc: ProductPersistence): ProductReadModel {
         return {
             id: doc._id.toString(),
-
+            categoryId: doc.categoryId,
             version: doc.version,
             title: doc.title,
             appearance: doc.appearance,
@@ -188,7 +188,7 @@ export const ProductMapper = {
     aggregateToResponseReadModel(product: ProductAggregate): ProductResponseReadModel {
         return {
             id: product.id.value,
-
+            categoryId: product.categoryId,
             version: product.version.value,
             title: product.title.value,
             appearance: product.appearance.value,

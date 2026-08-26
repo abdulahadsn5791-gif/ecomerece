@@ -12,7 +12,13 @@ export const CategoryMessags = {
         return {
             message: `Category ${id.value} has been created by ${actorId.value} on ${EffectiveDate.today().value}`
         }
+    },
+    deleted(id: Id, actorId: Id): CategoryMessagesType {
+        return {
+            message: `Category ${id.value} has been deleted by ${actorId.value} on ${EffectiveDate.today().value}`
+        }
     }
+
 
 
 

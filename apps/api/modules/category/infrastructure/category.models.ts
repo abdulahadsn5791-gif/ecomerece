@@ -66,5 +66,5 @@ export const CategorySchema = new Schema(
 
 export type CategoryPersistence = InferSchemaType<typeof CategorySchema>;
 export type CategoryDocument = HydratedDocument<CategoryPersistence>;
-export const CategoryModel = mongoose.model<CategoryPersistence>('Address', CategorySchema);
+export const CategoryModel = mongoose.model<CategoryPersistence>('Category', CategorySchema);
 

@@ -2,6 +2,7 @@ export interface ProductReadModel {
     id: string;
     version: number;
     title: string;
+    categoryId: string,
     appearance: 'public' | 'private';
     block: {
         blocked: boolean;

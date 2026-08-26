@@ -1,8 +1,10 @@
-import { CategoryAggregate, ICategoryRepository, Id, Title } from "@ecomerece/domain";
+import { CategoryAggregate, ICategoryRepository, Id, Quantity, Title } from "@ecomerece/domain";
 import { MongoRepository } from "../../../core/repository/mongo.repository";
 import { CategoryModel, CategoryPersistence } from "./category.models";
 import { CategoryMapper } from "./category.mapper";
 import { BadRequestError, ConcurrencyError } from "../../../errors/app-error";
+import { FilterQuery } from "mongoose";
+import { CursorMeta } from "../../../core/repository/base.repository";
 
 export class CategoryRepository extends MongoRepository<CategoryPersistence> implements ICategoryRepository {
   constructor() { super(CategoryModel); }
@@ -29,6 +31,29 @@ export class CategoryRepository extends MongoRepository<CategoryPersistence> imp
     const doc = await super.findOne({ title: title });
     if (!doc) throw new BadRequestError("Category not found");
     return CategoryMapper.persistenceToAggregate(doc);
+  }
+
+  async FindPaginated(params: {
+    cursor?: Id;
+    limit?: Quantity;
+    direction?: 'next' | 'prev';
+  }): Promise<{
+    data: any, meta: {
+      nextCursor: string | null;
+      prevCursor: string | null;
+      hasMore: boolean;
+    }
+  }> {
+    const info = {
+      cursor: params.cursor?.value,
+      limit: params.limit?.value,
+      direction: params.direction
+    }
+    const result = await this.paginateByCursor(info);
+    return {
+      data: result,
+      meta: result.meta,
+    };
   }
 
   async Save(category: CategoryAggregate): Promise<void> {

@@ -2,7 +2,7 @@ export interface ProductResponseReadModel {
     id: string;
 
     version: number;
-
+    categoryId: string,
     title: string;
     appearance: 'public' | 'private';
     description: string;

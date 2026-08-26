@@ -1,4 +1,5 @@
-import { Id, Title } from "../../../value-objects";
+
+import { Id, Quantity, Title } from "../../../value-objects";
 import { CategoryAggregate } from "../category.aggregate";
 
 export interface ICategoryRepository {
@@ -6,6 +7,13 @@ export interface ICategoryRepository {
     FindByTitle(title: Title): Promise<CategoryAggregate | null>;
     FindByIdOrThrow(id: Id): Promise<CategoryAggregate>;
     FindByTitleOrThrow(title: Title): Promise<CategoryAggregate>;
+    FindPaginated(params: { cursor?: Id; limit?: Quantity; direction?: 'next' | 'prev'; }): Promise<{
+        data: any, meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        }
+    }>
     Save(category: CategoryAggregate): Promise<void>;
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;

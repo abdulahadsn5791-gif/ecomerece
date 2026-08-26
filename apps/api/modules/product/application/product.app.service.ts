@@ -53,6 +53,7 @@ export class ProductApplicationService extends BaseService {
                 ImageVO.create(UrlVO.create(val.url), AltVO.create(val.alt), val.default),
             ),
         );
+        const categoryId = Id.create(data.categoryId);
         const title = Title.create(data.title);
         const description = Description.create(data.description);
         const ingredients = IngredientsVO.create({
@@ -68,6 +69,7 @@ export class ProductApplicationService extends BaseService {
         });
         const product = ProductAggregate.create({
             id: id,
+            categoryId: categoryId,
             vendorId: vendorId,
             images: images,
             title: title,

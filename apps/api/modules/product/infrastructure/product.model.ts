@@ -118,7 +118,10 @@ const ProductModelSchema = new Schema(
             required: true,
             default: 0,
         },
-
+        categoryId: {
+            type: String,
+            required: true,
+        },
         title: {
             type: String,
             required: true,

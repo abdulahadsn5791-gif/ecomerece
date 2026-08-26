@@ -11,8 +11,8 @@ import type { ImagesVO } from './value-objects/product-images.vo';
 type CreateVendorProps = {
     id: Id;
     vendorId: Id;
+    categoryId: Id,
     images: ImagesVO;
-
     title: Title;
     description: Description;
     ingredients: IngredientsVO;
@@ -23,7 +23,7 @@ export class ProductAggregate extends AggregateRoot {
     constructor(
         private readonly _id: Id,
         private readonly _vendorId: Id,
-
+        private readonly _categoryId: Id,
         private _title: Title,
         private _description: Description,
         private _ingredients: IngredientsVO,
@@ -36,6 +36,10 @@ export class ProductAggregate extends AggregateRoot {
         private readonly _createdAt: EffectiveDate,
     ) {
         super();
+    }
+
+    get categoryId(): Id {
+        return this._categoryId;
     }
 
     get id(): Id {
@@ -86,6 +90,7 @@ export class ProductAggregate extends AggregateRoot {
         return new ProductAggregate(
             data.id,
             data.vendorId,
+            data.categoryId,
             data.title,
             data.description,
             data.ingredients,
@@ -102,7 +107,7 @@ export class ProductAggregate extends AggregateRoot {
     static rehydrate(
         _id: Id,
         _vendorId: Id,
-
+        _categoryId: Id,
         _title: Title,
         _description: Description,
         _ingredients: IngredientsVO,
@@ -117,7 +122,7 @@ export class ProductAggregate extends AggregateRoot {
         return new ProductAggregate(
             _id,
             _vendorId,
-
+            _categoryId,
             _title,
             _description,
             _ingredients,

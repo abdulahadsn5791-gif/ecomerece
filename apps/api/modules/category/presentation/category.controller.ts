@@ -1,15 +1,28 @@
 import { Context } from "hono";
 import { BaseController } from "../../../core/controller/base.controller";
 import { CategoryAppService } from "../application/category.app.service";
-import { createCategoryDto } from "@ecomerece/shared";
+import { createCategoryDto, deleteCategoryDto, getPaginatedDto, idSchema } from "@ecomerece/shared";
 
 export class CategoryController extends BaseController<CategoryAppService> {
 
 
-    async createCategory(c: Context) {
-        const actor = c.get('user');
+    createCategory = async (c: Context) => {
+        const actor = c.get('user'); console.log('1')
         const data = await this.body(c, createCategoryDto);
         return this.ok(c, await this.service.createCategory(data, actor))
+    }
+    getPaginated = async (c: Context) => {
+        const data = await this.body(c, getPaginatedDto)
+        return this.ok(c, await this.service.getPaginatedCategories(data))
+    }
+    deleteCategory = async (c: Context) => {
+        const actor = c.get('user'); console.log('1')
+        const data = await this.body(c, deleteCategoryDto);
+        return this.ok(c, await this.service.deleteCategoryById(data, actor))
+    }
+    getCategory = async (c: Context) => {
+        const id = this.param(c, 'id', idSchema);
+        return this.ok(c, await this.service.getCategoryById(id));
     }
 
 }

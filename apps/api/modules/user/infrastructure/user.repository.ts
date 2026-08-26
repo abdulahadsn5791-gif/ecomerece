@@ -61,6 +61,13 @@ export class UserRepository extends MongoRepository<UserPersistence> implements 
     async Delete(id: Id): Promise<void> {
         await super.findByIdAndDelete(id.value);
     }
+    async Create(add: UserAggregate): Promise<void> {
+        const persistantUser = UserMapper.aggregateToPersistence(add);
+        const userDoc = new UserModel(persistantUser);
+
+        await super.create(userDoc);
+    }
+
     async Exists(id: Id): Promise<boolean> {
         return !!(await super.exists({
             _id: id.value,

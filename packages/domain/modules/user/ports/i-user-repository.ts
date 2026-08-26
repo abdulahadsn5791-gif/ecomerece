@@ -9,6 +9,7 @@ export interface IUserRepository {
     FindByIds(id: Id[]): Promise<UserAggregate[]>;
     FindByEmailOrThrow(email: EmailVO): Promise<UserAggregate>;
     Save(user: UserAggregate): Promise<void>;
+    Create(add: UserAggregate): Promise<void>
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;
 }

@@ -57,7 +57,7 @@ export class UserAppService extends BaseService {
             image,
         });
         user.signIn(user.id);
-        await this.userRepo.Save(user);
+        await this.userRepo.Create(user);
 
 
         return UserMessages.signIn(id);

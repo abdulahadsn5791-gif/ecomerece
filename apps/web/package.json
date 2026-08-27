@@ -13,10 +13,11 @@
     "@ecomerece/domain": "workspace:*",
     "@ecomerece/frontend": "workspace:*",
     "@ecomerece/shared": "workspace:*",
-    "lucide-react": "^1.33.0",
+    "lucide-react": "^1.34.0",
     "next": "16.2.9",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

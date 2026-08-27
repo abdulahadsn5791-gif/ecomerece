@@ -2,7 +2,7 @@ import { createCategoryDtoType, deleteCategoryType, getPaginatedDtoType, idSchem
 import { BaseService } from "../../../core/services/base.services";
 import { CategoryMessagesType, CategoryMessags } from "../presentation/category.messages";
 import { UserPersistence } from "../../user/infrastructure/user.models";
-import { CategoryAggregate, Id, Quantity, Reason, Title } from "@ecomerece/domain";
+import { CategoryAggregate, Id, Quantity, Reason, Title, UrlVO } from "@ecomerece/domain";
 import { CategoryRepository } from "../infrastructure/category.repository";
 import { CategoryMapper } from "../infrastructure/category.mapper";
 
@@ -16,7 +16,8 @@ export class CategoryAppService extends BaseService {
         const id = Id.create();
         const title = Title.create(data.title);
         const actorId = Id.create(actor._id);
-        const category = CategoryAggregate.create({ title: title, id: id, createdBy: actorId });
+        const image = UrlVO.create(data.image)
+        const category = CategoryAggregate.create({ title: title, id: id, image: image, createdBy: actorId });
         await this.categoryRepo.Create(category);
         return CategoryMessags.created(id, actorId);
     }

@@ -10,6 +10,7 @@ import {
     ArrowUp,
 } from 'lucide-react';
 
+
 // Sidebar sections for Privacy Policy
 const privacySections = [
     { id: 'collection', title: 'Information We Collect', icon: Info },

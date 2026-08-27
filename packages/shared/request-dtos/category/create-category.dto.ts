@@ -1,8 +1,9 @@
 import { z } from 'zod';
-import { titleSchema } from '../../dtos';
+import { titleSchema, urlSchema } from '../../dtos';
 
 export const createCategoryDto = z.object({
-    title: titleSchema
+    title: titleSchema,
+    image: urlSchema
 });
 
 export type createCategoryDtoType = z.infer<typeof createCategoryDto>

@@ -1,5 +1,6 @@
 // tailwind.config.js
 module.exports = {
+    darkMode: 'class',
     content: [
         "./app/**/*.{js,ts,jsx,tsx,mdx}",      // <-- App Router
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",    // <-- Pages Router (if used)

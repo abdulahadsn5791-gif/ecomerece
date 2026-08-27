@@ -1,10 +1,11 @@
 
 import { AggregateRoot } from "../../aggregate-root";
-import { BlockInfoVO, DeleteInfoVO, EffectiveDate, Id, Quantity, Reason, Title } from "../../value-objects";
+import { BlockInfoVO, DeleteInfoVO, EffectiveDate, Id, Quantity, Reason, Title, UrlVO } from "../../value-objects";
 
 export type createCategoryProps = {
     id: Id,
     title: Title,
+    image: UrlVO,
     createdBy: Id,
 }
 
@@ -15,6 +16,7 @@ export class CategoryAggregate extends AggregateRoot {
         private _title: Title,
         private readonly _createdBy: Id,
         private _delete: DeleteInfoVO,
+        private _image: UrlVO,
         private _block: BlockInfoVO,
         private readonly _version: Quantity,
         private readonly _createdAt: EffectiveDate,
@@ -25,6 +27,9 @@ export class CategoryAggregate extends AggregateRoot {
     }
     get title() {
         return this._title;
+    }
+    get image() {
+        return this._image;
     }
     get createdBy() {
         return this._createdBy;
@@ -43,15 +48,18 @@ export class CategoryAggregate extends AggregateRoot {
     }
 
     static create(data: createCategoryProps): CategoryAggregate {
-        return new CategoryAggregate(data.id, data.title, data.createdBy, DeleteInfoVO.none(), BlockInfoVO.none(), Quantity.create(0), EffectiveDate.today());
+        return new CategoryAggregate(data.id, data.title, data.createdBy, DeleteInfoVO.none(), data.image, BlockInfoVO.none(), Quantity.create(0), EffectiveDate.today());
 
     }
-    static rehydrate(_id: Id, title: Title, _createdBy: Id, _delete: DeleteInfoVO, _block: BlockInfoVO, _version: Quantity, _createdAt: EffectiveDate,): CategoryAggregate {
-        return new CategoryAggregate(_id, title, _createdBy, _delete, _block, _version, _createdAt)
+    static rehydrate(_id: Id, title: Title, _createdBy: Id, _delete: DeleteInfoVO, _image: UrlVO, _block: BlockInfoVO, _version: Quantity, _createdAt: EffectiveDate,): CategoryAggregate {
+        return new CategoryAggregate(_id, title, _createdBy, _delete, _image, _block, _version, _createdAt)
     }
 
     updateMeta(title: Title, actorId: Id) {
         this._title = title;
+    }
+    updateImage(image: UrlVO) {
+        this._image = image;
     }
 
     deleteCategory(reason: Reason, actorId: Id) {

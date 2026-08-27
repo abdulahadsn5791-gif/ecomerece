@@ -67,7 +67,7 @@ export const ProductMapper = {
         return {
             _id: product.id.value,
             vendorId: product.vendorId.value,
-
+            categoryId: product.categoryId.value,
             title: product.title.value,
             description: product.description.value,
             ingredient: {
@@ -188,7 +188,7 @@ export const ProductMapper = {
     aggregateToResponseReadModel(product: ProductAggregate): ProductResponseReadModel {
         return {
             id: product.id.value,
-            categoryId: product.categoryId,
+            categoryId: product.categoryId.value,
             version: product.version.value,
             title: product.title.value,
             appearance: product.appearance.value,

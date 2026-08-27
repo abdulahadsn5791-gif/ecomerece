@@ -3,11 +3,37 @@
   "version": "1.0.0",
   "main": "index.ts",
   "types": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./auth": {
+      "web": "./services/auth/auth.adapter.web.ts",
+      "react-native": "./services/auth/auth.adapter.native.ts",
+      "default": "./services/auth/auth.adapter.web.ts"
+    },
+    "./storage": {
+      "web": "./services/storage/storage.adapter.web.ts",
+      "react-native": "./services/storage/storage.adapter.native.ts",
+      "default": "./services/storage/storage.adapter.web.ts"
+    }
+  },
   "dependencies": {
-    "zustand": "^5.0.0",
-    "react": "^18.0.0"
+    "zustand": "^5.0.0"
   },
   "peerDependencies": {
-    "react": ">=18.0.0"
+    "react": ">=18.0.0",
+    "@clerk/nextjs": "*",
+    "@clerk/clerk-expo": "*"
+  },
+  "peerDependenciesMeta": {
+    "@clerk/nextjs": {
+      "optional": true
+    },
+    "@clerk/clerk-expo": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.0.0"
   }
 }

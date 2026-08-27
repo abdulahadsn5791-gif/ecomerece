@@ -22,6 +22,8 @@ import type { ProductRepository } from '../infrastructure/product.repository';
 import { productMessages, type productMessagesType } from '../presentation/product.messages';
 import { blockLiftProductDtoType, blockProductDtoType, CreateMyProductDto, deafultImageDtoType, disclaimerItemsDtoType, imagesDtoType, ingredientsDtotype, productAppereanceDtoType, ProductResponseReadModel, recoverProductDtoType, softDeleteMyProductDtoType, toggleDiscalimerDtoType, toggleIngredientsDtoType, updateProductMetaDtoType } from '@ecomerece/shared';
 import { DisclaimerVO, ImagesVO, IngredientsVO, ProductAggregate } from '@ecomerece/domain';
+import { VerifyCategoryAndGetQuery } from '../../category/application/queries/verify-category.query';
+import { BadRequestError } from '../../../errors/app-error';
 
 export class ProductApplicationService extends BaseService {
     constructor(
@@ -37,10 +39,7 @@ export class ProductApplicationService extends BaseService {
         return ProductMapper.aggregateToResponseReadModel(product);
     }
 
-    async createMyProduct(
-        data: CreateMyProductDto,
-        actor: UserPersistence,
-    ): Promise<productMessagesType> {
+    async createMyProduct(data: CreateMyProductDto, actor: UserPersistence,): Promise<productMessagesType> {
         const id = Id.create();
         const actorId = Id.create(actor._id);
         const vendor = this.ensureFound(
@@ -60,6 +59,8 @@ export class ProductApplicationService extends BaseService {
             isIngredients: data.ingredient.isIngredients,
             items: data.ingredient.ingredients.map((val) => Title.create(val)),
         });
+        const verfied = await this.queryBus.execute(new VerifyCategoryAndGetQuery({ id: categoryId }));
+        if (!verfied.isValid) throw new BadRequestError("Invalid category");
         const disclaimer = DisclaimerVO.create({
             isDisclaimer: data.disclaimer.isDisclaimer,
             items: data.disclaimer.disclaimers.map((val) => ({

@@ -47,6 +47,7 @@ export const UserMapper = {
 
     aggregateToPersistence(user: UserAggregate) {
         return {
+            _id: user.id.value,
             name: {
                 firstName: user.name.firstName.value,
                 middleName: user.name.middleName?.value ?? null,

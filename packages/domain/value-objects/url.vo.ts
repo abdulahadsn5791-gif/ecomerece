@@ -26,4 +26,7 @@ export class UrlVO extends StringVO {
     static create(url: string) {
         return new UrlVO(url);
     }
+    static rehydrate(url: string) {
+        return new UrlVO(url);
+    }
 }

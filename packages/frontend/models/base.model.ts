@@ -1,7 +1,13 @@
 export interface ServiceMeta {
-    total?: number;
-    page?: number;
-    limit?: number;
+    [key: string]: unknown;
+}
+
+export interface ConfirmationState {
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm?: () => void | Promise<void>;
+    onCancel?: () => void;
 }
 
 export interface ServiceState<T> {
@@ -11,15 +17,16 @@ export interface ServiceState<T> {
     isSubmitting: boolean;
     error: string | null;
     success: string | null;
-    confirmation: {
-        isOpen: boolean;
-        title?: string;
-        message?: string;
-        onConfirm?: () => void | Promise<void>;
-        onCancel?: () => void;
-    };
-    pendingAction: (() => Promise<void>) | null;
-    hydrated: boolean;   // ← new flag
+    confirmation: ConfirmationState;
+    pendingAction: string | null;
+    hydrated: boolean;
 }
 
-export type ServiceStateUpdate<T> = Partial<ServiceState<T>>;
+export type ServiceStateUpdate<T> =
+    | Partial<ServiceState<T>>
+    | ((state: ServiceState<T>) => Partial<ServiceState<T>>);
+
+export interface PersistedShape<T> {
+    data: T | null;
+    meta: ServiceMeta | null;
+}

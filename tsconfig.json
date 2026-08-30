@@ -2,10 +2,16 @@
     "compilerOptions": {
         "paths": {
             "@ecomerece/domain": [
-                "../../packages/domain/index.ts"
+                "./packages/domain/index.ts"
             ],
             "@ecomerece/shared": [
-                "../../packages/shared/index.ts"
+                "./packages/shared/index.ts"
+            ],
+            "@ecomerece/frontend": [
+                "./packages/frontend/index.ts"
+            ],
+            "@ecomerece/frontend/*": [
+                "./packages/frontend/*"
             ]
         },
         "target": "ES2022",

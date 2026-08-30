@@ -1,31 +1,42 @@
-import { useAuthStore } from '../store/auth.store';
-import { useAuthService } from '../services/auth.service';
 import { useEffect } from 'react';
+import { authAdapter } from '@ecomerece/frontend/auth';
+import { createServiceHook } from '../../../hooks/createServiceHook.hook';
+import { AuthService } from '../services/auth.service';
+import type { ServiceState } from '../../../models/base.model';
+import type { UserResponseReadModel } from '@ecomerece/shared';
 
-export const useAuth = () => {
-    const state = useAuthStore();
-    const service = useAuthService();
+const useAuthService = createServiceHook<AuthService, [typeof authAdapter]>(
+  AuthService,
+  authAdapter
+);
 
-    useEffect(() => {
-        service.loadUser();
-    }, []);
+type AuthUser = UserResponseReadModel;
 
-    const handleSignIn = async () => {
-        await service.signInWithGoogle();
-        service.loadUser();
-    };
-
-    const handleSignOut = async () => {
-        await service.signOut();
-    };
-
-    return {
-        user: state.user,
-        isLoading: state.isLoading,
-        error: state.error,
-        signInWithGoogle: handleSignIn,
-        signOut: handleSignOut,
-        loadUser: service.loadUser,
-        isSignedIn: service.isSignedIn,
-    };
+type UseAuthReturn = ServiceState<AuthUser> & {
+  user: AuthUser | null;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  submitSignUp: () => Promise<void>;
+  submitLogin: () => Promise<void>;
+  refresh: () => Promise<AuthUser | null>;
+  isSignedIn: () => boolean;
 };
+
+export function useAuth(): UseAuthReturn {
+  const [state, service] = useAuthService();
+
+  useEffect(() => {
+    void service.syncUser();
+  }, [service]);
+
+  return {
+    ...state,
+    user: state.data,
+    signInWithGoogle: () => service.signInWithGoogle(),
+    signOut: () => service.signOut(),
+    submitSignUp: () => service.submitSignUp(),
+    submitLogin: () => service.submitLogin(),
+    refresh: () => service.syncUser(),
+    isSignedIn: service.isSignedIn.bind(service),
+  };
+}

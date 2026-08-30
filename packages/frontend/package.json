@@ -4,13 +4,18 @@
   "main": "index.ts",
   "types": "index.ts",
   "exports": {
-    ".": "./index.ts",
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
+    },
     "./auth": {
+      "types": "./services/auth/auth.adapter.web.ts",
       "web": "./services/auth/auth.adapter.web.ts",
       "react-native": "./services/auth/auth.adapter.native.ts",
       "default": "./services/auth/auth.adapter.web.ts"
     },
     "./storage": {
+      "types": "./services/storage/storage.adapter.web.ts",
       "web": "./services/storage/storage.adapter.web.ts",
       "react-native": "./services/storage/storage.adapter.native.ts",
       "default": "./services/storage/storage.adapter.web.ts"

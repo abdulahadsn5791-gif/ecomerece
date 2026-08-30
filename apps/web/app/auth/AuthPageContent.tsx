@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useAuth, useGlobalUI, useTheme } from '@ecomerece/frontend';
 
@@ -12,6 +12,11 @@ export default function AuthPageContent() {
     signInWithGoogle,
     signOut,
   } = useAuth();
+
+  useEffect(() => {
+    console.log('🔵 [AuthPage] user:', user);
+  }, [user]);
+
   const {
     showLoading,
     hideLoading,
@@ -24,8 +29,8 @@ export default function AuthPageContent() {
   const handleGoogleAuth = async () => {
     showLoading();
     try {
-      await signInWithGoogle();
-      setSuccess('Signed in successfully!');
+      await signInWithGoogle(); // 👈 uses adapter's authenticateWithRedirect
+      // No need to setSuccess here – the redirect will happen and then syncUser runs
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
     } finally {
@@ -33,10 +38,11 @@ export default function AuthPageContent() {
     }
   };
 
+  // If user is already signed in, show welcome screen
   if (user) {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-        <p>Welcome, {user.name} ({user.email})</p>
+        <p>Welcome, {user.fullName} ({user.email})</p>
         <button onClick={signOut} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
           Sign Out
         </button>
@@ -53,11 +59,10 @@ export default function AuthPageContent() {
         </a>
         <button
           onClick={toggleTheme}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
-            darkMode
+          className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${darkMode
               ? 'bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
               : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-900'
-          }`}
+            }`}
         >
           {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           <span className="text-sm font-medium">{darkMode ? 'Light' : 'Dark'}</span>
@@ -95,40 +100,39 @@ export default function AuthPageContent() {
             <div className={`flex gap-1 rounded-full p-1 mb-8 ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
               <button
                 onClick={() => setAuthMode('login')}
-                className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-colors ${
-                  authMode === 'login'
+                className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-colors ${authMode === 'login'
                     ? darkMode
                       ? 'bg-white text-black'
                       : 'bg-black text-white'
                     : darkMode
-                    ? 'text-gray-400 hover:text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                      ? 'text-gray-400 hover:text-white'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 Sign In
               </button>
               <button
                 onClick={() => setAuthMode('signup')}
-                className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-colors ${
-                  authMode === 'signup'
+                className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-colors ${authMode === 'signup'
                     ? darkMode
                       ? 'bg-white text-black'
                       : 'bg-black text-white'
                     : darkMode
-                    ? 'text-gray-400 hover:text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                      ? 'text-gray-400 hover:text-white'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 Sign Up
               </button>
             </div>
 
-            {/* Google Button */}
+            {/* 👇 Custom Google button – calls signInWithGoogle directly */}
             <button
               onClick={handleGoogleAuth}
               disabled={authLoading}
               className="w-full flex items-center justify-center gap-3 h-12 px-4 rounded-[4px] bg-white border border-[#dadce0] text-[#3c4043] font-medium text-sm tracking-wide transition-colors hover:bg-[#f8f9fa] hover:shadow-sm active:bg-[#f1f3f4] disabled:opacity-50 disabled:cursor-not-allowed"
             >
+              {/* Google SVG */}
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20">
                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
                 <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />

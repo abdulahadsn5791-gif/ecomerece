@@ -1,58 +1,136 @@
 import { BaseService } from '../../../services/base.service';
-import type { AuthAdapter, AuthUser } from '../../../services/auth';
-import type { UserResponseReadModel } from '@ecomerece/shared';
+import type { AuthAdapter } from '../../../services/auth';
+import type { reasonType, UserResponseReadModel } from '@ecomerece/shared';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-export class AuthService extends BaseService<UserResponseReadModel> {
+
+export class AuthService extends BaseService {
   private readonly adapter: AuthAdapter;
 
   constructor(adapter: AuthAdapter) {
-    super(null, null, 'auth-service');
+    super('auth-service');
     this.adapter = adapter;
   }
 
+  // ─── Container getters ──────────────────────────────
+  private userContainer = () =>
+    this.getContainer<UserResponseReadModel>('userProfile', {
+      autoError: true,
+      autoSuccess: true,
+    });
+
+  private loginContainer = () =>
+    this.getContainer('loginForm', {
+      autoError: true,
+      autoSuccess: false, // we set success manually after fetching user
+    });
+
+  private signUpContainer = () =>
+    this.getContainer('signUpForm', {
+      autoError: true,
+      autoSuccess: true,
+    });
+
+  // ─── Public methods ─────────────────────────────────
   public async signInWithGoogle(): Promise<void> {
-    this.setSubmitting(true);
     await this.adapter.ensureReady();
     await this.adapter.signInWithGoogle();
-    this.setSubmitting(false);
-
+    await this.syncUser();
   }
 
   public async submitLogin(): Promise<void> {
-    this.setSubmitting(true);
     await this.adapter.ensureReady();
     const token = await this.computeToken();
-    await this.post(`${apiUrl}/users/me`, {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    this.setSubmitting(false);
 
+    try {
+      await this.post('loginForm', `${apiUrl}/users/login`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // After login, fetch user data (uses userProfile container)
+      await this.fetchUserFromBackend();
+      // Manually set success because autoSuccess was false for loginForm
+      this.loginContainer().setSuccess('Login successful');
+    } catch (error) {
+      // Error already set on loginForm container (autoError=true)
+      throw error;
+    }
   }
 
   public async submitSignUp(): Promise<void> {
-    this.setSubmitting(true);
     await this.adapter.ensureReady();
     const token = await this.computeToken();
     const user = await this.computeClerkUser();
-    await this.post(`${apiUrl}/${user.id}/signup`, {}, {
+
+    await this.post('signUpForm', `${apiUrl}/${user.id}/signup`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    this.setSubmitting(false);
+    // After signup, fetch user data
+    await this.fetchUserFromBackend();
+  }
 
+  public async deleteAccount(reason: reasonType): Promise<void> {
+    await this.adapter.ensureReady();
+    const token = await this.computeToken();
+
+    // Use deleteWithBody for DELETE with body
+    await this.deleteWithBody(
+      'userProfile',
+      `${apiUrl}/users/soft/me`,
+      { reason },
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+
+    await this.signOut();
   }
 
   public async signOut(): Promise<void> {
-    this.setSubmitting(true);
     await this.adapter.ensureReady();
     await this.adapter.signOut();
-    await this.resetAndClearStorage();
-    this.setSubmitting(false);
-
+    // Reset containers
+    this.resetContainer('userProfile');
+    this.resetContainer('loginForm');
+    this.resetContainer('signUpForm');
+    // If persistence is used, clear storage:
+    // await this.clearStorage();
   }
 
+  public async syncUser(): Promise<UserResponseReadModel | null> {
+    const container = this.userContainer();
+    container.setLoading(true);
+    await this.adapter.ensureReady();
 
+    const isSignedIn = this.adapter.isSignedIn();
+    if (!isSignedIn) {
+      container.reset();
+      return null;
+    }
+
+    const expired = await this.adapter.isExpired();
+    if (expired) {
+      container.setError('Session expired');
+      container.reset();
+      return null;
+    }
+
+    const cached = container.getState().data;
+    if (cached) {
+      container.setData(cached);
+      container.setLoading(false);
+      return cached;
+    }
+
+    await this.submitLogin(); // will handle its own container states
+    const user = await this.fetchUserFromBackend();
+    return user;
+  }
+
+  public async isSignedIn(): Promise<boolean> {
+    await this.adapter.ensureReady();
+    return this.adapter.isSignedIn();
+  }
+
+  // ─── Private helpers ────────────────────────────────
   private async computeClerkUser(): Promise<{ id: string; email: string; name: string }> {
     await this.adapter.ensureReady();
     const user = this.adapter.getClerkUser();
@@ -64,51 +142,14 @@ export class AuthService extends BaseService<UserResponseReadModel> {
     await this.adapter.ensureReady();
     const token = await this.adapter.getToken();
     if (!token) throw new Error('No authentication token available');
-    return token
+    return token;
   }
 
   private async fetchUserFromBackend(): Promise<UserResponseReadModel> {
     await this.adapter.ensureReady();
     const token = await this.computeToken();
-    const user = await this.get(`${apiUrl}/users/me`, {
+    return this.get('userProfile', `${apiUrl}/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return user;
-  }
-
-
-  public async syncUser(): Promise<UserResponseReadModel | null> {
-    this.setLoading(true);
-    await this.adapter.ensureReady();
-    const isSignedIn = this.adapter.isSignedIn();
-
-    if (!isSignedIn) {
-      this.resetState();
-      return null;
-    }
-
-    const expired = await this.adapter.isExpired();
-    if (expired) {
-      this.setError('Session expired');
-      this.resetState();
-      return null;
-    }
-
-    const cached = this.getStore().getState().data;
-    if (cached) {
-      this.setData(cached);
-      this.setLoading(false);
-      return cached
-    }
-
-    const user = await this.fetchUserFromBackend();
-    this.setData(user);
-    this.setLoading(false);
-    return user;
-
-  }
-
-  public isSignedIn(): boolean {
-    return this.adapter.isSignedIn();
   }
 }

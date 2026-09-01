@@ -22,7 +22,7 @@ export class AuthService extends BaseService {
   private loginContainer = () =>
     this.getContainer('loginForm', {
       autoError: true,
-      autoSuccess: false, // we set success manually after fetching user
+      autoSuccess: false,
     });
 
   private signUpContainer = () =>
@@ -38,42 +38,30 @@ export class AuthService extends BaseService {
     await this.syncUser();
   }
 
-  public async submitLogin(): Promise<void> {
+  private async submitLogin(): Promise<void> {
     await this.adapter.ensureReady();
     const token = await this.computeToken();
+    await this.post('loginForm', `${apiUrl}/users/login`, {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    await this.fetchUserFromBackend();
+    this.loginContainer().setSuccess('Login successful');
 
-    try {
-      await this.post('loginForm', `${apiUrl}/users/login`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // After login, fetch user data (uses userProfile container)
-      await this.fetchUserFromBackend();
-      // Manually set success because autoSuccess was false for loginForm
-      this.loginContainer().setSuccess('Login successful');
-    } catch (error) {
-      // Error already set on loginForm container (autoError=true)
-      throw error;
-    }
   }
 
   public async submitSignUp(): Promise<void> {
     await this.adapter.ensureReady();
     const token = await this.computeToken();
     const user = await this.computeClerkUser();
-
     await this.post('signUpForm', `${apiUrl}/${user.id}/signup`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    // After signup, fetch user data
-    await this.fetchUserFromBackend();
   }
 
   public async deleteAccount(reason: reasonType): Promise<void> {
     await this.adapter.ensureReady();
     const token = await this.computeToken();
-
-    // Use deleteWithBody for DELETE with body
     await this.deleteWithBody(
       'userProfile',
       `${apiUrl}/users/soft/me`,
@@ -87,7 +75,7 @@ export class AuthService extends BaseService {
   public async signOut(): Promise<void> {
     await this.adapter.ensureReady();
     await this.adapter.signOut();
-    // Reset containers
+
     this.resetContainer('userProfile');
     this.resetContainer('loginForm');
     this.resetContainer('signUpForm');
@@ -99,7 +87,6 @@ export class AuthService extends BaseService {
     const container = this.userContainer();
     container.setLoading(true);
     await this.adapter.ensureReady();
-
     const isSignedIn = this.adapter.isSignedIn();
     if (!isSignedIn) {
       container.reset();
@@ -119,8 +106,7 @@ export class AuthService extends BaseService {
       container.setLoading(false);
       return cached;
     }
-
-    await this.submitLogin(); // will handle its own container states
+    await this.submitLogin();
     const user = await this.fetchUserFromBackend();
     return user;
   }
@@ -130,7 +116,6 @@ export class AuthService extends BaseService {
     return this.adapter.isSignedIn();
   }
 
-  // ─── Private helpers ────────────────────────────────
   private async computeClerkUser(): Promise<{ id: string; email: string; name: string }> {
     await this.adapter.ensureReady();
     const user = this.adapter.getClerkUser();

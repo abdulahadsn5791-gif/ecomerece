@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 import type { ContainerState } from '../../../models/base.model';
 import type { reasonType, UserResponseReadModel } from '@ecomerece/shared';
 
+
 const useAuthContainer = createServiceContainerHook<AuthService>(
   AuthService,
   authAdapter,
@@ -21,7 +22,6 @@ interface UseAuthReturn {
   confirmation: ContainerState<AuthUser>['confirmation'];
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
-  submitLogin: () => Promise<void>;
   submitSignUp: () => Promise<void>;
   deleteAccount: (reason: reasonType) => Promise<void>;
   refresh: () => Promise<AuthUser | null>;
@@ -35,9 +35,12 @@ export function useAuth(autoSync = false): UseAuthReturn {
 
   useEffect(() => {
     if (autoSync) {
+
+
       void service.syncUser();
+
     }
-  }, [service, autoSync]);
+  }, [service]);
 
   return {
     user: state.data,
@@ -48,7 +51,6 @@ export function useAuth(autoSync = false): UseAuthReturn {
     confirmation: state.confirmation,
     signInWithGoogle: () => service.signInWithGoogle(),
     signOut: () => service.signOut(),
-    submitLogin: () => service.submitLogin(),
     submitSignUp: () => service.submitSignUp(),
     deleteAccount: (reason) => service.deleteAccount(reason),
     refresh: () => service.syncUser(),

@@ -22,10 +22,14 @@
     }
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.102.8",
+    "@types/react-dom": "^19.2.5",
+    "lucide-react": "0.468.0",
+    "react-dom": "^19.2.8",
     "zustand": "^5.0.0"
   },
   "peerDependencies": {
-    "react": ">=18.0.0",
+    "react": "^19.2.8",
     "@clerk/nextjs": "*",
     "@clerk/clerk-expo": "*"
   },
@@ -38,7 +42,7 @@
     }
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
+    "@types/react": "^19.2.18",
     "typescript": "^5.0.0"
   }
 }

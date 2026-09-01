@@ -1,5 +1,5 @@
-import Home from '@/app/page'
-import { CheckCircle, MapPin, Pencil, Star, Trash2 } from 'lucide-react'
+
+import { CheckCircle, Home, MapPin, Pencil, Star, Trash2 } from 'lucide-react'
 import React from 'react'
 
 function AddressList({ addresses }) {
@@ -27,7 +27,7 @@ function AddressList({ addresses }) {
                             </p>
                             <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                 <button
-                                    onClick={() => openEditForm(address)}
+                                    z
                                     className="inline-flex items-center gap-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                 >
                                     <Pencil className="w-3 h-3" /> Edit

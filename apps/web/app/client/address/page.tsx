@@ -2,36 +2,7 @@
 
 import { useState } from 'react';
 import { z } from 'zod';
-import {
-    MapPin,
-    Plus,
-    Pencil,
-    Trash2,
-    Star,
-    CheckCircle,
-    Home,
-    Phone,
-    Mail,
-    Globe,
-    Package,
-    Gift,
-    HelpCircle,
-    Search,
-    Heart,
-    User,
-    ShoppingCart,
-    Moon,
-    Sun,
-    X,
-    AlertTriangle,
-    CreditCard,
-    PackageOpen,
-    LogOut,
-    Settings,
-    ClipboardList,
-    Menu,
-    Form,
-} from 'lucide-react';
+
 import Navbar from '@/components/navbar/NavBar';
 import DeleteConfirmation from './components/DeleteConfirmation';
 
@@ -254,7 +225,7 @@ export default function AddressesPage() {
                 </div>
 
                 {/* ============ MODAL (Create/Update form) ============ */}
-                {formOpen && (<Form />)}
+                {/* {formOpen && (<Form/>)} */}
                 {/* ============ DELETE CONFIRMATION ============ */}
                 {deleteId && (<DeleteConfirmation />)}
 

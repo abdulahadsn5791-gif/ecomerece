@@ -1,3 +1,6 @@
+
+
+// components/Skeleton.tsx
 interface SkeletonProps {
     count?: number;
     className?: string;
@@ -9,7 +12,7 @@ export function Skeleton({ count = 1, className = '' }: SkeletonProps) {
             {Array.from({ length: count }).map((_, i) => (
                 <div
                     key={i}
-                    className={`h-4 animate-pulse rounded bg-neutral-500 dark:bg-slate-800 ${className}`}
+                    className={`h-4 animate-pulse rounded-md bg-slate-200 dark:bg-slate-800 ${className}`}
                 />
             ))}
         </div>

@@ -1,42 +1,49 @@
+// components/ToastContainer.tsx
 'use client';
 
+
 import { useEffect } from 'react';
-import { useGlobalUI } from '../../hooks/useGlobalUI.hook';
-import { Toast } from './Toast';
+import { Toast, ToastVariant } from './Toast';
+import { AppNotification } from '@ecomerece/frontend/models/base.model';
+import { useGlobalUIStore } from "../../stores";
 
-const AUTO_DISMISS_MS = 4000;
-
-// Reads error/success off the GLOBAL store (useGlobalUI), not any one
-// container directly. Anything that wants a container's error/success to
-// show up here needs to forward it first — see useContainerFeedback.
-//
-// Because useGlobalUI's setError/setSuccess each clear the other, at most
-// one of these two is ever set at a time, so there's no stacking/queue
-// logic needed here. If you outgrow that (want multiple simultaneous
-// toasts), swap the single error/success fields in global.store for an
-// array-based toast queue instead — this component's shape would barely
-// change.
 export function ToastContainer() {
-    const { error, success, setError, setSuccess } = useGlobalUI();
-
-    useEffect(() => {
-        if (!error) return;
-        const timer = setTimeout(() => setError(null), AUTO_DISMISS_MS);
-        return () => clearTimeout(timer);
-    }, [error, setError]);
-
-    useEffect(() => {
-        if (!success) return;
-        const timer = setTimeout(() => setSuccess(null), AUTO_DISMISS_MS);
-        return () => clearTimeout(timer);
-    }, [success, setSuccess]);
-
-    if (!error && !success) return null;
+    const notifications = useGlobalUIStore((state) => state.notifications);
+    const removeNotification = useGlobalUIStore((state) => state.removeNotification);
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 flex w-80 flex-col gap-2">
-            {error && <Toast variant="error" message={error} onDismiss={() => setError(null)} />}
-            {success && <Toast variant="success" message={success} onDismiss={() => setSuccess(null)} />}
+        <div className="pointer-events-none fixed top-4 right-4 z-50 flex max-w-sm w-full flex-col gap-2 p-4 sm:p-0">
+            {notifications.map((toast) => (
+                <ToastItem
+                    key={toast.id}
+                    toast={toast}
+                    onRemove={() => removeNotification(toast.id)}
+                />
+            ))}
         </div>
+    );
+}
+
+function ToastItem({ toast, onRemove }: { toast: AppNotification; onRemove: () => void }) {
+    useEffect(() => {
+        if (toast.duration !== 0) {
+            const timer = setTimeout(onRemove, toast.duration || 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [toast.duration, onRemove]);
+
+    const variantMap: Record<string, ToastVariant> = {
+        success: 'success',
+        error: 'error',
+        info: 'info',
+        warning: 'warning',
+    };
+
+    return (
+        <Toast
+            variant={variantMap[toast.type] || 'info'}
+            message={toast.message}
+            onDismiss={onRemove}
+        />
     );
 }

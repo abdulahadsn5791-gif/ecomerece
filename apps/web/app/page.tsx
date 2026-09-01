@@ -12,7 +12,7 @@ export default function Home() {
     try {
       setLoading(true);
 
-      const t = await getToken({ template: "template-1"});
+      const t = await getToken({ template: "template-1" });
       setToken(t ?? "");
     } catch (err) {
       console.error("Failed to get token:", err);

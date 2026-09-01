@@ -1,3 +1,4 @@
+// components/InlineSpinner.tsx
 import { Loader2 } from 'lucide-react';
 
 interface InlineSpinnerProps {
@@ -9,7 +10,7 @@ export function InlineSpinner({ size = 16, className = '' }: InlineSpinnerProps)
     return (
         <Loader2
             style={{ width: size, height: size }}
-            className={`animate-spin text-slate-400 ${className}`}
+            className={`animate-spin text-slate-400 dark:text-slate-500 ${className}`}
         />
     );
 }

@@ -1,114 +1,129 @@
-import { BaseService } from '../../../services/base.service';
-import type { AuthAdapter } from '../../../services/auth';
+import { BaseService } from '@ecomerece/frontend';
+import type { AuthAdapter } from '@ecomerece/frontend/services/auth';
 import type { reasonType, UserResponseReadModel } from '@ecomerece/shared';
+import { storageAdapter } from '@ecomerece/frontend/storage';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const CACHE_KEY = 'auth_user_profile';
 
 export class AuthService extends BaseService {
-  private readonly adapter: AuthAdapter;
-
-  constructor(adapter: AuthAdapter) {
+  constructor(private readonly adapter: AuthAdapter) {
     super('auth-service');
-    this.adapter = adapter;
   }
 
-  // ─── Container getters ──────────────────────────────
-  private userContainer = () =>
-    this.getContainer<UserResponseReadModel>('userProfile', {
+  // ─── Container Getters ──────────────────────────────────────────────
+
+  private get userContainer() {
+    return this.getContainer<UserResponseReadModel>('userProfile', {
       autoError: true,
       autoSuccess: true,
     });
+  }
 
-  private loginContainer = () =>
-    this.getContainer('loginForm', {
+  private get loginContainer() {
+    return this.getContainer('loginForm', {
       autoError: true,
       autoSuccess: false,
     });
+  }
 
-  private signUpContainer = () =>
-    this.getContainer('signUpForm', {
+  private get signUpContainer() {
+    return this.getContainer('signUpForm', {
       autoError: true,
       autoSuccess: true,
     });
+  }
 
-  // ─── Public methods ─────────────────────────────────
+  // ─── Core Sync & Cache Logic ────────────────────────────────────────
+
+  public async syncUser(forceRefresh = false): Promise<UserResponseReadModel | null> {
+    const container = this.userContainer;
+
+    // 1. Memory store check
+    let user = container.getState().data;
+
+    // 2. Storage cache check if memory is empty
+    if (!user) {
+      user = await storageAdapter.getItem<UserResponseReadModel>(CACHE_KEY);
+      if (user) container.setData(user);
+    }
+
+    // 3. Return cache immediately (unless forced refresh)
+    if (user && !forceRefresh) {
+      return user;
+    }
+
+    // 4. Fetch fresh user from backend
+    try {
+      await this.adapter.ensureReady();
+      if (!this.adapter.isSignedIn() || (await this.adapter.isExpired())) {
+        await this.signOut();
+        return null;
+      }
+
+      container.setLoading(true);
+
+      const token = await this.getToken();
+
+      // Log in to backend session
+      await this.post('loginForm', `${API_URL}/users/login`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fetch user profile
+      const freshUser = await this.get<UserResponseReadModel>(
+        'userProfile',
+        `${API_URL}/users/me`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Save to localStorage
+      await storageAdapter.setItem(CACHE_KEY, freshUser);
+      return freshUser;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Auth sync failed';
+      container.setError(message);
+      return null;
+    } finally {
+      container.setLoading(false);
+    }
+  }
+
+  // ─── Actions ────────────────────────────────────────────────────────
+
   public async signInWithGoogle(): Promise<void> {
     await this.adapter.ensureReady();
     await this.adapter.signInWithGoogle();
-    await this.syncUser();
-  }
-
-  private async submitLogin(): Promise<void> {
-    await this.adapter.ensureReady();
-    const token = await this.computeToken();
-    await this.post('loginForm', `${apiUrl}/users/login`, {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    await this.fetchUserFromBackend();
-    this.loginContainer().setSuccess('Login successful');
-
+    await this.syncUser(true);
   }
 
   public async submitSignUp(): Promise<void> {
-    await this.adapter.ensureReady();
-    const token = await this.computeToken();
-    const user = await this.computeClerkUser();
-    await this.post('signUpForm', `${apiUrl}/${user.id}/signup`, {}, {
+    const token = await this.getToken();
+    const user = this.adapter.getClerkUser();
+    if (!user) throw new Error('User not signed in');
+
+    await this.post('signUpForm', `${API_URL}/${user.id}/signup`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
   }
 
   public async deleteAccount(reason: reasonType): Promise<void> {
-    await this.adapter.ensureReady();
-    const token = await this.computeToken();
-    await this.deleteWithBody(
-      'userProfile',
-      `${apiUrl}/users/soft/me`,
-      { reason },
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
-
+    const token = await this.getToken();
+    await this.request('DELETE', `${API_URL}/users/soft/me`, 'userProfile', { reason }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     await this.signOut();
   }
 
   public async signOut(): Promise<void> {
-    await this.adapter.ensureReady();
-    await this.adapter.signOut();
+    await this.adapter.ensureReady().catch(() => { });
+    await this.adapter.signOut().catch(() => { });
+    await storageAdapter.removeItem(CACHE_KEY);
 
-    this.resetContainer('userProfile');
-    this.resetContainer('loginForm');
-    this.resetContainer('signUpForm');
-    // If persistence is used, clear storage:
-    // await this.clearStorage();
-  }
-
-  public async syncUser(): Promise<UserResponseReadModel | null> {
-    const container = this.userContainer();
-    container.setLoading(true);
-    await this.adapter.ensureReady();
-    const isSignedIn = this.adapter.isSignedIn();
-    if (!isSignedIn) {
-      container.reset();
-      return null;
-    }
-
-    const expired = await this.adapter.isExpired();
-    if (expired) {
-      container.setError('Session expired');
-      container.reset();
-      return null;
-    }
-
-    const cached = container.getState().data;
-    if (cached) {
-      container.setData(cached);
-      container.setLoading(false);
-      return cached;
-    }
-    await this.submitLogin();
-    const user = await this.fetchUserFromBackend();
-    return user;
+    // Reset all container states on sign-out
+    this.userContainer.reset();
+    this.loginContainer.reset();
+    this.signUpContainer.reset();
   }
 
   public async isSignedIn(): Promise<boolean> {
@@ -116,25 +131,12 @@ export class AuthService extends BaseService {
     return this.adapter.isSignedIn();
   }
 
-  private async computeClerkUser(): Promise<{ id: string; email: string; name: string }> {
-    await this.adapter.ensureReady();
-    const user = this.adapter.getClerkUser();
-    if (!user) throw new Error('User not signed in');
-    return user;
-  }
+  // ─── Helper ─────────────────────────────────────────────────────────
 
-  private async computeToken(): Promise<string> {
+  private async getToken(): Promise<string> {
     await this.adapter.ensureReady();
     const token = await this.adapter.getToken();
     if (!token) throw new Error('No authentication token available');
     return token;
-  }
-
-  private async fetchUserFromBackend(): Promise<UserResponseReadModel> {
-    await this.adapter.ensureReady();
-    const token = await this.computeToken();
-    return this.get('userProfile', `${apiUrl}/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
   }
 }

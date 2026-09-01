@@ -115,3 +115,27 @@ body {
 .animate-pulse-blur {
   animation: pulseBlur 2s ease-in-out infinite;
 }
+
+
+
+
+#engine-boot-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  transition: opacity 0.3s ease-out;
+  pointer-events: auto;
+}
+
+/* Add this class when fading out */
+#engine-boot-splash[style*="opacity: 0"] {
+  pointer-events: none;
+}
+
+.dark #engine-boot-splash {
+  background-color: #090d16;
+}

@@ -20,8 +20,7 @@ export default function AuthPageContent() {
   const {
     showLoading,
     hideLoading,
-    setError,
-    setSuccess,
+
   } = useGlobalUI();
 
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
@@ -32,7 +31,7 @@ export default function AuthPageContent() {
       await signInWithGoogle(); // 👈 uses adapter's authenticateWithRedirect
       // No need to setSuccess here – the redirect will happen and then syncUser runs
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+
     } finally {
       hideLoading();
     }
@@ -60,8 +59,8 @@ export default function AuthPageContent() {
         <button
           onClick={toggleTheme}
           className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${darkMode
-              ? 'bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-              : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-900'
+            ? 'bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
+            : 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-900'
             }`}
         >
           {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -101,12 +100,12 @@ export default function AuthPageContent() {
               <button
                 onClick={() => setAuthMode('login')}
                 className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-colors ${authMode === 'login'
-                    ? darkMode
-                      ? 'bg-white text-black'
-                      : 'bg-black text-white'
-                    : darkMode
-                      ? 'text-gray-400 hover:text-white'
-                      : 'text-gray-600 hover:text-gray-900'
+                  ? darkMode
+                    ? 'bg-white text-black'
+                    : 'bg-black text-white'
+                  : darkMode
+                    ? 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 Sign In
@@ -114,12 +113,12 @@ export default function AuthPageContent() {
               <button
                 onClick={() => setAuthMode('signup')}
                 className={`flex-1 py-2.5 rounded-full font-medium text-sm transition-colors ${authMode === 'signup'
-                    ? darkMode
-                      ? 'bg-white text-black'
-                      : 'bg-black text-white'
-                    : darkMode
-                      ? 'text-gray-400 hover:text-white'
-                      : 'text-gray-600 hover:text-gray-900'
+                  ? darkMode
+                    ? 'bg-white text-black'
+                    : 'bg-black text-white'
+                  : darkMode
+                    ? 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 Sign Up

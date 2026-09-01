@@ -3,47 +3,59 @@ import { storageAdapter } from '@ecomerece/frontend/storage';
 
 interface ThemeState {
     darkMode: boolean;
-    isLoading: boolean;
+    isInitialized: boolean;
     toggleTheme: () => void;
-    setDarkMode: (mode: boolean) => void;
-    loadTheme: () => Promise<void>;
+    setDarkMode: (mode: boolean, persist?: boolean) => void;
+    initTheme: () => Promise<void>;
 }
+
+let mediaQueryListener: ((e: MediaQueryListEvent) => void) | null = null;
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
     darkMode: false,
-    isLoading: true,
+    isInitialized: false,
 
     toggleTheme: () => {
-        const newMode = !get().darkMode;
-        set({ darkMode: newMode });
-        // Persist
-        if (typeof window !== 'undefined') {
-            storageAdapter.setItem('theme', newMode);
-        }
-
+        get().setDarkMode(!get().darkMode, true);
     },
 
-    setDarkMode: (mode: boolean) => {
+    setDarkMode: (mode: boolean, persist = true) => {
         set({ darkMode: mode });
         if (typeof window !== 'undefined') {
-            storageAdapter.setItem('theme', mode);
+            document.documentElement.classList.toggle('dark', mode);
+            if (persist) {
+                void storageAdapter.setItem('theme', mode);
+            }
         }
-
     },
 
-    loadTheme: async () => {
-        try {
-            const stored = await storageAdapter.getItem<boolean>('theme');
-            const mode = stored ?? false;
-            set({ darkMode: mode, isLoading: false });
+    initTheme: async () => {
+        if (get().isInitialized || typeof window === 'undefined') return;
 
+        try {
+            await storageAdapter.ensureReady();
+            const stored = await storageAdapter.getItem<boolean>('theme');
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+            // Use saved preference if available; otherwise check system setting
+            const initialMode = stored ?? mediaQuery.matches;
+
+            // Apply theme WITHOUT writing to storage during init (persist = false)
+            get().setDarkMode(initialMode, false);
+            set({ isInitialized: true });
+
+            if (!mediaQueryListener) {
+                mediaQueryListener = (e: MediaQueryListEvent) => {
+                    void storageAdapter.getItem<boolean>('theme').then((userPreference) => {
+                        if (userPreference === null) {
+                            get().setDarkMode(e.matches, false);
+                        }
+                    });
+                };
+                mediaQuery.addEventListener('change', mediaQueryListener);
+            }
         } catch {
-            set({ isLoading: false });
+            set({ isInitialized: true });
         }
     },
 }));
-
-// Auto‑load on import (runs once)
-if (typeof window !== 'undefined') {
-    useThemeStore.getState().loadTheme();
-}

@@ -1,121 +1,122 @@
 import { create } from 'zustand';
+import type { AppNotification, ConfirmationState } from '../models/base.model';
 
 export interface GlobalUIState {
-    // Global loading (stacked)
-    isLoading: boolean;
+    // Global Spinner State
     loadingCount: number;
-
-    // Global feedback
-    error: string | null;
-    success: string | null;
-
-    // Global confirmation modal
-    confirmation: {
-        isOpen: boolean;
-        title: string;
-        message: string;
-        confirmText?: string;
-        cancelText?: string;
-        onConfirm?: () => void | Promise<void>;
-        onCancel?: () => void;
-    };
-
-    // Actions
+    isLoading: boolean;
     showLoading: () => void;
     hideLoading: () => void;
-    setError: (error: string | null) => void;
-    setSuccess: (success: string | null) => void;
-    showConfirmation: (params: {
-        title: string;
-        message: string;
-        confirmText?: string;
-        cancelText?: string;
-        onConfirm?: () => void | Promise<void>;
-        onCancel?: () => void;
-    }) => void;
+
+    // Toast Notification System
+    notifications: AppNotification[];
+    notify: (notification: Omit<AppNotification, 'id'>) => void;
+    showError: (message: string, duration?: number) => void;
+    showSuccess: (message: string, duration?: number) => void;
+    showWarning: (message: string, duration?: number) => void;
+    showInfo: (message: string, duration?: number) => void;
+    removeNotification: (id: string) => void;
+    clearNotifications: () => void;
+
+    // Global Modal Confirmation
+    confirmation: ConfirmationState;
+    showConfirmation: (params: Omit<ConfirmationState, 'isOpen'>) => void;
     closeConfirmation: () => void;
+
     reset: () => void;
 }
 
-export const useGlobalUIStore = create<GlobalUIState>((set, get) => ({
-    isLoading: false,
-    loadingCount: 0,
-    error: null,
-    success: null,
-    confirmation: {
-        isOpen: false,
-        title: '',
-        message: '',
-        confirmText: 'Confirm',
-        cancelText: 'Cancel',
-        onConfirm: undefined,
-        onCancel: undefined,
-    },
+const DEFAULT_CONFIRMATION: ConfirmationState = {
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    isDestructive: false,
+};
 
-    showLoading: () => {
+const notificationTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+export const useGlobalUIStore = create<GlobalUIState>((set, get) => ({
+    loadingCount: 0,
+    isLoading: false,
+    notifications: [],
+    confirmation: DEFAULT_CONFIRMATION,
+
+    showLoading: () =>
         set((state) => ({
             loadingCount: state.loadingCount + 1,
             isLoading: true,
-        }));
-    },
+        })),
 
-    hideLoading: () => {
+    hideLoading: () =>
         set((state) => {
             const newCount = Math.max(0, state.loadingCount - 1);
             return {
                 loadingCount: newCount,
                 isLoading: newCount > 0,
             };
-        });
+        }),
+
+    notify: (notification) => {
+        const id = typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : Math.random().toString(36).substring(2, 9);
+
+        const newNotification: AppNotification = { ...notification, id };
+
+        set((state) => ({ notifications: [...state.notifications, newNotification] }));
+
+        const duration = notification.duration ?? 5000;
+        if (duration > 0) {
+            const timer = setTimeout(() => {
+                get().removeNotification(id);
+            }, duration);
+            notificationTimers.set(id, timer);
+        }
     },
 
-    setError: (error) => set({ error, success: null }),
+    showError: (message, duration = 6000) => get().notify({ type: 'error', message, duration }),
+    showSuccess: (message, duration = 4000) => get().notify({ type: 'success', message, duration }),
+    showWarning: (message, duration = 5000) => get().notify({ type: 'warning', message, duration }),
+    showInfo: (message, duration = 4000) => get().notify({ type: 'info', message, duration }),
 
-    setSuccess: (success) => set({ success, error: null }),
+    removeNotification: (id) => {
+        if (notificationTimers.has(id)) {
+            clearTimeout(notificationTimers.get(id)!);
+            notificationTimers.delete(id);
+        }
+        set((state) => ({
+            notifications: state.notifications.filter((n) => n.id !== id),
+        }));
+    },
 
-    showConfirmation: (params) => {
+    clearNotifications: () => {
+        notificationTimers.forEach((timer) => clearTimeout(timer));
+        notificationTimers.clear();
+        set({ notifications: [] });
+    },
+
+    showConfirmation: (params) =>
         set({
             confirmation: {
+                ...DEFAULT_CONFIRMATION,
+                ...params,
                 isOpen: true,
-                title: params.title,
-                message: params.message,
-                confirmText: params.confirmText || 'Confirm',
-                cancelText: params.cancelText || 'Cancel',
-                onConfirm: params.onConfirm,
-                onCancel: params.onCancel,
             },
-        });
-    },
+        }),
 
-    closeConfirmation: () => {
-        set({
-            confirmation: {
-                isOpen: false,
-                title: '',
-                message: '',
-                confirmText: 'Confirm',
-                cancelText: 'Cancel',
-                onConfirm: undefined,
-                onCancel: undefined,
-            },
-        });
-    },
+    closeConfirmation: () =>
+        set((state) => ({
+            confirmation: { ...state.confirmation, isOpen: false },
+        })),
 
     reset: () => {
+        get().clearNotifications();
         set({
-            isLoading: false,
             loadingCount: 0,
-            error: null,
-            success: null,
-            confirmation: {
-                isOpen: false,
-                title: '',
-                message: '',
-                confirmText: 'Confirm',
-                cancelText: 'Cancel',
-                onConfirm: undefined,
-                onCancel: undefined,
-            },
+            isLoading: false,
+            confirmation: DEFAULT_CONFIRMATION,
         });
     },
 }));

@@ -21,7 +21,8 @@ import {
     ClipboardList,
     Menu,
 } from "lucide-react";
-import { useTheme } from "@ecomerece/frontend";
+import { useThemeStore } from "@ecomerece/frontend";
+
 
 const navItems = [
     "Home",
@@ -47,7 +48,7 @@ const accountItems = [
 ];
 
 export default function Navbar() {
-    const { darkMode, toggleTheme } = useTheme();
+    const { darkMode, toggleTheme } = useThemeStore();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
@@ -66,8 +67,8 @@ export default function Navbar() {
             {/* ============ TOP BAR ============ */}
             <div
                 className={`text-sm border-b sticky top-0 z-50 ${darkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-gray-100 border-gray-200"
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-gray-100 border-gray-200"
                     }`}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center flex-wrap gap-2 py-2">
@@ -89,8 +90,8 @@ export default function Navbar() {
                         <a
                             href="#"
                             className={`flex items-center gap-1 ${darkMode
-                                    ? "text-gray-300 hover:text-white"
-                                    : "text-gray-600 hover:text-gray-900"
+                                ? "text-gray-300 hover:text-white"
+                                : "text-gray-600 hover:text-gray-900"
                                 }`}
                         >
                             <Package className="w-4 h-4" /> Track Order
@@ -98,8 +99,8 @@ export default function Navbar() {
                         <a
                             href="#"
                             className={`flex items-center gap-1 ${darkMode
-                                    ? "text-gray-300 hover:text-white"
-                                    : "text-gray-600 hover:text-gray-900"
+                                ? "text-gray-300 hover:text-white"
+                                : "text-gray-600 hover:text-gray-900"
                                 }`}
                         >
                             <HelpCircle className="w-4 h-4" /> Help Center
@@ -157,8 +158,8 @@ export default function Navbar() {
                     <button
                         onClick={toggleTheme}
                         className={`flex items-center gap-2 px-3 py-2 rounded-full transition-colors ${darkMode
-                                ? "bg-gray-800 text-white hover:bg-gray-700"
-                                : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                            ? "bg-gray-800 text-white hover:bg-gray-700"
+                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                             }`}
                     >
                         {darkMode ? (
@@ -174,22 +175,22 @@ export default function Navbar() {
                     {/* Search bar (desktop) */}
                     <div
                         className={`hidden md:flex flex-1 max-w-md items-center rounded-full px-4 border border-transparent transition-all ${darkMode
-                                ? "bg-gray-800 focus-within:bg-gray-900 focus-within:border-white"
-                                : "bg-gray-100 focus-within:bg-white focus-within:border-black"
+                            ? "bg-gray-800 focus-within:bg-gray-900 focus-within:border-white"
+                            : "bg-gray-100 focus-within:bg-white focus-within:border-black"
                             }`}
                     >
                         <input
                             type="text"
                             placeholder="Search products, brands, and more..."
                             className={`flex-1 bg-transparent border-none outline-none py-2 px-3 placeholder-gray-500 ${darkMode
-                                    ? "text-white placeholder-gray-400"
-                                    : "text-gray-900"
+                                ? "text-white placeholder-gray-400"
+                                : "text-gray-900"
                                 }`}
                         />
                         <button
                             className={`p-2 ${darkMode
-                                    ? "text-gray-400 hover:text-white"
-                                    : "text-gray-500 hover:text-gray-900"
+                                ? "text-gray-400 hover:text-white"
+                                : "text-gray-500 hover:text-gray-900"
                                 }`}
                         >
                             <Search className="w-5 h-5" />
@@ -200,15 +201,15 @@ export default function Navbar() {
                     <div className="flex items-center gap-2">
                         <button
                             className={`relative w-11 h-11 rounded-full flex items-center justify-center ${darkMode
-                                    ? "text-white hover:bg-gray-800"
-                                    : "text-gray-900 hover:bg-gray-100"
+                                ? "text-white hover:bg-gray-800"
+                                : "text-gray-900 hover:bg-gray-100"
                                 }`}
                         >
                             <Heart className="w-5 h-5" />
                             <span
                                 className={`absolute top-0 right-0 text-xs font-semibold w-5 h-5 rounded-full flex items-center justify-center border-2 ${darkMode
-                                        ? "bg-white text-black border-gray-900"
-                                        : "bg-black text-white border-white"
+                                    ? "bg-white text-black border-gray-900"
+                                    : "bg-black text-white border-white"
                                     }`}
                             >
                                 3
@@ -216,23 +217,23 @@ export default function Navbar() {
                         </button>
                         <button
                             className={`relative w-11 h-11 rounded-full flex items-center justify-center ${darkMode
-                                    ? "text-white hover:bg-gray-800"
-                                    : "text-gray-900 hover:bg-gray-100"
+                                ? "text-white hover:bg-gray-800"
+                                : "text-gray-900 hover:bg-gray-100"
                                 }`}
                         >
                             <User className="w-5 h-5" />
                         </button>
                         <button
                             className={`relative w-11 h-11 rounded-full flex items-center justify-center ${darkMode
-                                    ? "text-white hover:bg-gray-800"
-                                    : "text-gray-900 hover:bg-gray-100"
+                                ? "text-white hover:bg-gray-800"
+                                : "text-gray-900 hover:bg-gray-100"
                                 }`}
                         >
                             <ShoppingCart className="w-5 h-5" />
                             <span
                                 className={`absolute top-0 right-0 text-xs font-semibold w-5 h-5 rounded-full flex items-center justify-center border-2 ${darkMode
-                                        ? "bg-white text-black border-gray-900"
-                                        : "bg-black text-white border-white"
+                                    ? "bg-white text-black border-gray-900"
+                                    : "bg-black text-white border-white"
                                     }`}
                             >
                                 5
@@ -246,8 +247,8 @@ export default function Navbar() {
             {mobileMenuOpen && (
                 <div
                     className={`md:hidden border-b z-30 ${darkMode
-                            ? "bg-gray-900 border-gray-700"
-                            : "bg-white border-gray-200"
+                        ? "bg-gray-900 border-gray-700"
+                        : "bg-white border-gray-200"
                         }`}
                 >
                     <div className="px-4 py-2 space-y-1">
@@ -256,8 +257,8 @@ export default function Navbar() {
                                 key={item}
                                 href="#"
                                 className={`block px-3 py-2 rounded-lg ${darkMode
-                                        ? "text-gray-300 hover:bg-gray-800"
-                                        : "text-gray-700 hover:bg-gray-100"
+                                    ? "text-gray-300 hover:bg-gray-800"
+                                    : "text-gray-700 hover:bg-gray-100"
                                     }`}
                                 onClick={() => setMobileMenuOpen(false)}
                             >
@@ -272,8 +273,8 @@ export default function Navbar() {
             {accountMenuOpen && (
                 <div
                     className={`md:hidden border-b z-30 ${darkMode
-                            ? "bg-gray-900 border-gray-700"
-                            : "bg-white border-gray-200"
+                        ? "bg-gray-900 border-gray-700"
+                        : "bg-white border-gray-200"
                         }`}
                 >
                     <div className="px-4 py-2 space-y-1">
@@ -290,12 +291,12 @@ export default function Navbar() {
                                     key={item.label}
                                     href="#"
                                     className={`flex items-center gap-3 px-3 py-2 rounded-lg ${isActive
-                                            ? darkMode
-                                                ? "bg-white text-black font-medium"
-                                                : "bg-black text-white font-medium"
-                                            : darkMode
-                                                ? "text-gray-300 hover:bg-gray-800"
-                                                : "text-gray-700 hover:bg-gray-100"
+                                        ? darkMode
+                                            ? "bg-white text-black font-medium"
+                                            : "bg-black text-white font-medium"
+                                        : darkMode
+                                            ? "text-gray-300 hover:bg-gray-800"
+                                            : "text-gray-700 hover:bg-gray-100"
                                         }`}
                                     onClick={() => setAccountMenuOpen(false)}
                                 >
@@ -310,8 +311,8 @@ export default function Navbar() {
             {/* ============ DESKTOP NAVIGATION ============ */}
             <nav
                 className={`hidden md:block border-b sticky top-24 z-30 ${darkMode
-                        ? "bg-gray-900 border-gray-700"
-                        : "bg-white border-gray-200"
+                    ? "bg-gray-900 border-gray-700"
+                    : "bg-white border-gray-200"
                     }`}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1 overflow-x-auto">

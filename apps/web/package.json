@@ -9,10 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.8.0",
     "@ecomerece/domain": "workspace:*",
     "@ecomerece/frontend": "workspace:*",
     "@ecomerece/shared": "workspace:*",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.114.0",
+    "framer-motion": "^13.2.0",
     "lucide-react": "0.468.0",
     "next": "16.2.9",
     "react": "19.2.8",

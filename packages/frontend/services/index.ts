@@ -1,1 +1,2 @@
-export * from './app-init.service'
+export * from './theme.service'
+export * from './parseModalError.service'

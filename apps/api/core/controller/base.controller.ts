@@ -23,10 +23,10 @@ export type HttpErrorStatus = 400 | 401 | 403 | 404 | 409 | 422 | 500;
 // ─── Base Controller ──────────────────────────────────────────────────────────
 
 export abstract class BaseController<TService> {
-    constructor(protected readonly service: TService) {}
+    constructor(protected readonly service: TService) { }
 
     // ── 2xx Success ─────────────────────────────────────────────────────────────
-
+    //backend
     /** 200 – general success with a data payload */
     protected ok(c: Context, data: unknown) {
         return c.json({ success: true, data });

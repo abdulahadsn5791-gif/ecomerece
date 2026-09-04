@@ -1,3 +1,4 @@
+//backend
 export class AppError extends Error {
     code: string;
     status: number;

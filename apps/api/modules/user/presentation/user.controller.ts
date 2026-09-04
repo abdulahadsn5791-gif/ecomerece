@@ -2,7 +2,7 @@ import type { Context } from 'hono';
 import { BaseController } from '../../../core/controller/base.controller';
 import { clerkUserIdSchema } from '../../../shared/validation/clerkSchema';
 import type { UserAppService } from '../application/user.app.service';
-import { BanUserDTOSchema, BlockUserDTOSchema, DeleteMeDTOSchema, DeleteUserDTOSchema, ExtendBanDTOSchema, ObjUserIdDTOSchema, UserRoleDtoSchema } from '@ecomerece/shared';
+import { BanUserDTOSchema, BlockUserDTOSchema, DeleteMeDTOSchema, DeleteUserDTOSchema, ExtendBanDTOSchema, idSchema, ObjUserIdDTOSchema, UserRoleDtoSchema } from '@ecomerece/shared';
 
 
 export class UserController extends BaseController<UserAppService> {
@@ -10,21 +10,20 @@ export class UserController extends BaseController<UserAppService> {
         const clerkId = this.param(c, 'id', clerkUserIdSchema);
         return this.ok(c, await this.service.getUserById(clerkId));
     };
-    signIn = async (c: Context) => {
-        const clerkId = this.param(c, 'id', clerkUserIdSchema);
-        return this.ok(c, await this.service.signIn(clerkId));
+    initUser = async (c: Context) => {
+        const id = c.get('userId');
+
+        return this.accepted(c, await this.service.initUser(id))
     };
     assignRole = async (c: Context) => {
         const actor = c.get('user');
         const data = await this.body(c, UserRoleDtoSchema);
         return this.ok(c, await this.service.assignRole(data, actor));
     };
-    logIn = async (c: Context) => {
-        const actor = c.get('user');
-        return this.ok(c, await this.service.login(actor));
-    };
+
     getMe = async (c: Context) => {
         const actor = c.get('user');
+        console.log(actor);
         return this.ok(c, await this.service.getMe(actor));
     };
     blockUser = async (c: Context) => {

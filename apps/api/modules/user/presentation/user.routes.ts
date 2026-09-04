@@ -2,11 +2,11 @@ import { Hono } from 'hono';
 import { adminMiddleware } from '../../../middleware/admin';
 import { authMiddleware } from '../../../middleware/auth';
 import { createUserModule } from '../user.module';
+import { initAuthMiddleware } from '../../../middleware/init-auth';
 
 const usersRoutes = new Hono();
 const { userController } = createUserModule();
-
-usersRoutes.post('/login', authMiddleware, userController.logIn);
+usersRoutes.post('/init', initAuthMiddleware, userController.initUser);
 usersRoutes.get('/me', authMiddleware, userController.getMe);
 usersRoutes.delete('/soft/me', authMiddleware, userController.softDeleteMe);
 usersRoutes.patch('/block/lift', authMiddleware, adminMiddleware, userController.blockLift);
@@ -18,7 +18,7 @@ usersRoutes.patch('/ban', authMiddleware, adminMiddleware, userController.banUse
 usersRoutes.patch('/role', authMiddleware, adminMiddleware, userController.assignRole);
 usersRoutes.patch('/recover', authMiddleware, adminMiddleware, userController.recover);
 usersRoutes.delete('/soft', authMiddleware, adminMiddleware, userController.softDelete);
-usersRoutes.post('/:id/signup', userController.signIn);
+
 usersRoutes.get('/:id', authMiddleware, userController.getUserById);
 
 export default usersRoutes;

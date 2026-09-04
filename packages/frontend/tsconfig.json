@@ -13,7 +13,6 @@
     "include": [
         "**/*.ts",
         "**/*.tsx",
-        "../../apps/web/app/providers/ThemeProvider.tsx"
     ],
     "exclude": [
         "node_modules",

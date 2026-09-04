@@ -1,5 +1,5 @@
 "use client";
-import { useTheme } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend';
 import Aside from '@/components/aside/Aside';
 import Main from './components/Main';
 
@@ -7,7 +7,7 @@ import Main from './components/Main';
 
 export default function ProfilePage() {
 
-    const { darkMode } = useTheme();
+    const { darkMode } = useThemeStore();
 
 
 

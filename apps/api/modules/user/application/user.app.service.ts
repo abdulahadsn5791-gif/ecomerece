@@ -5,7 +5,7 @@ import { PersonName } from '@ecomerece/domain/value-objects/name.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
 import { BaseService } from '../../../core/services/base.services';
-import { BadRequestError } from '../../../errors/app-error';
+import { BadRequestError, NotFoundError } from '../../../errors/app-error';
 import { clerkClient } from '../../../lib/clerkClient';
 import type { BanUserDTO, BlockUserDTO, DeleteMeDTO, DeleteUserDTO, ExtendBanDTO, UserResponseReadModel, UserRoleDto } from '@ecomerece/shared';
 import { UserAggregate } from '@ecomerece/domain';
@@ -18,6 +18,8 @@ import type { UserRepository } from '../infrastructure/user.repository';
 
 import { UserMessages, type UserMessagesType } from '../presentation/user.messages';
 import { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
+import { getUserById } from '../../../lib/supabase';
+
 
 export class UserAppService extends BaseService {
     constructor(
@@ -26,42 +28,58 @@ export class UserAppService extends BaseService {
     ) {
         super();
     }
+
+    async initUser(userId: string) {
+
+        const SupabaseUser = await getUserById(userId);
+
+        if (!SupabaseUser.email) throw new BadRequestError('Invalid user');
+
+        const email = EmailVO.create(SupabaseUser.email);
+
+        const id = Id.create(userId);
+        const user = await this.userRepo.FindById(id);
+
+        if (user) {
+            user.loginUser();
+            await this.userRepo.Save(user);
+
+            return UserMessages.initailized(id);
+        }
+
+        const image = new UrlVO(SupabaseUser.user_metadata?.avatar_url || SupabaseUser.user_metadata?.picture);
+        console.log(SupabaseUser
+
+        )
+        const fullName = SupabaseUser.user_metadata.full_name;
+        const nameArray = fullName.trim().split(/\s+/);
+        const firstName = nameArray[0] || '';
+        const lastName = nameArray.length > 1 ? nameArray[nameArray.length - 1] : '';
+        const middleName = nameArray.length > 2 ? nameArray.slice(1, -1).join(' ') : '';
+        const name = NameInfoVO.create(
+            PersonName.create(firstName ?? ''),
+            middleName ? PersonName.create(middleName) : null,
+            lastName ? PersonName.create(lastName) : null,
+        );
+        const User = UserAggregate.create({
+            id,
+            name,
+            email,
+            image,
+        });
+        User.signIn(User.id);
+        await this.userRepo.Create(User);
+        return UserMessages.initailized(id);
+
+    }
+
     async getUserById(userId: string): Promise<UserResponseReadModel> {
         const id = Id.create(userId);
         const user = await this.userRepo.FindByIdOrThrow(id);
         return UserMapper.aggregateToResponseReadModel(user);
     }
 
-    async signIn(_id: string): Promise<UserMessagesType> {
-        const clerkUser = await clerkClient.users.getUser(_id);
-        const primaryEmail = clerkUser.emailAddresses.find(
-            (e) => e.id === clerkUser.primaryEmailAddressId,
-        );
-        if (!primaryEmail) throw new BadRequestError('Primary email address not found');
 
-        const image = new UrlVO(clerkUser.imageUrl);
-        const name = NameInfoVO.create(
-            PersonName.create(clerkUser.firstName ?? ''),
-            null,
-            clerkUser.lastName ? PersonName.create(clerkUser.lastName) : null,
-        );
-        const id = Id.create(clerkUser.id);
-        const email = new EmailVO(primaryEmail.emailAddress);
-        const existingUser = await this.userRepo.FindByEmail(email);
-        this.ensureNotExists(existingUser, 'User already exists with this email');
-
-        const user = UserAggregate.create({
-            id,
-            name,
-            email,
-            image,
-        });
-        user.signIn(user.id);
-        await this.userRepo.Create(user);
-
-
-        return UserMessages.signIn(id);
-    }
     async assignRole(data: UserRoleDto, actor: UserPersistence): Promise<UserMessagesType> {
         const actorId = Id.create(actor._id);
         const id = Id.create(data.userId);
@@ -74,14 +92,7 @@ export class UserAppService extends BaseService {
         return UserMessages.assignRole(id, role, actorId);
     }
 
-    async login(actor: UserPersistence): Promise<UserMessagesType> {
-        const id = Id.create(actor._id);
-        const user = await this.userRepo.FindByIdOrThrow(id);
-        user.loginUser();
-        await this.userRepo.Save(user);
 
-        return UserMessages.logIn(id);
-    }
     async getMe(actor: UserPersistence): Promise<UserResponseReadModel> {
         const id = Id.create(actor._id);
         const user = await this.userRepo.FindByIdOrThrow(id);

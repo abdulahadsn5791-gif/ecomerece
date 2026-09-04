@@ -26,6 +26,9 @@ export const UserMessages = {
     signIn(id: Id): UserMessagesType {
         return { message: `User got signed-in  with Id:${id.value} ` };
     },
+    initailized(id: Id): UserMessagesType {
+        return { message: `User has been initailized with Id:${id.value}` };
+    },
     logIn(id: Id): UserMessagesType {
         return { message: `User got logged-in with Id:${id.value}` };
     },

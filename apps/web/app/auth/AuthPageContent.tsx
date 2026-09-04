@@ -2,47 +2,39 @@
 
 import { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useAuth, useGlobalUI, useTheme } from '@ecomerece/frontend';
+import { useGetMe, useThemeStore } from '@ecomerece/frontend';
+import { SignedOut, SignIn } from '@clerk/nextjs';
+import { createClient } from '@/utils/supabase/client';
+
 
 export default function AuthPageContent() {
-  const { darkMode, toggleTheme } = useTheme();
-  const {
-    user,
-    isLoading: authLoading,
-    signInWithGoogle,
-    signOut,
-  } = useAuth();
+  const { darkMode, toggleTheme } = useThemeStore();
+  const { data: user, isLoading, error } = useGetMe();
 
   useEffect(() => {
     console.log('🔵 [AuthPage] user:', user);
   }, [user]);
-
-  const {
-    showLoading,
-    hideLoading,
-
-  } = useGlobalUI();
-
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
-  const handleGoogleAuth = async () => {
-    showLoading();
-    try {
-      await signInWithGoogle(); // 👈 uses adapter's authenticateWithRedirect
-      // No need to setSuccess here – the redirect will happen and then syncUser runs
-    } catch (err: any) {
 
-    } finally {
-      hideLoading();
-    }
-  };
+  const handleGoogleLogin = async () => {
+    const supabase = createClient()
 
-  // If user is already signed in, show welcome screen
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+  }
+
+
+
   if (user) {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
         <p>Welcome, {user.fullName} ({user.email})</p>
-        <button onClick={signOut} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
+        <button onClick={() => SignedOut} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
           Sign Out
         </button>
       </div>
@@ -127,8 +119,8 @@ export default function AuthPageContent() {
 
             {/* 👇 Custom Google button – calls signInWithGoogle directly */}
             <button
-              onClick={handleGoogleAuth}
-              disabled={authLoading}
+              onClick={() => handleGoogleLogin()}
+
               className="w-full flex items-center justify-center gap-3 h-12 px-4 rounded-[4px] bg-white border border-[#dadce0] text-[#3c4043] font-medium text-sm tracking-wide transition-colors hover:bg-[#f8f9fa] hover:shadow-sm active:bg-[#f1f3f4] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {/* Google SVG */}

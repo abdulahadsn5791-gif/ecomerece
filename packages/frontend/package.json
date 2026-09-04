@@ -1,48 +1,42 @@
 {
-  "name": "@ecomerece/frontend",
-  "version": "1.0.0",
-  "main": "index.ts",
-  "types": "index.ts",
-  "exports": {
-    ".": {
-      "types": "./index.ts",
-      "default": "./index.ts"
+    "name": "@ecomerece/frontend",
+    "version": "1.0.0",
+    "main": "index.ts",
+    "types": "index.ts",
+    "exports": {
+        ".": {
+            "types": "./index.ts",
+            "default": "./index.ts"
+        },
+        "./auth": {
+            "types": "./adapters/auth/auth-adapter.web.ts",
+            "web": "./adapters/auth/auth-adapter.web.ts",
+            "react-native": "./adapters/auth/auth-adapter.native.ts",
+            "default": "./adapters/auth/auth-adapter.web.ts"
+        },
+        "./storage": {
+            "types": "./adapters/storage/storage-adapter.web.ts",
+            "web": "./adapters/storage/storage-adapter.web.ts",
+            "react-native": "./adapters/storage/storage-adapter.native.ts",
+            "default": "./adapters/storage/storage-adapter.web.ts"
+        }
     },
-    "./auth": {
-      "types": "./services/auth/auth.adapter.web.ts",
-      "web": "./services/auth/auth.adapter.web.ts",
-      "react-native": "./services/auth/auth.adapter.native.ts",
-      "default": "./services/auth/auth.adapter.web.ts"
+    "dependencies": {
+        "@ecomerece/shared": "workspace:*",
+        "@supabase/supabase-js": "^2.114.0",
+        "@tanstack/react-query": "^5.102.8",
+        "@types/react-dom": "^19.2.5",
+        "framer-motion": "^13.2.0",
+        "lucide-react": "0.468.0",
+        "react-dom": "^19.2.8",
+        "zustand": "^5.0.0"
     },
-    "./storage": {
-      "types": "./services/storage/storage.adapter.web.ts",
-      "web": "./services/storage/storage.adapter.web.ts",
-      "react-native": "./services/storage/storage.adapter.native.ts",
-      "default": "./services/storage/storage.adapter.web.ts"
+    "peerDependencies": {
+        "react": "^19.2.8"
+    },
+    "peerDependenciesMeta": {},
+    "devDependencies": {
+        "@types/react": "^19.2.18",
+        "typescript": "^5.0.0"
     }
-  },
-  "dependencies": {
-    "@tanstack/react-query": "^5.102.8",
-    "@types/react-dom": "^19.2.5",
-    "lucide-react": "0.468.0",
-    "react-dom": "^19.2.8",
-    "zustand": "^5.0.0"
-  },
-  "peerDependencies": {
-    "react": "^19.2.8",
-    "@clerk/nextjs": "*",
-    "@clerk/clerk-expo": "*"
-  },
-  "peerDependenciesMeta": {
-    "@clerk/nextjs": {
-      "optional": true
-    },
-    "@clerk/clerk-expo": {
-      "optional": true
-    }
-  },
-  "devDependencies": {
-    "@types/react": "^19.2.18",
-    "typescript": "^5.0.0"
-  }
 }

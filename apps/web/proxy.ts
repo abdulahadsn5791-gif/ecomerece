@@ -13,10 +13,7 @@ export async function proxy(request: NextRequest) {
                     return request.cookies.getAll()
                 },
                 setAll(cookiesToSet) {
-                    // Update request cookies for downstream components
                     cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-
-                    // Re-create the response to include the updated auth cookies
                     supabaseResponse = NextResponse.next({ request })
                     cookiesToSet.forEach(({ name, value, options }) =>
                         supabaseResponse.cookies.set(name, value, options)
@@ -26,10 +23,8 @@ export async function proxy(request: NextRequest) {
         }
     )
 
-    // Crucial: This securely checks the token and refreshes it if expired
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Optional: Block unauthenticated users from hitting protected app routes
     if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
@@ -41,13 +36,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - public folder files (.svg, .png, .jpg, etc.)
-         */
+
         '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 }

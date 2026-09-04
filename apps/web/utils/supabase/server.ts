@@ -18,8 +18,7 @@ export async function createClient() {
                             cookieStore.set(name, value, options)
                         })
                     } catch {
-                        // The `setAll` method is read-only in Server Components.
-                        // We handle session refreshing in the middleware instead.
+
                     }
                 },
             },

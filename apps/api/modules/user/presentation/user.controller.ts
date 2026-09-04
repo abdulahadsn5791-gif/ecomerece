@@ -23,7 +23,6 @@ export class UserController extends BaseController<UserAppService> {
 
     getMe = async (c: Context) => {
         const actor = c.get('user');
-        console.log(actor);
         return this.ok(c, await this.service.getMe(actor));
     };
     blockUser = async (c: Context) => {

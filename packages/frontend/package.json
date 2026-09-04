@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "@ecomerece/shared": "workspace:*",
+        "@supabase/ssr": "^0.12.5",
         "@supabase/supabase-js": "^2.114.0",
         "@tanstack/react-query": "^5.102.8",
         "@types/react-dom": "^19.2.5",

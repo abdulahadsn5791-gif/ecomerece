@@ -9,13 +9,13 @@ import { supabaseAdmin } from '../lib/supabase';
 
 export const authMiddleware = createMiddleware(async (c, next) => {
     const authHeader = c.req.header('Authorization');
-    console.log('1');
+
     const token = getBearerToken(authHeader);
-    console.log('2');
+
     if (!token) {
         throw new UnauthorizedError('Missing token');
     }
-    console.log('3');
+
     // Verify the token securely via Supabase's server-side Auth API
     const { data: { user: supabaseUser }, error } = await supabaseAdmin.auth.getUser(token);
 

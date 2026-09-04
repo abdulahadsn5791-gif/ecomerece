@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useGetMe, useThemeStore } from '@ecomerece/frontend';
-import { SignedOut, SignIn } from '@clerk/nextjs';
-import { createClient } from '@/utils/supabase/client';
+import { supabase, useGetMe, useThemeStore } from '@ecomerece/frontend';
+import { createClient } from '@supabase/supabase-js';
+
+
 
 
 export default function AuthPageContent() {
@@ -18,7 +19,7 @@ export default function AuthPageContent() {
 
 
   const handleGoogleLogin = async () => {
-    const supabase = createClient()
+
 
     await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -34,7 +35,7 @@ export default function AuthPageContent() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
         <p>Welcome, {user.fullName} ({user.email})</p>
-        <button onClick={() => SignedOut} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
+        <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
           Sign Out
         </button>
       </div>

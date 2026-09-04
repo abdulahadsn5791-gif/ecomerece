@@ -1,8 +1,12 @@
-// user.hook.ts
 import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { userService, type UserMutationResult } from './user.service';
 import {
+    BanUserDTOSchema,
+    BlockUserDTOSchema,
     DeleteMeDTOSchema,
+    DeleteUserDTOSchema,
+    ExtendBanDTOSchema,
+    UserRoleDtoSchema,
     type BanUserDTO,
     type BlockUserDTO,
     type DeleteMeDTO,
@@ -33,14 +37,7 @@ export function useGetUserById(userId: string) {
     });
 }
 
-// ── Shared cache-update helper ───────────────────────────────────────────────
 
-/**
- * The backend returns the freshly-updated user alongside the message for
- * every mutation (`{ message, updatedData }`). When present, write it
- * straight into the cache — no refetch needed. When absent (e.g. `login`,
- * which doesn't resolve to a single user record) fall back to invalidating.
- */
 function applyUserMutationResult(queryClient: QueryClient, result: UserMutationResult) {
     const updated = result.updatedData;
 
@@ -58,26 +55,12 @@ function applyUserMutationResult(queryClient: QueryClient, result: UserMutationR
 
 // ── Mutations ───────────────────────────────────────────────────────────────
 
-export function useSignIn() {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (id: string) => userService.signIn(id),
-        onSuccess: (data) => applyUserMutationResult(queryClient, data),
-    });
-}
 
-export function useLogin() {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: () => userService.login(),
-        onSuccess: (data) => applyUserMutationResult(queryClient, data),
-    });
-}
 
 export function useAssignRole() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: UserRoleDto) => userService.assignRole(data),
+        mutationFn: (data: UserRoleDto) => userService.assignRole(UserRoleDtoSchema.parse(data)),
         onSuccess: (data) => applyUserMutationResult(queryClient, data),
     });
 }
@@ -85,7 +68,7 @@ export function useAssignRole() {
 export function useSoftDeleteUser() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: DeleteUserDTO) => userService.softDeleteUser(data),
+        mutationFn: (data: DeleteUserDTO) => userService.softDeleteUser(DeleteUserDTOSchema.parse(data)),
         onSuccess: (data) => applyUserMutationResult(queryClient, data),
     });
 }
@@ -93,7 +76,6 @@ export function useSoftDeleteUser() {
 export function useSoftDeleteMe() {
     const queryClient = useQueryClient();
     return useMutation({
-
         mutationFn: (data: DeleteMeDTO) => userService.softDeleteMe(DeleteMeDTOSchema.parse(data)),
         onSuccess: (data) => applyUserMutationResult(queryClient, data),
     });
@@ -110,7 +92,7 @@ export function useRecoverUser() {
 export function useBlockUser() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: BlockUserDTO) => userService.blockUser(data),
+        mutationFn: (data: BlockUserDTO) => userService.blockUser(BlockUserDTOSchema.parse(data)),
         onSuccess: (data) => applyUserMutationResult(queryClient, data),
     });
 }
@@ -126,7 +108,7 @@ export function useBlockLift() {
 export function useBanUser() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: BanUserDTO) => userService.banUser(data),
+        mutationFn: (data: BanUserDTO) => userService.banUser(BanUserDTOSchema.parse(data)),
         onSuccess: (data) => applyUserMutationResult(queryClient, data),
     });
 }
@@ -142,7 +124,7 @@ export function useBanLift() {
 export function useExtendBan() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: ExtendBanDTO) => userService.extendBan(data),
+        mutationFn: (data: ExtendBanDTO) => userService.extendBan(ExtendBanDTOSchema.parse(data)),
         onSuccess: (data) => applyUserMutationResult(queryClient, data),
     });
 }
@@ -150,7 +132,7 @@ export function useExtendBan() {
 export function useShortenBan() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: ExtendBanDTO) => userService.shortenBan(data),
+        mutationFn: (data: ExtendBanDTO) => userService.shortenBan(ExtendBanDTOSchema.parse(data)),
         onSuccess: (data) => applyUserMutationResult(queryClient, data),
     });
 }

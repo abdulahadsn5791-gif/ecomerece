@@ -5,8 +5,7 @@ import { PersonName } from '@ecomerece/domain/value-objects/name.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
 import { BaseService } from '../../../core/services/base.services';
-import { BadRequestError, NotFoundError } from '../../../errors/app-error';
-import { clerkClient } from '../../../lib/clerkClient';
+import { BadRequestError } from '../../../errors/app-error';
 import type { BanUserDTO, BlockUserDTO, DeleteMeDTO, DeleteUserDTO, ExtendBanDTO, UserResponseReadModel, UserRoleDto } from '@ecomerece/shared';
 import { UserAggregate } from '@ecomerece/domain';
 import { NameInfoVO } from '@ecomerece/domain';
@@ -14,8 +13,6 @@ import { UserRoleVO } from '@ecomerece/domain';
 import { UserMapper } from '../infrastructure/user.mapper';
 import type { UserPersistence } from '../infrastructure/user.models';
 import type { UserRepository } from '../infrastructure/user.repository';
-
-
 import { UserMessages, type UserMessagesType } from '../presentation/user.messages';
 import { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
 import { getUserById } from '../../../lib/supabase';
@@ -48,9 +45,6 @@ export class UserAppService extends BaseService {
         }
 
         const image = new UrlVO(SupabaseUser.user_metadata?.avatar_url || SupabaseUser.user_metadata?.picture);
-        console.log(SupabaseUser
-
-        )
         const fullName = SupabaseUser.user_metadata.full_name;
         const nameArray = fullName.trim().split(/\s+/);
         const firstName = nameArray[0] || '';

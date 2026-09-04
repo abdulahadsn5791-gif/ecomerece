@@ -1,3 +1,4 @@
+// packages/frontend/adapters/auth/auth-adapter.web.ts
 import type { AuthAdapter, AuthUser } from './auth-adapter.interface';
 import { type SupabaseClient } from '@supabase/supabase-js';
 import { supabase as defaultSupabase } from '../../services/supabaseClient';
@@ -10,8 +11,7 @@ class SupabaseWebAuthAdapter implements AuthAdapter {
     constructor(supabaseClient: SupabaseClient) {
         this.supabase = supabaseClient;
 
-        this.readyPromise = this.supabase.auth.getSession().then(({ data, error }) => {
-            if (error) console.error('Supabase session fetch error:', error);
+        this.readyPromise = this.supabase.auth.getSession().then(({ data }) => {
             this.hasSession = Boolean(data.session);
         });
 
@@ -44,7 +44,7 @@ class SupabaseWebAuthAdapter implements AuthAdapter {
         const { error } = await this.supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/sso-callback`,
+                redirectTo: `${window.location.origin}/auth/callback`,
             },
         });
         if (error) throw error;
@@ -56,13 +56,10 @@ class SupabaseWebAuthAdapter implements AuthAdapter {
     }
 
     async getToken(): Promise<string | null> {
-
+        // Fetches session reliably from client/cookies
         const { data: { session }, error } = await this.supabase.auth.getSession();
 
-        if (error || !session) {
-            console.warn('[AuthAdapter] No session found. Storage keys:', Object.keys(localStorage));
-            return null;
-        }
+        if (error || !session) return null;
 
         return session.access_token;
     }
@@ -84,5 +81,4 @@ class SupabaseWebAuthAdapter implements AuthAdapter {
     }
 }
 
-// Pass the shared singleton instance
 export const authAdapter: AuthAdapter = new SupabaseWebAuthAdapter(defaultSupabase);

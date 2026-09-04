@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Trash2 } from 'lucide-react';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+import MutationButton from '@/components/Mutationbutton';
 
 interface DeleteMeDTO {
     reason: string;
@@ -35,14 +35,13 @@ export const DangerZone = ({ darkMode, deleteAccount, isDeleting, deleteError, r
                         <h4 className={`text-sm font-bold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>Danger Zone</h4>
                         <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>Once deleted, your account will be soft-deleted and restricted.</p>
                     </div>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="px-6 py-2.5 flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-600 text-red-600 hover:text-white rounded-xl text-sm font-semibold transition-all active:scale-95"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                        Delete Account
-                    </button>
+                    <MutationButton
+                        variant="danger"
+                        onClick={() => setIsModalOpen(true)}>
+                        Delete account
+                    </MutationButton>
                 </div>
+
             </div>
 
             <GenericConfirmModal<DeleteMeDTO>

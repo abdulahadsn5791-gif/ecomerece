@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['192.168.100.110'],
   transpilePackages: ['@ecomerece/domain', '@ecomerece/shared', '@ecomerece/frontend'],
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@ecomerece/frontend'],

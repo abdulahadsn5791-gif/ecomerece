@@ -1,67 +1,117 @@
-import React from 'react'
+// components/Footer.tsx
+"use client";
 
-function Footer() {
+import { useThemeStore } from '@ecomerece/frontend';
+import { Facebook, Instagram, Twitter, Linkedin, ArrowUpRight } from 'lucide-react';
+import React from 'react';
+
+export default function Footer() {
+    const { darkMode } = useThemeStore();
+
     return (
-        <footer className="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <a href="#" className="text-xl font-bold text-gray-900 dark:text-white">
-                        <span>Shop</span>Verse
+        <footer className={`border-t py-20 transition-colors duration-500 ${darkMode
+                ? "bg-neutral-950 border-neutral-800 text-white"
+                : "bg-white border-neutral-200 text-neutral-900"
+            }`}>
+            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8">
+
+                {/* Brand Column (Span 4) */}
+                <div className="md:col-span-4 space-y-5">
+                    <a href="#" className="inline-block text-2xl font-extrabold tracking-tight">
+                        <span className="opacity-60">Shop</span>Verse
                     </a>
-                    <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+
+                    <p className={`text-sm leading-relaxed max-w-sm ${darkMode ? "text-neutral-400" : "text-neutral-600"
+                        }`}>
                         Your one-stop destination for quality products at unbeatable prices. Shop with confidence and enjoy a seamless online shopping experience.
                     </p>
-                    <div className="flex gap-3 mt-4">
-                        <a href="#" className="w-9 h-9 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
-                            <span className="sr-only">Facebook</span>
-                        </a>
-                        <a href="#" className="w-9 h-9 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
-                            <span className="sr-only">Instagram</span>
-                        </a>
-                        <a href="#" className="w-9 h-9 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
-                            <span className="sr-only">Twitter</span>
-                        </a>
-                        <a href="#" className="w-9 h-9 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600">
-                            <span className="sr-only">LinkedIn</span>
-                        </a>
+
+                    {/* Social Icons */}
+                    <div className="flex gap-3 pt-2">
+                        {[
+                            { name: 'Facebook', icon: Facebook },
+                            { name: 'Instagram', icon: Instagram },
+                            { name: 'Twitter', icon: Twitter },
+                            { name: 'LinkedIn', icon: Linkedin },
+                        ].map((social) => {
+                            const IconComponent = social.icon;
+                            return (
+                                <a
+                                    key={social.name}
+                                    href="#"
+                                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 ${darkMode
+                                            ? "border-neutral-800 bg-neutral-900 text-neutral-300 hover:bg-white hover:text-black hover:border-white"
+                                            : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:bg-black hover:text-white hover:border-black"
+                                        }`}
+                                >
+                                    <span className="sr-only">{social.name}</span>
+                                    <IconComponent className="w-4 h-4" />
+                                </a>
+                            );
+                        })}
                     </div>
                 </div>
-                <div>
-                    <h4 className="font-semibold mb-3">Quick Links</h4>
-                    <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">About Us</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Contact Us</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Careers</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Blog</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Press</a></li>
+
+                {/* Quick Links (Span 2 or 3) */}
+                <div className="md:col-span-2 space-y-4">
+                    <h4 className="font-bold text-sm tracking-wide uppercase">Quick Links</h4>
+                    <ul className={`space-y-3 text-sm ${darkMode ? "text-neutral-400" : "text-neutral-600"}`}>
+                        {['About Us', 'Contact Us', 'Careers', 'Blog', 'Press'].map((item) => (
+                            <li key={item}>
+                                <a href="#" className={`inline-flex items-center gap-1 transition-colors ${darkMode ? "hover:text-white" : "hover:text-black"
+                                    }`}>
+                                    {item}
+                                </a>
+                            </li>
+                        ))}
                     </ul>
                 </div>
-                <div>
-                    <h4 className="font-semibold mb-3">Customer Service</h4>
-                    <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">FAQs</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Shipping Policy</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Returns & Refunds</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Order Tracking</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Support Center</a></li>
+
+                {/* Customer Service (Span 3) */}
+                <div className="md:col-span-3 space-y-4">
+                    <h4 className="font-bold text-sm tracking-wide uppercase">Customer Service</h4>
+                    <ul className={`space-y-3 text-sm ${darkMode ? "text-neutral-400" : "text-neutral-600"}`}>
+                        {['FAQs', 'Shipping Policy', 'Returns & Refunds', 'Order Tracking', 'Support Center'].map((item) => (
+                            <li key={item}>
+                                <a href="#" className={`inline-flex items-center gap-1 transition-colors ${darkMode ? "hover:text-white" : "hover:text-black"
+                                    }`}>
+                                    {item}
+                                </a>
+                            </li>
+                        ))}
                     </ul>
                 </div>
-                <div>
-                    <h4 className="font-semibold mb-3">Categories</h4>
-                    <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Fashion & Apparel</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Electronics & Gadgets</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Home & Furniture</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Beauty & Health</a></li>
-                        <li><a href="#" className="hover:text-gray-900 dark:hover:text-white">Sports & Outdoors</a></li>
+
+                {/* Categories (Span 3) */}
+                <div className="md:col-span-3 space-y-4">
+                    <h4 className="font-bold text-sm tracking-wide uppercase">Categories</h4>
+                    <ul className={`space-y-3 text-sm ${darkMode ? "text-neutral-400" : "text-neutral-600"}`}>
+                        {['Fashion & Apparel', 'Electronics & Gadgets', 'Home & Furniture', 'Beauty & Health', 'Sports & Outdoors'].map((item) => (
+                            <li key={item}>
+                                <a href="#" className={`inline-flex items-center gap-1 transition-colors ${darkMode ? "hover:text-white" : "hover:text-black"
+                                    }`}>
+                                    {item}
+                                </a>
+                            </li>
+                        ))}
                     </ul>
                 </div>
+
             </div>
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <p>&copy; 2026 ShopVerse. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+
+            {/* Bottom Bar */}
+            <div className={`max-w-7xl mx-auto px-6 mt-16 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs ${darkMode ? "border-neutral-800 text-neutral-500" : "border-neutral-200 text-neutral-500"
+                }`}>
+                <p>&copy; 2026 ShopVerse. All rights reserved.</p>
+
+                <div className="flex items-center gap-6">
+                    <a href="#" className="hover:underline transition-colors">Privacy Policy</a>
+                    <a href="#" className="hover:underline transition-colors">Terms of Service</a>
+                    <a href="#" className="inline-flex items-center gap-0.5 hover:underline transition-colors">
+                        Security <ArrowUpRight className="w-3 h-3" />
+                    </a>
+                </div>
             </div>
         </footer>
-    )
+    );
 }
-
-export default Footer

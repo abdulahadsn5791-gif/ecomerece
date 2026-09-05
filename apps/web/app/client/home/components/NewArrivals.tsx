@@ -1,69 +1,102 @@
-// components/FeaturedProducts.tsx
+// components/NewArrivals.tsx
 "use client";
 
-import { useThemeStore } from "@ecomerece/frontend";
-import { ShoppingCart, ArrowRight, Sparkles, Star, Eye } from "lucide-react";
-import { useRef } from "react";
+import { useThemeStore } from '@ecomerece/frontend';
+import { ArrowRight, ShoppingCart, Sparkles, Star, Eye } from 'lucide-react';
+import React, { useRef } from 'react';
 
-const featuredProducts = [
+const newArrivals = [
     {
-        id: 1,
-        vendor: 'TechNova',
-        name: 'Wireless Noise-Cancelling Headphones Pro',
-        rating: 5,
-        reviews: '2,345',
-        price: '$149.99',
-        originalPrice: '$199.99',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
-        badge: 'Save 25%',
-    },
-    {
-        id: 2,
-        vendor: 'FitLife',
-        name: 'SmartWatch Series 8 - Fitness Tracker',
-        rating: 5,
-        reviews: '1,890',
-        price: '$299.00',
-        originalPrice: '$349.00',
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
-        badge: 'Best Seller',
-    },
-    {
-        id: 3,
-        vendor: 'RunWay',
-        name: 'Premium Running Sneakers - Comfort Fit',
+        id: 6,
+        vendor: 'BrightHome',
+        name: 'Smart LED Desk Lamp with Wireless Charging',
         rating: 4,
-        reviews: '1,234',
-        price: '$89.99',
-        originalPrice: '$129.99',
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
-        badge: 'Popular',
+        reviews: '654',
+        price: '$49.99',
+        originalPrice: '$79.99',
+        image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&q=80',
+        badge: 'Just Dropped',
     },
     {
-        id: 4,
-        vendor: 'Luxe',
-        name: 'Luxury Leather Handbag - Brown',
+        id: 7,
+        vendor: 'AdventureX',
+        name: '4K Action Camera - Waterproof Edition',
         rating: 5,
-        reviews: '987',
-        price: '$179.99',
-        originalPrice: '$299.99',
-        image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80',
+        reviews: '1,567',
+        price: '$199.00',
+        originalPrice: '$249.00',
+        image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80',
+        badge: 'New Gen',
+    },
+    {
+        id: 8,
+        vendor: 'BaristaPro',
+        name: 'Espresso Machine - Barista Quality',
+        rating: 4,
+        reviews: '432',
+        price: '$429.00',
+        originalPrice: '$499.00',
+        image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&q=80',
+        badge: 'Pro Grade',
+    },
+    {
+        id: 9,
+        vendor: 'GameOn',
+        name: 'Pro Gaming Controller - Custom Edition',
+        rating: 5,
+        reviews: '3,210',
+        price: '$69.99',
+        originalPrice: '$89.99',
+        image: 'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=800&q=80',
         badge: 'Limited',
     },
     {
-        id: 5,
-        vendor: 'SoundMax',
-        name: 'Portable Bluetooth Speaker - Deep Bass',
-        rating: 4,
-        reviews: '1,876',
-        price: '$59.99',
-        originalPrice: '$79.99',
-        image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&q=80',
+        id: 10,
+        vendor: 'SoundWave',
+        name: 'Spatial Audio Wireless Earbuds',
+        rating: 5,
+        reviews: '1,120',
+        price: '$129.99',
+        originalPrice: '$159.99',
+        image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&q=80',
         badge: 'Trending',
+    },
+    {
+        id: 11,
+        vendor: 'Chronos',
+        name: 'Minimalist Titanium Quartz Watch',
+        rating: 4,
+        reviews: '890',
+        price: '$219.00',
+        originalPrice: '$279.00',
+        image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&q=80',
+        badge: 'Exclusive',
+    },
+    {
+        id: 12,
+        vendor: 'UrbanFit',
+        name: 'Ergonomic Daily Backpack - Charcoal',
+        rating: 5,
+        reviews: '2,040',
+        price: '$89.99',
+        originalPrice: '$119.99',
+        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80',
+        badge: 'Best Seller',
+    },
+    {
+        id: 13,
+        vendor: 'AeroGlide',
+        name: 'Ultralight Carbon Fiber Travel Mug',
+        rating: 4,
+        reviews: '540',
+        price: '$39.99',
+        originalPrice: '$55.99',
+        image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80',
+        badge: 'Fresh',
     },
 ];
 
-export default function FeaturedProducts() {
+export default function NewArrivals() {
     const { darkMode } = useThemeStore();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -85,15 +118,15 @@ export default function FeaturedProducts() {
                         <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 sm:mb-4 border shadow-sm ${darkMode ? "border-neutral-800 bg-neutral-900 text-neutral-300" : "border-neutral-200 bg-neutral-50 text-neutral-700"
                             }`}>
                             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Handpicked Selection</span>
+                            <span>Just Dropped</span>
                         </div>
                         <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-                            Featured Products
+                            New Arrivals
                         </h2>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        {/* Desktop/Tablet Scroll Control Buttons */}
+                        {/* Mobile Scroll Control Buttons */}
                         <div className="hidden sm:flex items-center gap-2">
                             <button
                                 onClick={() => scroll('left')}
@@ -124,13 +157,13 @@ export default function FeaturedProducts() {
                 {/* Mobile Swipeable Carousel / Desktop Grid */}
                 <div
                     ref={scrollContainerRef}
-                    className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory pb-4 sm:pb-0 scrollbar-none [-webkit-overflow-scrolling:touch]"
+                    className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory pb-4 sm:pb-0 scrollbar-none [-webkit-overflow-scrolling:touch]"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                    {featuredProducts.map((product) => (
+                    {newArrivals.map((product) => (
                         <div
                             key={product.id}
-                            className={`group rounded-[1.75rem] sm:rounded-[2rem] overflow-hidden border flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 shadow-md hover:shadow-2xl shrink-0 w-[78%] sm:w-auto snap-start ${darkMode
+                            className={`group rounded-[1.75rem] sm:rounded-[2rem] overflow-hidden border flex flex-col justify-between transition-all duration-500 hover:-translate-y-1 shadow-md hover:shadow-xl shrink-0 w-[78%] sm:w-auto snap-start ${darkMode
                                     ? "bg-neutral-900/80 border-neutral-800 hover:border-neutral-700"
                                     : "bg-neutral-50/80 border-neutral-200 hover:border-neutral-300"
                                 }`}
@@ -141,7 +174,7 @@ export default function FeaturedProducts() {
                                 <img
                                     src={product.image}
                                     alt={product.name}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                                     loading="lazy"
                                 />
 
@@ -152,7 +185,7 @@ export default function FeaturedProducts() {
                                     </span>
                                 </div>
 
-                                {/* Quick View Hover Action Button */}
+                                {/* Quick View Hover Action Button (Hidden on touch devices for cleaner tap UX) */}
                                 <div className="absolute inset-0 bg-neutral-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center justify-center">
                                     <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md text-neutral-900 flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:scale-110">
                                         <Eye className="w-4 h-4" />

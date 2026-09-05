@@ -1,210 +1,204 @@
 // components/HeroBanner.tsx
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ShoppingBag, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { useThemeStore } from "@ecomerece/frontend";
 
-const slides = [
+type Slide = {
+    tag: string;
+    title: string;
+    subhead: string;
+    subtitle: string;
+    image: string;
+    /** Vivid variant — used for chip/dot backgrounds and dark-mode text */
+    accent: string;
+    /** Deepened variant — used for text/borders in light mode so contrast holds on white */
+    accentText: string;
+};
+
+const slides: Slide[] = [
     {
-        id: 1,
-        image:
-            "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=80",
-        tag: "New Season Collection",
-        title: "Elevate Your Everyday Style",
+        tag: "New arrivals",
+        title: "Discover premium products",
+        subhead: "with everyday simplicity",
         subtitle:
-            "Discover handpicked pieces designed to blend comfort with timeless elegance.",
-        cta: "Shop Now",
+            "Shop the latest in fashion, electronics and home essentials — curated quality, free shipping over $50.",
+        image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80",
+        accent: "#D4A24C",
+        accentText: "#A6752A",
     },
     {
-        id: 2,
-        image:
-            "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1920&q=80",
-        tag: "Limited Time Offer",
-        title: "Up to 40% Off Premium Essentials",
+        tag: "Featured electronics",
+        title: "Next-gen audio and tech",
+        subhead: "built for immersive sound",
         subtitle:
-            "Refresh your wardrobe with luxury staples at unbeatable prices. Limited stock available.",
-        cta: "Shop Sale",
+            "Upgrade your setup with studio-grade headphones, smart devices and the latest gear.",
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=80",
+        accent: "#4A7FB5",
+        accentText: "#2F5F8C",
     },
     {
-        id: 3,
-        image:
-            "https://images.unsplash.com/photo-1523779917675-b6ed3a42a561?w=1920&q=80",
-        tag: "Accessories Edit",
-        title: "Complete Your Look",
+        tag: "Mid-season apparel",
+        title: "Curated fashion styles",
+        subhead: "that define your everyday look",
         subtitle:
-            "From statement bags to delicate jewelry — find the perfect finishing touches.",
-        cta: "Explore Accessories",
-    },
-    {
-        id: 4,
-        image:
-            "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&q=80",
-        tag: "Sustainable Fashion",
-        title: "Style That Cares",
-        subtitle:
-            "Our eco-conscious collection is crafted with responsibly sourced materials.",
-        cta: "Shop Sustainable",
+            "Contemporary apparel in premium fabrics, made for comfort that lasts.",
+        image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80",
+        accent: "#D8607C",
+        accentText: "#B84364",
     },
 ];
 
 export default function HeroBanner() {
-    const [current, setCurrent] = useState(0);
-    const [direction, setDirection] = useState(1);
-    const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-    const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+    const { darkMode } = useThemeStore();
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [paused, setPaused] = useState(false);
+    const slide = slides[currentIndex];
 
-    const goTo = useCallback((index: number, dir: number = 1) => {
-        setDirection(dir);
-        setCurrent((prev) => {
-            if (index < 0) return slides.length - 1;
-            if (index >= slides.length) return 0;
-            return index;
-        });
-    }, []);
-
-    const next = useCallback(() => goTo(current + 1, 1), [current, goTo]);
-    const prev = useCallback(() => goTo(current - 1, -1), [current, goTo]);
-
+    // Auto-advance, but respect reduced-motion and pause while the visitor is looking at it
     useEffect(() => {
-        if (!isAutoPlaying) return;
-        autoPlayRef.current = setInterval(() => {
-            setDirection(1);
-            setCurrent((prev) => (prev + 1) % slides.length);
-        }, 5000);
-        return () => {
-            if (autoPlayRef.current) clearInterval(autoPlayRef.current);
-        };
-    }, [isAutoPlaying]);
+        const prefersReducedMotion =
+            typeof window !== "undefined" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (prefersReducedMotion || paused) return;
+        const timer = setInterval(() => {
+            setCurrentIndex((i) => (i + 1) % slides.length);
+        }, 6000);
+        return () => clearInterval(timer);
+    }, [paused]);
 
-    const handleManualNav = (fn: () => void) => {
-        setIsAutoPlaying(false);
-        fn();
-        setTimeout(() => setIsAutoPlaying(true), 6000);
-    };
+    const prevSlide = () => setCurrentIndex((i) => (i === 0 ? slides.length - 1 : i - 1));
+    const nextSlide = () => setCurrentIndex((i) => (i + 1) % slides.length);
 
     return (
         <section
-            className="relative h-[85vh] min-h-[520px] max-h-[800px] w-full overflow-hidden group"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
+            className={`py-14 sm:py-20 lg:py-28 transition-colors duration-500 ${darkMode ? "bg-neutral-950 text-white" : "bg-white text-neutral-900"
+                }`}
         >
-            {/* Current Slide */}
             <div
-                key={current}
-                className={`absolute inset-0 ${direction === 1 ? "animate-slide-in-right" : "animate-slide-in-left"
-                    }`}
+                className="max-w-7xl mx-auto px-4 sm:px-6"
+                style={
+                    {
+                        "--accent": slide.accent,
+                        "--accent-text": darkMode ? slide.accent : slide.accentText,
+                    } as React.CSSProperties
+                }
+                onMouseEnter={() => setPaused(true)}
+                onMouseLeave={() => setPaused(false)}
             >
-                <img
-                    src={slides[current].image}
-                    alt={slides[current].title}
-                    className="w-full h-full object-cover pointer-events-none"
-                    draggable={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-stone-900/80 via-stone-900/50 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-transparent to-transparent" />
-
-                {/* Content */}
-                <div className="absolute inset-0 flex items-center">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                        <div className="max-w-xl">
-                            <div
-                                className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 backdrop-blur-md rounded-full border border-white/20 mb-5 animate-fade-in-up"
-                                style={{ animationDelay: "0.3s" }}
-                            >
-                                <Sparkles size={13} className="text-amber-400" />
-                                <span className="text-xs font-semibold text-white tracking-widest uppercase">
-                                    {slides[current].tag}
-                                </span>
-                            </div>
-
-                            <h1
-                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight mb-4 animate-fade-in-up"
-                                style={{ animationDelay: "0.45s" }}
-                            >
-                                {slides[current].title}
-                            </h1>
-
-                            <p
-                                className="text-base sm:text-lg md:text-xl text-stone-200 leading-relaxed mb-7 max-w-md animate-fade-in-up"
-                                style={{ animationDelay: "0.6s" }}
-                            >
-                                {slides[current].subtitle}
-                            </p>
-
-                            <div
-                                className="flex flex-wrap gap-4 animate-fade-in-up"
-                                style={{ animationDelay: "0.75s" }}
-                            >
-                                <a
-                                    href="#featured"
-                                    className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-stone-900 font-semibold rounded-full shadow-xl shadow-stone-900/20 hover:bg-stone-100 hover:shadow-2xl hover:shadow-stone-900/25 hover:scale-105 transition-all duration-300 text-sm sm:text-base"
+                <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+                    {/* Image card */}
+                    <div className="order-1 lg:order-2 lg:col-span-6">
+                        <div className="relative rounded-[2rem] overflow-hidden shadow-2xl aspect-[16/10] lg:aspect-[4/5]">
+                            {slides.map((s, i) => (
+                                <div
+                                    key={s.title}
+                                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out motion-reduce:transition-none ${i === currentIndex ? "opacity-100" : "opacity-0"
+                                        }`}
                                 >
-                                    {slides[current].cta}
-                                    <ArrowRight size={16} />
-                                </a>
-                                <a
-                                    href="#categories"
-                                    className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/15 backdrop-blur-md text-white font-semibold rounded-full border border-white/30 hover:bg-white/25 hover:scale-105 transition-all duration-300 text-sm sm:text-base"
-                                >
-                                    Browse Categories
-                                </a>
+                                    <img src={s.image} alt={s.title} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-neutral-950/10 to-transparent" />
+                                </div>
+                            ))}
+
+                            {/* Tag chip, labels the photo directly rather than floating above the headline */}
+                            <span className="absolute top-5 left-5 z-10 px-3 py-1 rounded-full text-xs font-medium bg-[var(--accent)] text-white shadow-md">
+                                {slide.tag}
+                            </span>
+
+                            {/* A numbered counter is fair game here — these tiles really are a sequence */}
+                            <span className="absolute top-5 right-5 z-10 text-xs font-medium text-white/80 tabular-nums">
+                                {String(currentIndex + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
+                            </span>
+
+                            {/* Carousel controls live on the image itself */}
+                            <div className="absolute bottom-5 left-5 right-5 z-10 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    {slides.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setCurrentIndex(i)}
+                                            className={`h-1.5 rounded-full transition-all duration-500 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${i === currentIndex ? "w-6 bg-[var(--accent)]" : "w-1.5 bg-white/50 hover:bg-white/80"
+                                                }`}
+                                            aria-label={`Go to slide ${i + 1}`}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={prevSlide}
+                                        className="w-9 h-9 rounded-full bg-white/90 text-neutral-900 flex items-center justify-center transition-all duration-300 hover:bg-[var(--accent)] hover:text-white hover:scale-110 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                        aria-label="Previous slide"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={nextSlide}
+                                        className="w-9 h-9 rounded-full bg-white/90 text-neutral-900 flex items-center justify-center transition-all duration-300 hover:bg-[var(--accent)] hover:text-white hover:scale-110 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                        aria-label="Next slide"
+                                    >
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Text content */}
+                    <div className="order-2 lg:order-1 lg:col-span-6">
+                        <div
+                            key={slide.title}
+                            className="animate-in fade-in slide-in-from-bottom-2 duration-700 motion-reduce:animate-none"
+                        >
+                            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight leading-[1.08] mb-5">
+                                {slide.title}
+                                <span className="block text-[var(--accent-text)] mt-1">{slide.subhead}</span>
+                            </h1>
+
+                            <p
+                                className={`text-base sm:text-lg leading-relaxed mb-8 max-w-lg ${darkMode ? "text-neutral-400" : "text-neutral-600"
+                                    }`}
+                            >
+                                {slide.subtitle}
+                            </p>
+
+                            <div className="flex flex-wrap gap-4 mb-8">
+                                <a
+                                    href="#"
+                                    className={`group inline-flex items-center gap-2.5 px-6 py-3 sm:px-7 sm:py-3.5 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-[var(--accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-text)] focus-visible:ring-offset-2 ${darkMode
+                                            ? "bg-white text-black focus-visible:ring-offset-neutral-950"
+                                            : "bg-neutral-900 text-white focus-visible:ring-offset-white"
+                                        }`}
+                                >
+                                    <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" />
+                                    Shop the collection
+                                </a>
+                                <a
+                                    href="#"
+                                    className={`group inline-flex items-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 rounded-full font-semibold border transition-all duration-300 hover:border-[var(--accent-text)] hover:text-[var(--accent-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-text)] focus-visible:ring-offset-2 ${darkMode
+                                            ? "border-neutral-700 text-white focus-visible:ring-offset-neutral-950"
+                                            : "border-neutral-300 text-neutral-900 focus-visible:ring-offset-white"
+                                        }`}
+                                >
+                                    View deals
+                                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Trust strip stays put across slide changes, no reason to re-animate it */}
+                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-neutral-500">
+                            <span className="pr-0 sm:pr-5 border-r-0 sm:border-r border-neutral-500/25">
+                                10K+ products
+                            </span>
+                            <span className="pr-0 sm:pr-5 border-r-0 sm:border-r border-neutral-500/25">
+                                50K+ happy customers
+                            </span>
+                            <span>4.8★ average rating</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            {/* Arrow Controls */}
-            <button
-                onClick={() => handleManualNav(prev)}
-                className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-stone-900 transition-all duration-300 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                aria-label="Previous slide"
-            >
-                <ArrowLeft size={18} />
-            </button>
-            <button
-                onClick={() => handleManualNav(next)}
-                className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-stone-900 transition-all duration-300 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                aria-label="Next slide"
-            >
-                <ArrowRight size={18} />
-            </button>
-
-            {/* Dot Indicators */}
-            <div className="absolute bottom-7 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5">
-                {slides.map((slide, index) => (
-                    <button
-                        key={slide.id}
-                        onClick={() => {
-                            setIsAutoPlaying(false);
-                            goTo(index, index > current ? 1 : -1);
-                            setTimeout(() => setIsAutoPlaying(true), 6000);
-                        }}
-                        className={`transition-all duration-500 rounded-full ${index === current
-                                ? "w-9 h-2.5 bg-white"
-                                : "w-2.5 h-2.5 bg-white/50 hover:bg-white/80"
-                            }`}
-                        aria-label={`Go to slide ${index + 1}`}
-                    />
-                ))}
-            </div>
-
-            {/* Slide Counter */}
-            <div className="absolute bottom-7 right-4 sm:right-6 z-20 text-white/70 text-xs font-medium tracking-wider">
-                <span className="text-white font-bold text-lg">{current + 1}</span> /{" "}
-                {slides.length}
-            </div>
-
-            {/* Auto-play Progress */}
-            <div className="absolute bottom-0 left-0 right-0 z-10 h-0.5 bg-white/20">
-                <div
-                    key={current}
-                    className="h-full bg-amber-500 transition-all duration-[5000ms] ease-linear"
-                    style={{
-                        animation: `progress 5s linear forwards`,
-                        animationPlayState: isAutoPlaying ? "running" : "paused",
-                    }}
-                />
             </div>
         </section>
     );

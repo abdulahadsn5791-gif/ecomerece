@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { supabase, useGetMe, useThemeStore } from '@ecomerece/frontend';
-import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -11,12 +11,8 @@ import { createClient } from '@supabase/supabase-js';
 export default function AuthPageContent() {
   const { darkMode, toggleTheme } = useThemeStore();
   const { data: user, isLoading, error } = useGetMe();
-
-  useEffect(() => {
-    console.log('🔵 [AuthPage] user:', user);
-  }, [user]);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
-
+  const router = useRouter();
 
   const handleGoogleLogin = async () => {
 
@@ -29,18 +25,9 @@ export default function AuthPageContent() {
     })
   }
 
+  useEffect(() => { if (user) router.replace('./') }, [user])
 
 
-  if (user) {
-    return (
-      <div className={`min-h-screen flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-        <p>Welcome, {user.fullName} ({user.email})</p>
-        <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
-          Sign Out
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>

@@ -1,12 +1,14 @@
+import { useThemeStore } from '@ecomerece/frontend';
 import { Home } from 'lucide-react';
 import React from 'react';
 
 interface EmptyAddressesProps {
-    darkMode: boolean;
     openCreateForm: () => void;
 }
 
-export default function EmptyAddresses({ darkMode, openCreateForm }: EmptyAddressesProps) {
+export default function EmptyAddresses({ openCreateForm }: EmptyAddressesProps) {
+
+    const { darkMode } = useThemeStore();
     return (
         <div className={`text-center py-20 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
             <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>

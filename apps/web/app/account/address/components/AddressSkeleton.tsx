@@ -1,10 +1,11 @@
+import { useThemeStore } from '@ecomerece/frontend';
 import React from 'react';
 
-interface AddressSkeletonProps {
-    darkMode: boolean;
-}
 
-export default function AddressSkeleton({ darkMode }: AddressSkeletonProps) {
+
+export default function AddressSkeleton() {
+
+    const { darkMode } = useThemeStore();
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[1, 2].map((n) => (

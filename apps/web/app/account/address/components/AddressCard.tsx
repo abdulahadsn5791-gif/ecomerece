@@ -1,10 +1,10 @@
+import { useThemeStore } from '@ecomerece/frontend';
 import type { AddressResponseReadModel } from '@ecomerece/shared';
 import { CheckCircle, MapPin, Pencil, Star, Trash2 } from 'lucide-react';
 import React from 'react';
 
 interface AddressCardProps {
     address: AddressResponseReadModel;
-    darkMode: boolean;
     setDeleteId: (id: string) => void;
     handleSetDefault: (id: string) => void;
     openEditForm: (address: AddressResponseReadModel) => void;
@@ -12,11 +12,11 @@ interface AddressCardProps {
 
 export default function AddressCard({
     address,
-    darkMode,
     setDeleteId,
     handleSetDefault,
     openEditForm,
 }: AddressCardProps) {
+    const { darkMode } = useThemeStore();
     return (
         <div
             className={`border rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow relative ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'

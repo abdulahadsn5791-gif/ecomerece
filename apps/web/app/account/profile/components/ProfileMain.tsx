@@ -8,6 +8,7 @@ import { ProfileHeader } from './ProfileHeader';
 import { ProfileStats } from './ProfileStats';
 import { DangerZone } from './DangerZone';
 
+
 export default function ProfileMain() {
     const { darkMode } = useThemeStore();
     const {

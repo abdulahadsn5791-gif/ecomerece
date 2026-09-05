@@ -23,7 +23,7 @@ const INITIAL_ADDRESS_FORM: createMyAddressDtoType = {
 
 export function useAddressManager() {
     // 1. Data queries & mutations
-    const { data: addresses = [], isLoading } = useGetMyAddresses();
+    const { data: addresses = [], isLoading, error, isFetching, refetch } = useGetMyAddresses();
     const createMutation = useCreateMyAddress();
     const updateMutation = useUpdateMyAddress();
     const deleteMutation = useDeleteMyAddress();
@@ -124,7 +124,10 @@ export function useAddressManager() {
         formData,
         formError,
         setFormError,
+        error,
 
+        refetch,
+        isFetching,
         // Handlers
         openCreateForm,
         openEditForm,

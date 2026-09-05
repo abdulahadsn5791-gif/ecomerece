@@ -1,20 +1,55 @@
 "use client";
 
-import { useThemeStore } from '@ecomerece/frontend';
-import Aside from '@/components/aside/Aside';
-import ProfileMain from './components/ProfileMain';
+import { useProfileManager, useThemeStore } from '@ecomerece/frontend';
+import { motion } from 'framer-motion';
+import { ProfileSkeleton } from './components/ProfileSkeleton';
+import { ProfileErrorState } from './components/ProfileErrorState';
+import { ProfileHeader } from './components/ProfileHeader';
+import { ProfileStats } from './components/ProfileStats';
+import { DangerZone } from './components/DangerZone';
 
-export default function ProfilePage() {
+
+
+export default function ProfileMain() {
     const { darkMode } = useThemeStore();
+    const {
+        user,
+        isLoading,
+        error,
+        refetch,
+        isFetching,
+        deleteAccount,
+        isDeleting,
+        deleteError,
+        resetDelete,
+        formatDate,
+    } = useProfileManager();
+
+    if (isLoading) return <main className="lg:col-span-3"><ProfileSkeleton darkMode={darkMode} /></main>;
+
+    if (error || !user) {
+        return <main className="lg:col-span-3"><ProfileErrorState darkMode={darkMode} refetch={refetch} isFetching={isFetching} /></main>;
+    }
 
     return (
-        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    <Aside />
-                    <ProfileMain />
-                </div>
-            </div>
-        </div>
+        <main className="lg:col-span-3 ">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className={`border rounded-3xl p-8 shadow-sm transition-colors duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
+                    }`}
+            >
+                <ProfileHeader user={user} darkMode={darkMode} />
+                <ProfileStats user={user} darkMode={darkMode} formatDate={formatDate} />
+                <DangerZone
+                    darkMode={darkMode}
+                    deleteAccount={deleteAccount}
+                    isDeleting={isDeleting}
+                    deleteError={deleteError}
+                    resetDelete={resetDelete}
+                />
+            </motion.div>
+        </main>
     );
 }

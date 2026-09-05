@@ -1,7 +1,7 @@
-import { Hono } from "hono";
-import { authMiddleware } from "../../../middleware/auth";
-import { adminMiddleware } from "../../../middleware/admin";
-import { createCategoryModule } from "../category.module";
+import { Hono } from 'hono';
+import { adminMiddleware } from '../../../middleware/admin';
+import { authMiddleware } from '../../../middleware/auth';
+import { createCategoryModule } from '../category.module';
 
 export const CategoryRoutes = new Hono();
 const { categoryController } = createCategoryModule();

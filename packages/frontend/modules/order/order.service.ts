@@ -12,7 +12,7 @@ export type OrderMutationResult = {
 
 export class OrderService {
     createMyOrder(data: createMyOrderDtoType): Promise<OrderMutationResult> {
-        return http.post<OrderMutationResult>('/orders/me', data);
+        return http.post<OrderMutationResult>('/order/create/my', data);
     }
 }
 

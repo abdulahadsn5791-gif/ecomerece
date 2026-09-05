@@ -1,6 +1,6 @@
+import type { AddressReadModel } from '@ecomerece/domain/modules/address/read-models/address.read-models';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { BaseService } from '../../../core/services/base.services';
-import type { AddressReadModel } from '@ecomerece/domain/modules/address/read-models/address.read-models';
 import { AddressMapper } from '../infrastructure/address.mapper';
 import type { AddressRepository } from '../infrastructure/address.repository';
 

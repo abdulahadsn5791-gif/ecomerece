@@ -13,8 +13,12 @@ AddressRoutes.delete('/my/:id', authMiddleware, addressController.deleteMyAddres
 AddressRoutes.patch(
     '/my/:id/default',
     authMiddleware,
-    adminMiddleware,
     addressController.setMyAddressAsDefault,
+);
+AddressRoutes.patch(
+    '/my/:id/update',
+    authMiddleware,
+    addressController.updateMyAddress,
 );
 AddressRoutes.patch(
     '/my/:id/recover',

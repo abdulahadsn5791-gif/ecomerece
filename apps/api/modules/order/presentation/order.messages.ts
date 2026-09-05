@@ -1,7 +1,6 @@
 import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
-import { OrderResponseReadModel } from '@ecomerece/shared';
-
+import type { OrderResponseReadModel } from '@ecomerece/shared';
 
 export type OrderMessagesType = {
     updatedData?: OrderResponseReadModel;

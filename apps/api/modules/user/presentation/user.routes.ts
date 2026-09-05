@@ -1,14 +1,14 @@
 import { Hono } from 'hono';
 import { adminMiddleware } from '../../../middleware/admin';
 import { authMiddleware } from '../../../middleware/auth';
-import { createUserModule } from '../user.module';
 import { initAuthMiddleware } from '../../../middleware/init-auth';
+import { createUserModule } from '../user.module';
 
 const usersRoutes = new Hono();
 const { userController } = createUserModule();
 usersRoutes.post('/init', initAuthMiddleware, userController.initUser);
 usersRoutes.get('/me', authMiddleware, userController.getMe);
-usersRoutes.delete('/soft/me', authMiddleware, userController.softDeleteMe);
+usersRoutes.delete('/me/soft', authMiddleware, userController.softDeleteMe);
 usersRoutes.patch('/block/lift', authMiddleware, adminMiddleware, userController.blockLift);
 usersRoutes.patch('/ban/lift', authMiddleware, adminMiddleware, userController.banLift);
 usersRoutes.patch('/ban/extend', authMiddleware, adminMiddleware, userController.extendBan);

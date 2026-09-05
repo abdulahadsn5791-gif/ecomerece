@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
 import MutationButton from '@/components/Mutationbutton';
 
@@ -41,7 +41,6 @@ export const DangerZone = ({ darkMode, deleteAccount, isDeleting, deleteError, r
                         Delete account
                     </MutationButton>
                 </div>
-
             </div>
 
             <GenericConfirmModal<DeleteMeDTO>
@@ -66,8 +65,9 @@ export const DangerZone = ({ darkMode, deleteAccount, isDeleting, deleteError, r
                             disabled={isDeleting}
                             rows={3}
                             className={`w-full p-3 text-sm rounded-xl border focus:outline-none focus:ring-2 focus:ring-red-500 ${darkMode
-                                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
-                                : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`}
+                                    ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                                }`}
                         />
                     </div>
                 )}

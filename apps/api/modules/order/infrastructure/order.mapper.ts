@@ -1,3 +1,4 @@
+import { OrderAggregate, type OrderReadModel } from '@ecomerece/domain';
 import { DeleteInfoVO } from '@ecomerece/domain/value-objects/delete-info.vo';
 import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
@@ -5,14 +6,11 @@ import { Money } from '@ecomerece/domain/value-objects/money.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { FullAddressVO } from '@ecomerece/domain/value-objects/street-address.vo';
-
+import type { OrderResponseReadModel } from '@ecomerece/shared';
 import type { OrderPersistence } from './order.model';
-import { OrderAggregate, OrderReadModel } from '@ecomerece/domain';
-import { OrderResponseReadModel } from '@ecomerece/shared';
 
 export const OrderMapper = {
     persistenceToAggregate(doc: OrderPersistence): OrderAggregate {
-
         return OrderAggregate.rehydrate(
             Id.create(doc.idempotentKey),
             Id.create(doc._id),
@@ -30,7 +28,6 @@ export const OrderMapper = {
         );
     },
     aggregateToPersistence(order: OrderAggregate) {
-
         return {
             _id: order.id.value,
             idempotentKey: order.idempotentKey.value,
@@ -48,7 +45,6 @@ export const OrderMapper = {
         };
     },
     aggregateToReadModel(order: OrderAggregate): OrderReadModel {
-
         return {
             id: order.id.value,
             buyerId: order.buyerId.value,
@@ -64,7 +60,6 @@ export const OrderMapper = {
         };
     },
     persistenceToReadModel(doc: OrderPersistence): OrderReadModel {
-
         return {
             id: doc._id,
             buyerId: doc.buyerId,
@@ -82,7 +77,6 @@ export const OrderMapper = {
         };
     },
     aggregateToResponseReadModel(order: OrderAggregate): OrderResponseReadModel {
-
         return {
             id: order.id.value,
             buyerId: order.buyerId.value,

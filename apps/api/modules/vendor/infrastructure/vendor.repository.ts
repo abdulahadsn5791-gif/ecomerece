@@ -1,16 +1,15 @@
+import type { IVendorRepository, VendorAggregate } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError, NotFoundError } from '../../../errors/app-error';
-import type { IVendorRepository } from '@ecomerece/domain';
-
-import type { VendorAggregate } from '@ecomerece/domain';
 import { VendorMapper } from './vendor.mapper';
 
 import { VendorModel, type VendorPersistence } from './vendor.models';
 
 export class VendorRepository
     extends MongoRepository<VendorPersistence>
-    implements IVendorRepository {
+    implements IVendorRepository
+{
     constructor() {
         super(VendorModel);
     }

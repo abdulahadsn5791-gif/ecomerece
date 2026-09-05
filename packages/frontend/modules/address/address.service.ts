@@ -13,23 +13,26 @@ export type AddressMutationResult = {
 
 export class AddressService {
     getMyAddresses(): Promise<AddressResponseReadModel[]> {
-        return http.get<AddressResponseReadModel[]>('/addresses/me');
+        return http.get<AddressResponseReadModel[]>('/address/my');
     }
 
     createMyAddress(data: createMyAddressDtoType): Promise<AddressMutationResult> {
-        return http.post<AddressMutationResult>('/addresses/me', data);
+        return http.post<AddressMutationResult>('/address/my', data);
+    }
+    updateMyAddress(data: createMyAddressDtoType, id: string): Promise<AddressMutationResult> {
+        return http.patch<AddressMutationResult>(`/address/my/${id}/update`, data);
     }
 
     deleteMyAddress(id: string): Promise<AddressMutationResult> {
-        return http.delete<AddressMutationResult>(`/addresses/me/${id}`);
+        return http.delete<AddressMutationResult>(`/address/my/${id}`);
     }
 
     setMyAddressAsDefault(id: string): Promise<AddressMutationResult> {
-        return http.patch<AddressMutationResult>(`/addresses/me/${id}/default`);
+        return http.patch<AddressMutationResult>(`/address/my/${id}/default`);
     }
 
     recoverAddress(id: string): Promise<AddressMutationResult> {
-        return http.patch<AddressMutationResult>(`/addresses/${id}/recover`);
+        return http.patch<AddressMutationResult>(`/address/my/${id}/recover`);
     }
 }
 

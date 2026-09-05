@@ -4,7 +4,7 @@ import type { EnsureActiveVariantGetByIdQuery } from '../queries/ensure-active-v
 
 export class EnsureActiveVariantGetByIdHandler {
     readonly type = 'EnsureActiveVariantGetByIdQuery';
-    constructor(private readonly internalService: productVariantInternalService) { }
+    constructor(private readonly internalService: productVariantInternalService) {}
     async handle(
         query: EnsureActiveVariantGetByIdQuery,
     ): Promise<{ variant: ProductVariantReadModel | null; active: boolean }> {

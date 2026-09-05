@@ -9,47 +9,48 @@ const { productController } = createProductModule();
 
 productRoutes.get('/:id', productController.getProductById);
 productRoutes.post(`/my`, authMiddleware, productController.createMyProudct);
-productRoutes.delete(`/my`, authMiddleware, productController.softDeleteMyProduct);
-productRoutes.patch(`/recover/my`, authMiddleware, productController.recoverMyProduct);
+productRoutes.delete(`/my/soft`, authMiddleware, productController.softDeleteMyProduct);
+productRoutes.patch(`/my/recover`, authMiddleware, productController.recoverMyProduct);
 productRoutes.post(`/block`, authMiddleware, adminMiddleware, productController.blockProduct);
-productRoutes.post(`/unblock`, authMiddleware, adminMiddleware, productController.unBlockProduct);
-productRoutes.patch(`/state/public/my`, authMiddleware, productController.makeMyProductPublic);
-productRoutes.patch(`/state/private/my`, authMiddleware, productController.makeMyProductPrivate);
-productRoutes.patch(`/meta/my`, authMiddleware, productController.updateMyProductMeta);
+productRoutes.post(
+    `/block/lift`,
+    authMiddleware,
+    adminMiddleware,
+    productController.unBlockProduct,
+);
+productRoutes.patch(`/state/my/public`, authMiddleware, productController.makeMyProductPublic);
+productRoutes.patch(`/state/my/private`, authMiddleware, productController.makeMyProductPrivate);
+productRoutes.patch(`/my/meta`, authMiddleware, productController.updateMyProductMeta);
 productRoutes.patch(
-    `/disclaimer/toggle/my`,
+    `my/disclaimer/toggle`,
     authMiddleware,
     productController.toggleMyProductDisclaimer,
 );
+productRoutes.patch(`my/disclaimer/add`, authMiddleware, productController.addMyProductDisclaimers);
 productRoutes.patch(
-    `/disclaimer/add/my`,
-    authMiddleware,
-    productController.addMyProductDisclaimers,
-);
-productRoutes.patch(
-    `/disclaimer/remove/my`,
+    `my/disclaimer/remove`,
     authMiddleware,
     productController.removeMyProductDisclaimers,
 );
-productRoutes.patch(`/images/add/my`, authMiddleware, productController.addMyProductImages);
-productRoutes.patch(`/images/remove/my`, authMiddleware, productController.removeMyProductImages);
+productRoutes.patch(`/my/images/add`, authMiddleware, productController.addMyProductImages);
+productRoutes.patch(`/my/images/remove`, authMiddleware, productController.removeMyProductImages);
 productRoutes.patch(
-    `/images/default/my`,
+    `/my/images/default`,
     authMiddleware,
     productController.setMyProductDefaultImage,
 );
 productRoutes.patch(
-    `/ingrediants/toggle/my`,
+    `/my/ingredients/toggle`,
     authMiddleware,
     productController.toggleMyProductIngredients,
 );
 productRoutes.patch(
-    `/ingrediants/add/my`,
+    `/my/ingredients/add`,
     authMiddleware,
     productController.addMyProductIngredients,
 );
 productRoutes.patch(
-    `/ingrediants/remove/my`,
+    `/my/ingredients/remove`,
     authMiddleware,
     productController.removeMyProductIngredients,
 );

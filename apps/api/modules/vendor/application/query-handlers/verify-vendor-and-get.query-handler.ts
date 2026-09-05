@@ -1,11 +1,11 @@
-import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import type { VendorReadModel } from '@ecomerece/domain';
+import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import type { VerifyVendorAndGetQuery } from '../queries/verify-vendor-and-get.query';
 import type { VendorInternalService } from '../vendor.internal.service';
 
 export class VerifyVendorAndGetHandler {
     readonly type = 'VerifyVendorAndGetQuery';
-    constructor(private readonly internalService: VendorInternalService) { }
+    constructor(private readonly internalService: VendorInternalService) {}
     async handle(query: VerifyVendorAndGetQuery): Promise<{
         validIds: Id[];
         notFoundIds: Id[];

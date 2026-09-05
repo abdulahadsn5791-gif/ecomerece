@@ -1,11 +1,9 @@
-
+import type { ProductVariantReadModel } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import { BaseService } from '../../../core/services/base.services';
-
 import { productVariantMapper } from '../infrastructure/product-variant.mapper';
 import type { ProductVariantRepository } from '../infrastructure/product-variant.repository';
-import { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
-import { ProductVariantReadModel } from '@ecomerece/domain';
 
 export class productVariantInternalService extends BaseService {
     constructor(

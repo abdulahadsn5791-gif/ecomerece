@@ -1,11 +1,13 @@
+import {
+    buyMyInventoryStockDto,
+    createMyInventoryDto,
+    removeMyInventoryStockDto,
+    updateMylowStockThresholdDto,
+} from '@ecomerece/shared';
 import type { Context } from 'hono';
-
-import { BaseController } from '../../../core/controller/base.controller';
-
-import type { InventoryApplicationService } from '../application/inventory.app.service';
-
 import { idSchema } from '../../../../../packages/shared/dtos/id-schema';
-import { buyMyInventoryStockDto, createMyInventoryDto, removeMyInventoryStockDto, updateMylowStockThresholdDto } from '@ecomerece/shared';
+import { BaseController } from '../../../core/controller/base.controller';
+import type { InventoryApplicationService } from '../application/inventory.app.service';
 
 export class InventoryController extends BaseController<InventoryApplicationService> {
     createMyInventory = async (c: Context) => {
@@ -14,8 +16,7 @@ export class InventoryController extends BaseController<InventoryApplicationServ
         return this.ok(c, await this.service.createMyInventory(data, actor));
     };
     buyMyInventory = async (c: Context) => {
-        const data = await this.body(c, buyMyInventoryStockDto
-        );
+        const data = await this.body(c, buyMyInventoryStockDto);
         const actor = c.get('user');
         const inventoryId = this.param(c, 'id', idSchema);
         return this.ok(c, await this.service.buyMyInventoryStock(data, inventoryId, actor));

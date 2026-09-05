@@ -1,9 +1,9 @@
-import { categoryReadModels, Id, IQuery } from "@ecomerece/domain";
+import type { categoryReadModels, Id, IQuery } from '@ecomerece/domain';
 
-
-export class VerifyCategoryAndGetQuery implements IQuery<{ isValid: boolean, category: null | categoryReadModels }> {
-
-    readonly __result?: { isValid: boolean, category: null | categoryReadModels };
+export class VerifyCategoryAndGetQuery
+    implements IQuery<{ isValid: boolean; category: null | categoryReadModels }>
+{
+    readonly __result?: { isValid: boolean; category: null | categoryReadModels };
     readonly type = 'VerifyCategoryAndGetQuery';
     public readonly payload: { id: Id };
 

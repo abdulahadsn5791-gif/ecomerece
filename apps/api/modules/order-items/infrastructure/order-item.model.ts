@@ -1,7 +1,5 @@
-import mongoose, { HydratedDocument } from "mongoose";
-import { StatusEnum, StatusType } from "@ecomerece/domain";
-
-
+import { StatusEnum, type StatusType } from '@ecomerece/domain';
+import mongoose, { type HydratedDocument } from 'mongoose';
 
 const deletedSchema = new mongoose.Schema(
     {
@@ -10,7 +8,7 @@ const deletedSchema = new mongoose.Schema(
         deletedBy: { type: String, default: null },
         reason: { type: String, default: null },
     },
-    { _id: false }
+    { _id: false },
 );
 
 export interface OrderItemsPersistence {
@@ -86,12 +84,12 @@ const OrderItemsModelSchema = new mongoose.Schema<OrderItemsPersistence>(
     {
         timestamps: true,
         versionKey: false,
-    }
+    },
 );
 
 export type OrderItemsDocument = HydratedDocument<OrderItemsPersistence>;
 
 export const OrderItemsModel = mongoose.model<OrderItemsPersistence>(
     'Order-Items',
-    OrderItemsModelSchema
+    OrderItemsModelSchema,
 );

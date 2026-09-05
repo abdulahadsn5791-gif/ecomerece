@@ -1,28 +1,43 @@
-import { createCategoryDtoType, deleteCategoryType, getPaginatedDtoType, idSchema } from "@ecomerece/shared";
-import { BaseService } from "../../../core/services/base.services";
-import { CategoryMessagesType, CategoryMessags } from "../presentation/category.messages";
-import { UserPersistence } from "../../user/infrastructure/user.models";
-import { CategoryAggregate, Id, Quantity, Reason, Title, UrlVO } from "@ecomerece/domain";
-import { CategoryRepository } from "../infrastructure/category.repository";
-import { CategoryMapper } from "../infrastructure/category.mapper";
-
+import { CategoryAggregate, Id, Quantity, Reason, Title, UrlVO } from '@ecomerece/domain';
+import {
+    type createCategoryDtoType,
+    type deleteCategoryType,
+    type getPaginatedDtoType,
+    idSchema,
+} from '@ecomerece/shared';
+import { BaseService } from '../../../core/services/base.services';
+import type { UserPersistence } from '../../user/infrastructure/user.models';
+import { CategoryMapper } from '../infrastructure/category.mapper';
+import type { CategoryRepository } from '../infrastructure/category.repository';
+import { type CategoryMessagesType, CategoryMessags } from '../presentation/category.messages';
 
 export class CategoryAppService extends BaseService {
+    constructor(private readonly categoryRepo: CategoryRepository) {
+        super();
+    }
 
-    constructor(private readonly categoryRepo: CategoryRepository) { super(); }
-
-
-    async createCategory(data: createCategoryDtoType, actor: UserPersistence): Promise<CategoryMessagesType> {
+    async createCategory(
+        data: createCategoryDtoType,
+        actor: UserPersistence,
+    ): Promise<CategoryMessagesType> {
         const id = Id.create();
         const title = Title.create(data.title);
         const actorId = Id.create(actor._id);
-        const image = UrlVO.create(data.image)
-        const category = CategoryAggregate.create({ title: title, id: id, image: image, createdBy: actorId });
+        const image = UrlVO.create(data.image);
+        const category = CategoryAggregate.create({
+            title: title,
+            id: id,
+            image: image,
+            createdBy: actorId,
+        });
         await this.categoryRepo.Create(category);
         return CategoryMessags.created(id, actorId);
     }
 
-    async deleteCategoryById(data: deleteCategoryType, actor: UserPersistence): Promise<CategoryMessagesType> {
+    async deleteCategoryById(
+        data: deleteCategoryType,
+        actor: UserPersistence,
+    ): Promise<CategoryMessagesType> {
         const id = Id.create(data.id);
         const actorId = Id.create(actor._id);
         const reason = Reason.create(data.reason);
@@ -38,11 +53,13 @@ export class CategoryAppService extends BaseService {
         return CategoryMapper.aggregateToReadModel(category);
     }
 
-
     async getPaginatedCategories(data: getPaginatedDtoType): Promise<{
-        data: any, meta: {
-            nextCursor: string | null; prevCursor: string | null; hasMore: boolean;
-        }
+        data: any;
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
     }> {
         let cursor;
         let limit;
@@ -52,7 +69,5 @@ export class CategoryAppService extends BaseService {
         if (data.direction) direction = data.direction;
         const categories = await this.categoryRepo.FindPaginated({ cursor, limit, direction });
         return categories;
-
-
     }
 }

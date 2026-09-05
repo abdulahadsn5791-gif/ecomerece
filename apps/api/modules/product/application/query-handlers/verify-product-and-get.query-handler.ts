@@ -1,11 +1,11 @@
-import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import type { ProductReadModel } from '@ecomerece/domain';
+import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import type { ProductInternelService } from '../product.internel.service';
 import type { VerifyProductAndGetQuery } from '../queries/verify-product-and-get.query';
 
 export class VerifyProductAndGetHandler {
     readonly type = 'VerifyProductAndGetQuery';
-    constructor(private readonly internalService: ProductInternelService) { }
+    constructor(private readonly internalService: ProductInternelService) {}
     async handle(query: VerifyProductAndGetQuery): Promise<{
         validIds: Id[];
         notFoundIds: Id[];

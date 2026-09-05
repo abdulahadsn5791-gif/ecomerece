@@ -18,31 +18,31 @@ export type VendorMutationResult = {
 
 export class VendorService {
     getVendorById(id: string): Promise<VendorResponseReadModel> {
-        return http.get<VendorResponseReadModel>(`/vendors/${id}`);
+        return http.get<VendorResponseReadModel>(`/vendor/${id}`);
     }
 
     createMyVendor(data: CreateVendorDto): Promise<VendorMutationResult> {
-        return http.post<VendorMutationResult>('/vendors/me', data);
+        return http.post<VendorMutationResult>('/vendor/my', data);
     }
 
     deleteMyVendor(data: DeleteMyVendorDto): Promise<VendorMutationResult> {
-        return http.delete<VendorMutationResult>('/vendors/me', data);
+        return http.delete<VendorMutationResult>('/vendor/my', data);
     }
 
     softDeleteVendor(data: DeleteVendorDto): Promise<VendorMutationResult> {
-        return http.delete<VendorMutationResult>('/vendors/soft', data);
+        return http.delete<VendorMutationResult>('/vendor/soft', data);
     }
 
     recoverVendor(data: RecoverVendorDto): Promise<VendorMutationResult> {
-        return http.patch<VendorMutationResult>('/vendors/recover', data);
+        return http.patch<VendorMutationResult>('/vendor/recover', data);
     }
 
     verifyVendor(data: VerifyVendorDto): Promise<VendorMutationResult> {
-        return http.patch<VendorMutationResult>('/vendors/verify', data);
+        return http.patch<VendorMutationResult>('/vendor/verify', data);
     }
 
     rejectVendorVerification(data: RejectVendorDto): Promise<VendorMutationResult> {
-        return http.patch<VendorMutationResult>('/vendors/reject', data);
+        return http.patch<VendorMutationResult>('/vendor/reject', data);
     }
 }
 

@@ -10,5 +10,19 @@
         "**/node_modules": true,
         "**/dist": true,
         "**/.next": true
-    }
+    },
+    // Allocate more RAM to the TS Server to prevent crash loops (value in MB)
+    "typescript.tsserver.maxTsServerMemory": 8192,
+    // Only run diagnostics on files you actually have open in the editor
+    "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+    // Prevent ESLint from crawling the entire monorepo looking for a config
+    "eslint.workingDirectories": [
+        {
+            "mode": "auto"
+        }
+    ],
+    "editor.minimap.enabled": false,
+    "editor.smoothScrolling": false,
+    "editor.cursorBlinking": "solid",
+    "workbench.list.smoothScrolling": false
 }

@@ -1,17 +1,15 @@
-import { DeleteInfoVO } from "@ecomerece/domain/value-objects/delete-info.vo";
-import { EffectiveDate } from "@ecomerece/domain/value-objects/effective-date.vo";
-import { ExpirationDate } from "@ecomerece/domain/value-objects/expiration-date.vo";
-import { Id } from "@ecomerece/domain/value-objects/id.vo";
-import { Money } from "@ecomerece/domain/value-objects/money.vo";
-import { Quantity } from "@ecomerece/domain/value-objects/quantity.vo";
-import { Reason } from "@ecomerece/domain/value-objects/reason.vo";
-
-import { OrderItemsPersistence } from "./order-item.model";
-import { OrderItemReadModel, OrderItemsAggregate, StatusVo } from "@ecomerece/domain";
-import { OrderItemResponseReadModel } from "@ecomerece/shared";
+import { type OrderItemReadModel, OrderItemsAggregate, StatusVo } from '@ecomerece/domain';
+import { DeleteInfoVO } from '@ecomerece/domain/value-objects/delete-info.vo';
+import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
+import { ExpirationDate } from '@ecomerece/domain/value-objects/expiration-date.vo';
+import { Id } from '@ecomerece/domain/value-objects/id.vo';
+import { Money } from '@ecomerece/domain/value-objects/money.vo';
+import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
+import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
+import type { OrderItemResponseReadModel } from '@ecomerece/shared';
+import type { OrderItemsPersistence } from './order-item.model';
 
 export const OrderItemsMapper = {
-
     persistenceToAggregate(doc: OrderItemsPersistence): OrderItemsAggregate {
         return OrderItemsAggregate.rehydrate(
             Id.rehydrate(doc._id),
@@ -31,9 +29,8 @@ export const OrderItemsMapper = {
             ),
 
             Quantity.rehydrate(doc.version),
-            EffectiveDate.rehydrate(doc.createdAt)
+            EffectiveDate.rehydrate(doc.createdAt),
         );
-
     },
     aggregateToPersistence(items: OrderItemsAggregate) {
         return {
@@ -54,9 +51,7 @@ export const OrderItemsMapper = {
                 reason: items.delete.reason?.value ?? null,
             },
             createdAt: items.createdAt.value,
-
-
-        }
+        };
     },
     aggregateToReadModel(items: OrderItemsAggregate): OrderItemReadModel {
         return {
@@ -76,9 +71,8 @@ export const OrderItemsMapper = {
                 reason: items.delete.reason?.value ?? null,
             },
             createdAt: items.createdAt.value,
-        }
-    }
-    ,
+        };
+    },
 
     persistenceToReadModel(doc: OrderItemsPersistence): OrderItemReadModel {
         return {
@@ -98,9 +92,8 @@ export const OrderItemsMapper = {
                 reason: doc.deleted.reason ?? null,
             },
             createdAt: doc.createdAt,
-        }
+        };
     },
-
 
     aggregateToResponseReadModel(items: OrderItemsAggregate): OrderItemResponseReadModel {
         return {
@@ -115,6 +108,6 @@ export const OrderItemsMapper = {
             price: items.price.value,
 
             createdAt: items.createdAt.value,
-        }
-    }
-}
+        };
+    },
+};

@@ -1,25 +1,27 @@
-
+import { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
-
 import {
+    AddressVO,
     CityVO,
     CountryVO,
     PostalCodeVO,
     StateVO,
     StreetAddressVO,
 } from '@ecomerece/domain/value-objects/street-address.vo';
+import type {
+    AddressResponseReadModel,
+    createMyAddressDtoType,
+} from '../../../../../packages/shared';
+import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
 import { EnsureActiveUserGetByIdQuery } from '../../user/application/queries/ensure-active-user-get-by-id.query';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
-import { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
-
 import { AddressMapper } from '../infrastructure/address.mapper';
 import type { AddressRepository } from '../infrastructure/address.repository';
 import { AddressMessages, type addressMessagesType } from '../presentation/address.messgae';
-import { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
-import { AddressResponseReadModel, createMyAddressDtoType } from '../../../../../packages/shared';
+import { updateMyAddressDtoType } from '../../../../../packages/shared/request-dtos/address/update-address.dto';
 
 
 export class AddressApplicationService extends BaseService {
@@ -103,5 +105,23 @@ export class AddressApplicationService extends BaseService {
         await this.addressRepo.Create(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);
         return AddressMessages.addressCreated(actorId, addressId, response);
+    }
+
+
+    async updateMyAddress(id: string, actor: UserPersistence, data: updateMyAddressDtoType) {
+        const addressId = Id.create(id);
+        const actorId = Id.create(actor._id);
+        const address = await this.addressRepo.FindByIdOrThrow(addressId);
+        const streetAddress = StreetAddressVO.create(data.streetAddress);
+        const city = CityVO.create(data.city);
+        const state = StateVO.create(data.state);
+        const postalCode = PostalCodeVO.create(data.postalCode);
+        const country = CountryVO.create(data.country);
+        const updated = AddressVO.create(streetAddress, city, state, postalCode, country)
+        await this.canEditAddress(actorId);
+        address.updateAddress(updated, actorId);
+        await this.addressRepo.Save(address);
+        const response = AddressMapper.aggregateToResponseReadModel(address);
+        return AddressMessages.addressUpdated(actorId, addressId, response);
     }
 }

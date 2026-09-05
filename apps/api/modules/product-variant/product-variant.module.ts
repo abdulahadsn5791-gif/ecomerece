@@ -1,4 +1,3 @@
-
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { productVariantInternalService } from './application/product-varaint.internal.service';
 import { productVariantApplicationService } from './application/product-variant.app.service';

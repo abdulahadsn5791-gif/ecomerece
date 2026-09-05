@@ -1,4 +1,5 @@
 import { Clock, Calendar, Star, Ban } from 'lucide-react';
+import React from 'react';
 
 interface ProfileStatsProps {
     user: any;

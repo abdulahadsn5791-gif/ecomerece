@@ -8,7 +8,6 @@ import type {
 
 } from '@ecomerece/shared';
 
-/** Matches the backend's standard category mutation response envelope. */
 export type CategoryMutationResult = {
     message: string;
     updatedData?: categoryResponseReadModels;
@@ -25,7 +24,7 @@ export type PaginatedCategoriesResult = {
 
 export class CategoryService {
     getCategoryById(id: string): Promise<categoryResponseReadModels> {
-        return http.get<categoryResponseReadModels>(`/categories/${id}`);
+        return http.get<categoryResponseReadModels>(`/category/${id}`);
     }
 
     getPaginatedCategories(params: getPaginatedDtoType): Promise<PaginatedCategoriesResult> {
@@ -36,16 +35,17 @@ export class CategoryService {
         if (params.direction) searchParams.append('direction', params.direction);
 
         const query = searchParams.toString();
-        const url = query ? `/categories?${query}` : '/categories';
+        const url = query ? `/category?${query}` : '/category';
 
         return http.get<PaginatedCategoriesResult>(url);
     }
+
     createCategory(data: createCategoryDtoType): Promise<CategoryMutationResult> {
-        return http.post<CategoryMutationResult>('/categories', data);
+        return http.post<CategoryMutationResult>('/category/create', data);
     }
 
     deleteCategoryById(data: deleteCategoryType): Promise<CategoryMutationResult> {
-        return http.delete<CategoryMutationResult>('/categories', data);
+        return http.delete<CategoryMutationResult>('/category', data);
     }
 }
 

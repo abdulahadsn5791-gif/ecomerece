@@ -11,7 +11,7 @@ export interface RetryOptions {
  */
 export async function withRetry<T>(
     operation: () => Promise<T>,
-    options: RetryOptions = {}
+    options: RetryOptions = {},
 ): Promise<T> {
     const {
         retries = 3,
@@ -21,7 +21,7 @@ export async function withRetry<T>(
             'errorLabels' in error &&
             Array.isArray((error as any).errorLabels) &&
             (error as any).errorLabels.includes('TransientTransactionError'),
-        backoff = (attempt: number) => Math.min(100 * Math.pow(2, attempt - 1), 5000),
+        backoff = (attempt: number) => Math.min(100 * 2 ** (attempt - 1), 5000),
     } = options;
 
     let lastError: unknown;

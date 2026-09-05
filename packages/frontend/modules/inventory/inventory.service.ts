@@ -15,23 +15,23 @@ export type InventoryMutationResult = {
 
 export class InventoryService {
     getInventoryByVariantId(variantId: string): Promise<InventoryResponseReadModel> {
-        return http.get<InventoryResponseReadModel>(`/inventory/variant/${variantId}`);
+        return http.get<InventoryResponseReadModel>(`/product-inventory/${variantId}`);
     }
 
     createMyInventory(data: createMyInventoryDtoType): Promise<InventoryMutationResult> {
-        return http.post<InventoryMutationResult>('/inventory/me', data);
+        return http.post<InventoryMutationResult>('/product-inventory/my/create', data);
     }
 
     buyMyInventoryStock(id: string, data: buyMyInventoryStockDtoType): Promise<InventoryMutationResult> {
-        return http.patch<InventoryMutationResult>(`/inventory/me/${id}/buy`, data);
+        return http.patch<InventoryMutationResult>(`/product-inventory/my/${id}/purchase`, data);
     }
 
     removeMyInventoryStock(id: string, data: removeMyInventoryStockDtoType): Promise<InventoryMutationResult> {
-        return http.patch<InventoryMutationResult>(`/inventory/me/${id}/remove`, data);
+        return http.patch<InventoryMutationResult>(`/product-inventory/my/${id}/remove`, data);
     }
 
     updateMyLowStockThreshold(id: string, data: updateMylowStockThresholdDtoType): Promise<InventoryMutationResult> {
-        return http.patch<InventoryMutationResult>(`/inventory/me/${id}/threshold`, data);
+        return http.patch<InventoryMutationResult>(`/product-inventory/my/${id}/threshold`, data);
     }
 }
 

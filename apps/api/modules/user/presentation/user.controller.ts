@@ -1,9 +1,17 @@
+import {
+    BanUserDTOSchema,
+    BlockUserDTOSchema,
+    DeleteMeDTOSchema,
+    DeleteUserDTOSchema,
+    ExtendBanDTOSchema,
+    idSchema,
+    ObjUserIdDTOSchema,
+    UserRoleDtoSchema,
+} from '@ecomerece/shared';
 import type { Context } from 'hono';
 import { BaseController } from '../../../core/controller/base.controller';
 import { clerkUserIdSchema } from '../../../shared/validation/clerkSchema';
 import type { UserAppService } from '../application/user.app.service';
-import { BanUserDTOSchema, BlockUserDTOSchema, DeleteMeDTOSchema, DeleteUserDTOSchema, ExtendBanDTOSchema, idSchema, ObjUserIdDTOSchema, UserRoleDtoSchema } from '@ecomerece/shared';
-
 
 export class UserController extends BaseController<UserAppService> {
     getUserById = async (c: Context) => {
@@ -13,7 +21,7 @@ export class UserController extends BaseController<UserAppService> {
     initUser = async (c: Context) => {
         const id = c.get('userId');
 
-        return this.accepted(c, await this.service.initUser(id))
+        return this.accepted(c, await this.service.initUser(id));
     };
     assignRole = async (c: Context) => {
         const actor = c.get('user');

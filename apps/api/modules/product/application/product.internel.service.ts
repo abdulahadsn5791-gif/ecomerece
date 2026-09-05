@@ -1,6 +1,6 @@
+import type { ProductReadModel } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { BaseService } from '../../../core/services/base.services';
-import type { ProductReadModel } from '@ecomerece/domain';
 import { ProductMapper } from '../infrastructure/product.mapper';
 import type { ProductRepository } from '../infrastructure/product.repository';
 

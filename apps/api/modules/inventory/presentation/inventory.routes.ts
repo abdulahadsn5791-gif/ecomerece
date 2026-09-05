@@ -7,10 +7,10 @@ export const inventoryRoutes = new Hono();
 const { inventoryController } = createInventoryModule();
 
 inventoryRoutes.get('/:id', inventoryController.getInventoryByVarientId);
-inventoryRoutes.post('/create', authMiddleware, inventoryController.createMyInventory);
-inventoryRoutes.patch('/:id/purchase', authMiddleware, inventoryController.buyMyInventory);
+inventoryRoutes.post('/my/create', authMiddleware, inventoryController.createMyInventory);
+inventoryRoutes.patch('/my/:id/purchase', authMiddleware, inventoryController.buyMyInventory);
 inventoryRoutes.patch(
-    '/:id/low-stock-threshold',
+    '/my/:id/threshold',
     authMiddleware,
     inventoryController.updateMylowStockThreshold,
 );

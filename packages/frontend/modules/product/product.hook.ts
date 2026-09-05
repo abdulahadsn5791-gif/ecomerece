@@ -3,19 +3,33 @@ import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tansta
 import { productService, type ProductMutationResult } from './product.service';
 import {
 
-    type CreateMyProductDto,
-    type softDeleteMyProductDtoType,
-    type recoverProductDtoType,
-    type blockProductDtoType,
-    type blockLiftProductDtoType,
-    type productAppereanceDtoType,
-    type updateProductMetaDtoType,
-    type toggleDiscalimerDtoType,
-    type disclaimerItemsDtoType,
-    type imagesDtoType,
-    type deafultImageDtoType,
-    type toggleIngredientsDtoType,
-    type ingredientsDtotype,
+
+    softDeleteMyProductDto,
+    recoverProductDto,
+    createMyProductVariantDtoType,
+    softDeleteMyProductDtoType,
+    CreateMyProductDtoSchema,
+    recoverProductDtoType,
+    blockProductDtoType,
+    blockProductDto,
+    blockLiftProductDto,
+    blockLiftProductDtoType,
+    productAppereanceDtoType,
+    productAppereanceDto,
+    updateProductMetaDtoType,
+    updateProductMetaDto,
+    toggleDiscalimerDtoType,
+    toggleDiscalimerDto,
+    disclaimerItemsDtoType,
+    disclaimerItemsDto,
+    imagesDtoType,
+    imagesDto,
+    deafultImageDtoType,
+    deafultImageDto,
+    toggleIngredientsDtoType,
+    toggleIngredientsDto,
+    ingredientsDtotype,
+    ingredientsDto,
 } from '@ecomerece/shared';
 
 export const PRODUCT_QUERY_KEY = ['products'];
@@ -49,8 +63,8 @@ function applyProductMutationResult(queryClient: QueryClient, result: ProductMut
 export function useCreateMyProduct() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: CreateMyProductDto) =>
-            productService.createMyProduct(CreateMyProductSchema.parse(data)),
+        mutationFn: (data: createMyProductVariantDtoType) =>
+            productService.createMyProduct(CreateMyProductDtoSchema.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -59,7 +73,7 @@ export function useSoftDeleteMyProduct() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: softDeleteMyProductDtoType) =>
-            productService.softDeleteMyProduct(softDeleteMyProductDtoSchema.parse(data)),
+            productService.softDeleteMyProduct(softDeleteMyProductDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -68,7 +82,7 @@ export function useRecoverMyProduct() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: recoverProductDtoType) =>
-            productService.recoverMyProduct(recoverProductDtoSchema.parse(data)),
+            productService.recoverMyProduct(recoverProductDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -77,7 +91,7 @@ export function useBlockProduct() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: blockProductDtoType) =>
-            productService.blockProduct(blockProductDtoSchema.parse(data)),
+            productService.blockProduct(blockProductDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -86,7 +100,7 @@ export function useUnBlockProduct() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: blockLiftProductDtoType) =>
-            productService.unBlockProduct(blockLiftProductDtoSchema.parse(data)),
+            productService.unBlockProduct(blockLiftProductDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -95,7 +109,7 @@ export function useMakeMyProductPublic() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: productAppereanceDtoType) =>
-            productService.makeMyProductPublic(productAppereanceDtoSchema.parse(data)),
+            productService.makeMyProductPublic(productAppereanceDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -104,7 +118,7 @@ export function useMakeMyProductPrivate() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: productAppereanceDtoType) =>
-            productService.makeMyProductPrivate(productAppereanceDtoSchema.parse(data)),
+            productService.makeMyProductPrivate(productAppereanceDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -113,7 +127,7 @@ export function useUpdateMyProductMeta() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: updateProductMetaDtoType) =>
-            productService.updateMyProductMeta(updateProductMetaDtoSchema.parse(data)),
+            productService.updateMyProductMeta(updateProductMetaDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -122,7 +136,7 @@ export function useToggleMyProductDisclaimer() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: toggleDiscalimerDtoType) =>
-            productService.toggleMyProductDisclaimer(toggleDiscalimerDtoSchema.parse(data)),
+            productService.toggleMyProductDisclaimer(toggleDiscalimerDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -131,7 +145,7 @@ export function useAddMyProductDisclaimers() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: disclaimerItemsDtoType) =>
-            productService.addMyProductDisclaimers(disclaimerItemsDtoSchema.parse(data)),
+            productService.addMyProductDisclaimers(disclaimerItemsDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -140,7 +154,7 @@ export function useRemoveMyProductDisclaimers() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: disclaimerItemsDtoType) =>
-            productService.removeMyProductDisclaimers(disclaimerItemsDtoSchema.parse(data)),
+            productService.removeMyProductDisclaimers(disclaimerItemsDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -149,7 +163,7 @@ export function useAddMyProductImages() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: imagesDtoType) =>
-            productService.addMyProductImages(imagesDtoSchema.parse(data)),
+            productService.addMyProductImages(imagesDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -158,7 +172,7 @@ export function useSetMyProductDefaultImage() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: deafultImageDtoType) =>
-            productService.setMyProductDefaultImage(deafultImageDtoSchema.parse(data)),
+            productService.setMyProductDefaultImage(deafultImageDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -167,7 +181,7 @@ export function useRemoveMyProductImages() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: imagesDtoType) =>
-            productService.removeMyProductImages(imagesDtoSchema.parse(data)),
+            productService.removeMyProductImages(imagesDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -176,7 +190,7 @@ export function useToggleMyProductIngredients() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: toggleIngredientsDtoType) =>
-            productService.toggleMyProductIngredients(toggleIngredientsDtoSchema.parse(data)),
+            productService.toggleMyProductIngredients(toggleIngredientsDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -185,7 +199,7 @@ export function useAddMyProductIngredients() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: ingredientsDtotype) =>
-            productService.addMyProductIngredients(ingredientsDtotypeSchema.parse(data)),
+            productService.addMyProductIngredients(ingredientsDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }
@@ -194,7 +208,7 @@ export function useRemoveMyProductIngredients() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (data: ingredientsDtotype) =>
-            productService.removeMyProductIngredients(ingredientsDtotypeSchema.parse(data)),
+            productService.removeMyProductIngredients(ingredientsDto.parse(data)),
         onSuccess: (data) => applyProductMutationResult(queryClient, data),
     });
 }

@@ -1,7 +1,7 @@
 // src/core/database/unit-of-work.ts
 import mongoose, { type ClientSession } from 'mongoose';
-import { transactionContext } from './transaction-context';
 import { withRetry } from '../../utils/retry';
+import { transactionContext } from './transaction-context';
 
 export class UnitOfWork {
     async transaction<T>(callback: () => Promise<T>, retries = 3): Promise<T> {
@@ -17,7 +17,7 @@ export class UnitOfWork {
                 try {
                     session.startTransaction();
                     const result = await transactionContext.run({ session }, async () =>
-                        callback()
+                        callback(),
                     );
                     await session.commitTransaction();
                     return result;
@@ -38,8 +38,8 @@ export class UnitOfWork {
                     Array.isArray((error as any).errorLabels) &&
                     (error as any).errorLabels.includes('TransientTransactionError'),
 
-                backoff: (attempt: number) => Math.min(100 * Math.pow(2, attempt - 1), 5000),
-            }
+                backoff: (attempt: number) => Math.min(100 * 2 ** (attempt - 1), 5000),
+            },
         );
     }
 

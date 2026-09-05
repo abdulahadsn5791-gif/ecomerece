@@ -1,5 +1,4 @@
-import mongoose, { HydratedDocument, InferSchemaType } from "mongoose";
-import { Schema } from "mongoose";
+import mongoose, { type HydratedDocument, type InferSchemaType, Schema } from 'mongoose';
 
 const deletedSchema = new Schema(
     {
@@ -21,7 +20,6 @@ const blockSchema = new mongoose.Schema(
     { _id: false },
 );
 
-
 export const CategorySchema = new Schema(
     {
         _id: {
@@ -30,7 +28,7 @@ export const CategorySchema = new Schema(
         },
         image: {
             type: String,
-            required: true
+            required: true,
         },
         title: {
             type: String,
@@ -70,4 +68,3 @@ export const CategorySchema = new Schema(
 export type CategoryPersistence = InferSchemaType<typeof CategorySchema>;
 export type CategoryDocument = HydratedDocument<CategoryPersistence>;
 export const CategoryModel = mongoose.model<CategoryPersistence>('Category', CategorySchema);
-

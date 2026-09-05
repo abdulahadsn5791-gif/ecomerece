@@ -1,22 +1,26 @@
-
+import { NameInfoVO, UserAggregate, UserRoleVO } from '@ecomerece/domain';
 import { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { PersonName } from '@ecomerece/domain/value-objects/name.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
+import type {
+    BanUserDTO,
+    BlockUserDTO,
+    DeleteMeDTO,
+    DeleteUserDTO,
+    ExtendBanDTO,
+    UserResponseReadModel,
+    UserRoleDto,
+} from '@ecomerece/shared';
+import type { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
-import type { BanUserDTO, BlockUserDTO, DeleteMeDTO, DeleteUserDTO, ExtendBanDTO, UserResponseReadModel, UserRoleDto } from '@ecomerece/shared';
-import { UserAggregate } from '@ecomerece/domain';
-import { NameInfoVO } from '@ecomerece/domain';
-import { UserRoleVO } from '@ecomerece/domain';
+import { getUserById } from '../../../lib/supabase';
 import { UserMapper } from '../infrastructure/user.mapper';
 import type { UserPersistence } from '../infrastructure/user.models';
 import type { UserRepository } from '../infrastructure/user.repository';
 import { UserMessages, type UserMessagesType } from '../presentation/user.messages';
-import { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
-import { getUserById } from '../../../lib/supabase';
-
 
 export class UserAppService extends BaseService {
     constructor(
@@ -27,7 +31,6 @@ export class UserAppService extends BaseService {
     }
 
     async initUser(userId: string) {
-
         const SupabaseUser = await getUserById(userId);
 
         if (!SupabaseUser.email) throw new BadRequestError('Invalid user');
@@ -44,7 +47,9 @@ export class UserAppService extends BaseService {
             return UserMessages.initailized(id);
         }
 
-        const image = new UrlVO(SupabaseUser.user_metadata?.avatar_url || SupabaseUser.user_metadata?.picture);
+        const image = new UrlVO(
+            SupabaseUser.user_metadata?.avatar_url || SupabaseUser.user_metadata?.picture,
+        );
         const fullName = SupabaseUser.user_metadata.full_name;
         const nameArray = fullName.trim().split(/\s+/);
         const firstName = nameArray[0] || '';
@@ -64,7 +69,6 @@ export class UserAppService extends BaseService {
         User.signIn(User.id);
         await this.userRepo.Create(User);
         return UserMessages.initailized(id);
-
     }
 
     async getUserById(userId: string): Promise<UserResponseReadModel> {
@@ -72,7 +76,6 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         return UserMapper.aggregateToResponseReadModel(user);
     }
-
 
     async assignRole(data: UserRoleDto, actor: UserPersistence): Promise<UserMessagesType> {
         const actorId = Id.create(actor._id);
@@ -85,7 +88,6 @@ export class UserAppService extends BaseService {
 
         return UserMessages.assignRole(id, role, actorId);
     }
-
 
     async getMe(actor: UserPersistence): Promise<UserResponseReadModel> {
         const id = Id.create(actor._id);
@@ -140,7 +142,6 @@ export class UserAppService extends BaseService {
         user.unBlockUser(actorId);
 
         await this.userRepo.Save(user);
-
 
         return UserMessages.blockLift(id, actorId);
     }

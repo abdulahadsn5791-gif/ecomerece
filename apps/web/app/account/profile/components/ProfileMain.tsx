@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetMe, useThemeStore, useSoftDeleteMe } from '@ecomerece/frontend';
+import { useProfileManager, useThemeStore } from '@ecomerece/frontend';
 import { motion } from 'framer-motion';
 import { ProfileSkeleton } from './ProfileSkeleton';
 import { ProfileErrorState } from './ProfileErrorState';
@@ -8,18 +8,20 @@ import { ProfileHeader } from './ProfileHeader';
 import { ProfileStats } from './ProfileStats';
 import { DangerZone } from './DangerZone';
 
-export default function Main() {
-    const { data: user, isLoading, error, refetch, isFetching } = useGetMe();
+export default function ProfileMain() {
     const { darkMode } = useThemeStore();
-    const { mutate: deleteAccount, isPending: isDeleting, error: deleteError, reset: resetDelete } = useSoftDeleteMe();
-
-    const formatDate = (date: string | Date | null | undefined) => {
-        if (!date) return 'Never';
-        return new Intl.DateTimeFormat('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        }).format(new Date(date));
-    };
+    const {
+        user,
+        isLoading,
+        error,
+        refetch,
+        isFetching,
+        deleteAccount,
+        isDeleting,
+        deleteError,
+        resetDelete,
+        formatDate,
+    } = useProfileManager();
 
     if (isLoading) return <main className="lg:col-span-3"><ProfileSkeleton darkMode={darkMode} /></main>;
 
@@ -30,8 +32,11 @@ export default function Main() {
     return (
         <main className="lg:col-span-3 relative">
             <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-                className={`border rounded-3xl p-8 shadow-sm transition-colors duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className={`border rounded-3xl p-8 shadow-sm transition-colors duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
+                    }`}
             >
                 <ProfileHeader user={user} darkMode={darkMode} />
                 <ProfileStats user={user} darkMode={darkMode} formatDate={formatDate} />

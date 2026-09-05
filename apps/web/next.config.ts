@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
-const nextConfig = {
-  transpilePackages: ['@ecomerece/domain', '@ecomerece/shared'],
+const nextConfig: NextConfig = {
+  transpilePackages: ['@ecomerece/domain', '@ecomerece/shared', '@ecomerece/frontend'],
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion', '@ecomerece/frontend'],
+  },
   rewrites: async () => [
     {
       source: '/api/:path*',
@@ -9,4 +12,5 @@ const nextConfig = {
     },
   ],
 };
+
 export default nextConfig;

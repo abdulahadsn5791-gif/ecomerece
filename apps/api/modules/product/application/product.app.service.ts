@@ -1,3 +1,4 @@
+import { DisclaimerVO, ImagesVO, IngredientsVO, ProductAggregate } from '@ecomerece/domain';
 import type { IQueryBus } from '@ecomerece/domain/query/query-bus.interface';
 import { AltVO } from '@ecomerece/domain/value-objects/alt.vo';
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
@@ -8,22 +9,30 @@ import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
+import type {
+    blockLiftProductDtoType,
+    blockProductDtoType,
+    CreateMyProductDto,
+    deafultImageDtoType,
+    disclaimerItemsDtoType,
+    imagesDtoType,
+    ingredientsDtotype,
+    ProductResponseReadModel,
+    productAppereanceDtoType,
+    recoverProductDtoType,
+    softDeleteMyProductDtoType,
+    toggleDiscalimerDtoType,
+    toggleIngredientsDtoType,
+    updateProductMetaDtoType,
+} from '@ecomerece/shared';
 import { BaseService } from '../../../core/services/base.services';
+import { BadRequestError } from '../../../errors/app-error';
+import { VerifyCategoryAndGetQuery } from '../../category/application/queries/verify-category.query';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { GetVendorByUserIdQuery } from '../../vendor/application/queries/get-vendor-by-user-id.query';
-
 import { ProductMapper } from '../infrastructure/product.mapper';
 import type { ProductRepository } from '../infrastructure/product.repository';
-
-
-
-
-
 import { productMessages, type productMessagesType } from '../presentation/product.messages';
-import { blockLiftProductDtoType, blockProductDtoType, CreateMyProductDto, deafultImageDtoType, disclaimerItemsDtoType, imagesDtoType, ingredientsDtotype, productAppereanceDtoType, ProductResponseReadModel, recoverProductDtoType, softDeleteMyProductDtoType, toggleDiscalimerDtoType, toggleIngredientsDtoType, updateProductMetaDtoType } from '@ecomerece/shared';
-import { DisclaimerVO, ImagesVO, IngredientsVO, ProductAggregate } from '@ecomerece/domain';
-import { VerifyCategoryAndGetQuery } from '../../category/application/queries/verify-category.query';
-import { BadRequestError } from '../../../errors/app-error';
 
 export class ProductApplicationService extends BaseService {
     constructor(
@@ -39,7 +48,10 @@ export class ProductApplicationService extends BaseService {
         return ProductMapper.aggregateToResponseReadModel(product);
     }
 
-    async createMyProduct(data: CreateMyProductDto, actor: UserPersistence,): Promise<productMessagesType> {
+    async createMyProduct(
+        data: CreateMyProductDto,
+        actor: UserPersistence,
+    ): Promise<productMessagesType> {
         const id = Id.create();
         const actorId = Id.create(actor._id);
         const vendor = this.ensureFound(
@@ -59,8 +71,10 @@ export class ProductApplicationService extends BaseService {
             isIngredients: data.ingredient.isIngredients,
             items: data.ingredient.ingredients.map((val) => Title.create(val)),
         });
-        const verfied = await this.queryBus.execute(new VerifyCategoryAndGetQuery({ id: categoryId }));
-        if (!verfied.isValid) throw new BadRequestError("Invalid category");
+        const verfied = await this.queryBus.execute(
+            new VerifyCategoryAndGetQuery({ id: categoryId }),
+        );
+        if (!verfied.isValid) throw new BadRequestError('Invalid category');
         const disclaimer = DisclaimerVO.create({
             isDisclaimer: data.disclaimer.isDisclaimer,
             items: data.disclaimer.disclaimers.map((val) => ({

@@ -1,10 +1,22 @@
+import {
+    blockLiftProductDto,
+    blockProductDto,
+    CreateMyProductDtoSchema,
+    deafultImageDto,
+    disclaimerItemsDto,
+    imagesDto,
+    ingredientsDto,
+    productAppereanceDto,
+    recoverProductDto,
+    softDeleteMyProductDto,
+    toggleDiscalimerDto,
+    toggleIngredientsDto,
+    updateProductMetaDto,
+} from '@ecomerece/shared';
 import type { Context } from 'hono';
-
+import { idSchema } from '../../../../../packages/shared/dtos/id-schema';
 import { BaseController } from '../../../core/controller/base.controller';
 import type { ProductApplicationService } from '../application/product.app.service';
-
-import { idSchema } from '../../../../../packages/shared/dtos/id-schema';
-import { blockLiftProductDto, blockProductDto, CreateMyProductDtoSchema, deafultImageDto, disclaimerItemsDto, imagesDto, ingredientsDto, productAppereanceDto, recoverProductDto, softDeleteMyProductDto, toggleDiscalimerDto, toggleIngredientsDto, updateProductMetaDto } from '@ecomerece/shared';
 
 export class ProductController extends BaseController<ProductApplicationService> {
     getProductById = async (c: Context) => {
@@ -25,8 +37,7 @@ export class ProductController extends BaseController<ProductApplicationService>
     };
 
     recoverMyProduct = async (c: Context) => {
-        const data = await this.body(c, recoverProductDto
-        );
+        const data = await this.body(c, recoverProductDto);
         const actor = c.get('user');
         return this.ok(c, await this.service.recoverMyProduct(data, actor));
     };

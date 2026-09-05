@@ -1,3 +1,4 @@
+import { ProductVariantAggregate, type ProductVariantReadModel } from '@ecomerece/domain';
 import { DeleteInfoVO } from '@ecomerece/domain/value-objects/delete-info.vo';
 import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
@@ -5,9 +6,8 @@ import { Money } from '@ecomerece/domain/value-objects/money.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
+import type { ProductVariantResponseReadModel } from '@ecomerece/shared';
 import type { ProductVariantPersistence } from './product-variant.model';
-import { ProductVariantAggregate, ProductVariantReadModel } from '@ecomerece/domain';
-import { ProductVariantResponseReadModel } from '@ecomerece/shared';
 
 export const productVariantMapper = {
     persistenceToAggregate(doc: ProductVariantPersistence): ProductVariantAggregate {

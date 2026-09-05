@@ -1,12 +1,10 @@
+import { DeleteInfoVO, InventoryAggregate, type InventoryReadModel } from '@ecomerece/domain';
 import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
-import { DeleteInfoVO } from '@ecomerece/domain';
-
+import type { InventoryResponseReadModel } from '@ecomerece/shared';
 import type { InventoryPersistence } from './inventory.model';
-import { InventoryAggregate, InventoryReadModel } from '@ecomerece/domain';
-import { InventoryResponseReadModel } from '@ecomerece/shared';
 
 export const InventoryMapper = {
     persistenceToAggregate(doc: InventoryPersistence): InventoryAggregate {

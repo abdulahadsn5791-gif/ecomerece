@@ -1,14 +1,14 @@
+import type { IIventoryRepository, InventoryAggregate } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
-import type { InventoryAggregate } from '@ecomerece/domain';
-import type { IIventoryRepository } from '@ecomerece/domain';
 import { InventoryMapper } from './inventory.mapper';
 import { InventoryModel, type InventoryPersistence } from './inventory.model';
 
 export class InventoryReposityory
     extends MongoRepository<InventoryPersistence>
-    implements IIventoryRepository {
+    implements IIventoryRepository
+{
     constructor() {
         super(InventoryModel);
     }

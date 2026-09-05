@@ -1,8 +1,6 @@
-import { Hono } from "hono";
-import { createOrderItemsModule } from "../order-items.module";
+import { Hono } from 'hono';
+import { createOrderItemsModule } from '../order-items.module';
 
+export const orderItemsRoutes = new Hono();
 
-export const orderItemsRoutes = new Hono()
-
-
-createOrderItemsModule()
+createOrderItemsModule();

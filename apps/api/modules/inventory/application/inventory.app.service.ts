@@ -1,7 +1,15 @@
-
-
+import { InventoryAggregate } from '@ecomerece/domain';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
+import type {
+    buyMyInventoryStockDtoType,
+    createMyInventoryDtoType,
+    InventoryResponseReadModel,
+    removeMyInventoryStockDtoType,
+    updateMylowStockThresholdDtoType,
+} from '@ecomerece/shared';
+import type { idType } from '../../../../../packages/shared/dtos/id-schema';
+import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
 import { EnsureActiveProductGetByIdQuery } from '../../product/application/queries/ensure-active-product-get-by-id.query';
@@ -9,15 +17,9 @@ import { EnsureActiveVariantGetByIdQuery } from '../../product-variant/applicati
 import { EnsureActiveUserGetByIdQuery } from '../../user/application/queries/ensure-active-user-get-by-id.query';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { EnsureActiveVendorGetByIdQuery } from '../../vendor/application/queries/ensure-active-vendor-get-by-id.query';
-
 import { InventoryMapper } from '../infrastructure/inventory.mapper';
 import type { InventoryReposityory } from '../infrastructure/inventory.repository';
-
 import { InventoryMessages, type inventoryMessagesType } from '../presentation/inventory.messages';
-import { idType } from '../../../../../packages/shared/dtos/id-schema';
-import { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
-import { buyMyInventoryStockDtoType, createMyInventoryDtoType, InventoryResponseReadModel, removeMyInventoryStockDtoType, updateMylowStockThresholdDtoType } from '@ecomerece/shared';
-import { InventoryAggregate } from '@ecomerece/domain';
 
 export class InventoryApplicationService extends BaseService {
     constructor(

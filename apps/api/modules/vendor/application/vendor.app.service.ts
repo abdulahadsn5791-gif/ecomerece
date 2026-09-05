@@ -1,5 +1,5 @@
-
-
+import type { IVendorRepository } from '@ecomerece/domain';
+import { ContactInfoVO, ImageInfoVO, VendorAggregate } from '@ecomerece/domain';
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
 import { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
@@ -16,22 +16,21 @@ import {
 } from '@ecomerece/domain/value-objects/street-address.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
+import type {
+    CreateVendorDto,
+    DeleteMyVendorDto,
+    DeleteVendorDto,
+    RecoverVendorDto,
+    RejectVendorDto,
+    VendorResponseReadModel,
+    VerifyVendorDto,
+} from '@ecomerece/shared';
+import type { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
 import { BaseService } from '../../../core/services/base.services';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
-import type { IVendorRepository } from '@ecomerece/domain';
-import type { VendorResponseReadModel } from '@ecomerece/shared';
-import { ContactInfoVO } from '@ecomerece/domain';
-import { ImageInfoVO } from '@ecomerece/domain';
-import { VendorAggregate } from '@ecomerece/domain';
 import { VendorMapper } from '../infrastructure/vendor.mapper';
-import type { CreateVendorDto } from '@ecomerece/shared';
-import type { DeleteMyVendorDto, DeleteVendorDto } from '@ecomerece/shared';
-import type { RecoverVendorDto } from '@ecomerece/shared';
-import type { RejectVendorDto } from '@ecomerece/shared';
-import type { VerifyVendorDto } from '@ecomerece/shared';
 import { VendorMessages, type VendorMessagesType } from '../presentation/vendor.messages';
 import type { VendorInternalService } from './vendor.internal.service';
-import { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
 
 export class VendorAppService extends BaseService {
     constructor(

@@ -13,8 +13,8 @@ if (!MONGO_URI) {
 
 // Timeouts – fail fast instead of waiting 30 seconds
 const CONNECTION_OPTIONS: mongoose.ConnectOptions = {
-    serverSelectionTimeoutMS: 5000,   // 5s to find a server
-    socketTimeoutMS: 45000,           // 45s for socket inactivity
+    serverSelectionTimeoutMS: 5000, // 5s to find a server
+    socketTimeoutMS: 45000, // 45s for socket inactivity
     // Add other options as needed (e.g., retryWrites, etc.)
 };
 

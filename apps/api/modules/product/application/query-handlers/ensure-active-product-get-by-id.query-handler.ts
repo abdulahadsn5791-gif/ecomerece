@@ -5,7 +5,7 @@ import type { EnsureActiveProductGetByIdQuery } from '../queries/ensure-active-p
 
 export class EnsureActiveProductGetByIdHandler {
     readonly type = 'EnsureActiveProductGetByIdQuery';
-    constructor(private readonly internalService: ProductInternelService) { }
+    constructor(private readonly internalService: ProductInternelService) {}
     async handle(
         query: EnsureActiveProductGetByIdQuery,
     ): Promise<{ product: ProductReadModel | null; active: boolean }> {

@@ -13,6 +13,12 @@ export const AddressMessages = {
             message: `Address ${addressId.value} has been created by ${actorId.value} on ${EffectiveDate.today().value}`,
         };
     },
+    addressUpdated(actorId: Id, addressId: Id, updatedData: AddressResponseReadModel) {
+        return {
+            updatedData,
+            message: `Address ${addressId.value} has been updated by ${actorId.value} on ${EffectiveDate.today().value}`,
+        };
+    },
     addressDeleted(actorId: Id, addressId: Id): addressMessagesType {
         return {
             message: `Address ${addressId.value} has been deleted by ${actorId.value} on ${EffectiveDate.today().value}`,

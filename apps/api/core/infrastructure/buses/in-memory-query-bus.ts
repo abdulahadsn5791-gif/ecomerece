@@ -1,9 +1,4 @@
-import type {
-    IQuery,
-    IQueryBus,
-    IQueryHandler,
-    QueryConstructor,
-} from '@ecomerece/domain';
+import type { IQuery, IQueryBus, IQueryHandler, QueryConstructor } from '@ecomerece/domain';
 
 export class InMemoryQueryBus implements IQueryBus {
     private readonly handlers = new Map<QueryConstructor<IQuery>, IQueryHandler<IQuery, unknown>>();

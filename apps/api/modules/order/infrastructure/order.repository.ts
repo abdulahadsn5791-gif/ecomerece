@@ -1,10 +1,9 @@
+import type { IOrderRepository, OrderAggregate } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
-
 import { OrderMapper } from './order.mapper';
 import { OrderModel, type OrderPersistence } from './order.model';
-import { IOrderRepository, OrderAggregate } from '@ecomerece/domain';
 
 export class OrderRepository extends MongoRepository<OrderPersistence> implements IOrderRepository {
     constructor() {
@@ -20,7 +19,7 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
     async EnsureUniqueImpodentKey(key: Id): Promise<void> {
         const doc = await super.findOne({ idempotentKey: key.value });
         if (doc) {
-            throw new BadRequestError("This order was already created");
+            throw new BadRequestError('This order was already created');
         }
     }
 
@@ -31,7 +30,6 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
     }
 
     async Save(product: OrderAggregate): Promise<void> {
-
         const data = OrderMapper.aggregateToPersistence(product);
 
         const result = await super.updateOne(

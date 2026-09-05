@@ -4,7 +4,7 @@ import type { VendorInternalService } from '../vendor.internal.service';
 
 export class GetVendorByUserIdHandler {
     readonly type = 'GetVendorByUserIdQuery';
-    constructor(private readonly internalService: VendorInternalService) { }
+    constructor(private readonly internalService: VendorInternalService) {}
     async handle(query: GetVendorByUserIdQuery): Promise<VendorReadModel | null> {
         return await this.internalService.getVendorByUserId(query.payload.userId);
     }

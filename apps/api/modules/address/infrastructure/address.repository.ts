@@ -1,8 +1,8 @@
+import type { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
+import type { IAddressRepository } from '@ecomerece/domain/modules/address/ports/i-address-repository';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
-import type { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
-import type { IAddressRepository } from '@ecomerece/domain/modules/address/ports/i-address-repository';
 import { AddressMapper } from './address.mapper';
 import { AddressModel, type AddressPersistence } from './address.models';
 

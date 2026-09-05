@@ -1,8 +1,15 @@
 import { motion } from 'framer-motion';
+import React from 'react';
 
-export const ProfileSkeleton = ({ darkMode }: { darkMode: boolean }) => (
+interface ProfileSkeletonProps {
+    darkMode: boolean;
+}
+
+export const ProfileSkeleton = ({ darkMode }: ProfileSkeletonProps) => (
     <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         className={`border rounded-3xl p-8 shadow-sm ${darkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-100'}`}
     >
         <div className="flex flex-col sm:flex-row items-center gap-8 animate-pulse">

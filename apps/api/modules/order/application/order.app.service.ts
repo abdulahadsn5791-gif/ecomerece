@@ -1,38 +1,32 @@
-
+import { OrderAggregate } from '@ecomerece/domain';
+import type { InventoryReadModel } from '@ecomerece/domain/modules/inventory/read-models/inventory.read-model';
+import type { ProductReadModel } from '@ecomerece/domain/modules/product/read-models/product.read-model';
+import type { ProductVariantReadModel } from '@ecomerece/domain/modules/product-variant/read-models/product-variant.read-model';
+import type { UserReadModel } from '@ecomerece/domain/modules/user/read-models/user.read-model';
+import type { VendorReadModel } from '@ecomerece/domain/modules/vendor/read-models/vendor-read-model';
 import { ExpirationDate } from '@ecomerece/domain/value-objects/expiration-date.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
+import { Money } from '@ecomerece/domain/value-objects/money.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { FullAddressVO } from '@ecomerece/domain/value-objects/street-address.vo';
+import type { createMyOrderDtoType } from '@ecomerece/shared';
+import type { InMemoryCommandBus } from '../../../core/infrastructure/buses/in-memory-command-bus';
+import type { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
+import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
 import { EnsureActiveAddressGetByIdQuery } from '../../address/application/queries/ensure-active-address-get-by-it.query';
+import { ReserveInventoryCommand } from '../../inventory/application/commands/reserve-inventory.command';
+import { CreateItemsCommand } from '../../order-items/application/commands/create-items-inventory.command';
 import { VerifyProductAndGetQuery } from '../../product/application/queries/verify-product-and-get.query';
-import type { ProductReadModel } from '@ecomerece/domain/modules/product/read-models/product.read-model';
 import { VerifyVariantsAndGetQuery } from '../../product-variant/application/queries/verify-variants-and-get.query';
-import type { ProductVariantReadModel } from '@ecomerece/domain/modules/product-variant/read-models/product-variant.read-model';
 import { EnsureActiveUserGetByIdQuery } from '../../user/application/queries/ensure-active-user-get-by-id.query';
 import { VerifyUserAndGetQuery } from '../../user/application/queries/verify-user-and-get.query';
-import type { UserReadModel } from '@ecomerece/domain/modules/user/read-models/user.read-model';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { VerifyVendorAndGetQuery } from '../../vendor/application/queries/verify-vendor-and-get.query';
-import type { VendorReadModel } from '@ecomerece/domain/modules/vendor/read-models/vendor-read-model';
-
 import { OrderMapper } from '../infrastructure/order.mapper';
 import type { OrderRepository } from '../infrastructure/order.repository';
-
 import { OrderMessages } from '../presentation/order.messages';
-
-import { ReserveInventoryCommand } from '../../inventory/application/commands/reserve-inventory.command';
-import { InventoryReadModel } from '@ecomerece/domain/modules/inventory/read-models/inventory.read-model';
-import { Money } from '@ecomerece/domain/value-objects/money.vo';
-import { CreateItemsCommand } from '../../order-items/application/commands/create-items-inventory.command';
-import { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
-import { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
-import { InMemoryCommandBus } from '../../../core/infrastructure/buses/in-memory-command-bus';
-import { createMyOrderDtoType } from '@ecomerece/shared';
-import { OrderAggregate } from '@ecomerece/domain';
-
-
 
 interface InventoryResult {
     validIds: Id[];
@@ -55,24 +49,20 @@ interface VerifyReportResult {
     validOrderItems: Array<{
         variantId: Id;
         quantity: Quantity;
-        price: number;   // price is guaranteed here
+        price: number; // price is guaranteed here
     }>;
     firstReport: any;
 }
-
-
 
 export class OrderApplicationService extends BaseService {
     constructor(
         private readonly orderRepo: OrderRepository,
         private readonly queryBus: InMemoryQueryBus,
         private readonly eventBus: InMemoryEventBus,
-        private readonly commandBus: InMemoryCommandBus
+        private readonly commandBus: InMemoryCommandBus,
     ) {
         super();
-
     }
-
 
     getReport(
         variants: {
@@ -104,7 +94,7 @@ export class OrderApplicationService extends BaseService {
             deletedIds: Id[];
             userReadModel: UserReadModel[];
         },
-        inventories?: InventoryResult
+        inventories?: InventoryResult,
     ) {
         // ----- 1. Build direct error maps -----
         const ownerErrors = new Map<string, string>();
@@ -193,7 +183,7 @@ export class OrderApplicationService extends BaseService {
             const availableSet = new Set(inventories.availableStockIds.map((id) => id.value));
             const buyableSet = new Set(inventories.buyableIds.map((id) => id.value));
             const variantHasInventory = new Set(
-                inventories.inventoriesReadModel.map((inv) => Id.create(inv.variantId).value)
+                inventories.inventoriesReadModel.map((inv) => Id.create(inv.variantId).value),
             );
             for (const variantId of variantHasInventory) {
                 if (inventoryErrors.has(variantId)) continue;
@@ -242,15 +232,13 @@ export class OrderApplicationService extends BaseService {
         userId: Id,
         addressId: Id,
         actorId: Id,
-        items: { variantId: Id; quantity: Quantity }[]
+        items: { variantId: Id; quantity: Quantity }[],
     ) {
         // ----- 1. Validate address and user -----
         const address = await this.queryBus.execute(
-            new EnsureActiveAddressGetByIdQuery({ addressId })
+            new EnsureActiveAddressGetByIdQuery({ addressId }),
         );
-        const user = await this.queryBus.execute(
-            new EnsureActiveUserGetByIdQuery({ userId })
-        );
+        const user = await this.queryBus.execute(new EnsureActiveUserGetByIdQuery({ userId }));
         if (!address.active) throw new BadRequestError('Address is not active');
         if (!address.address) throw new BadRequestError('Address not found');
         if (!user.active) throw new BadRequestError('User is not active');
@@ -261,20 +249,18 @@ export class OrderApplicationService extends BaseService {
         // ----- 2. Fetch variants, products, vendors, owners -----
         const variantIds = items.map((item) => item.variantId);
         const variants = await this.queryBus.execute(
-            new VerifyVariantsAndGetQuery({ ids: variantIds })
+            new VerifyVariantsAndGetQuery({ ids: variantIds }),
         );
         const productIds = variants.variantReadModel.map((v) => v.productId);
         const products = await this.queryBus.execute(
-            new VerifyProductAndGetQuery({ ids: productIds })
+            new VerifyProductAndGetQuery({ ids: productIds }),
         );
         const vendorIds = products.productReadModel.map((p) => Id.create(p.vendorId));
         const vendors = await this.queryBus.execute(
-            new VerifyVendorAndGetQuery({ ids: vendorIds })
+            new VerifyVendorAndGetQuery({ ids: vendorIds }),
         );
         const ownerIds = vendors.vendorReadModel.map((v) => Id.create(v.id));
-        const owners = await this.queryBus.execute(
-            new VerifyUserAndGetQuery({ ids: ownerIds })
-        );
+        const owners = await this.queryBus.execute(new VerifyUserAndGetQuery({ ids: ownerIds }));
 
         // ----- 3. First report (without inventory) -----
         const emptyInventory: InventoryResult = {
@@ -288,11 +274,11 @@ export class OrderApplicationService extends BaseService {
         const firstReport = this.getReport(variants, products, vendors, owners, emptyInventory);
 
         const validOrderItems = items.filter((item) =>
-            firstReport.some((r) => r.valid && r.id.value === item.variantId.value)
+            firstReport.some((r) => r.valid && r.id.value === item.variantId.value),
         );
 
         const inventoryResult = await this.commandBus.execute<InventoryResult>(
-            new ReserveInventoryCommand(validOrderItems, actorId)
+            new ReserveInventoryCommand(validOrderItems, actorId),
         );
 
         const finalReport = this.getReport(variants, products, vendors, owners, inventoryResult);
@@ -304,7 +290,10 @@ export class OrderApplicationService extends BaseService {
         }
 
         // Build status map from finalReport
-        const reportMap = new Map<string, { productId: string | null; valid: boolean; reason: string | null }>();
+        const reportMap = new Map<
+            string,
+            { productId: string | null; valid: boolean; reason: string | null }
+        >();
         for (const entry of finalReport) {
             reportMap.set(entry.id.value, {
                 productId: entry.productId ? entry.productId.value : null,
@@ -331,19 +320,20 @@ export class OrderApplicationService extends BaseService {
                 variantId: item.variantId,
                 productId: productId ? Id.create(productId) : null,
                 quantity: item.quantity,
-                price,          // may be null
+                price, // may be null
                 valid: finalValid,
                 reason,
             };
         });
-
 
         // Build variant → vendorId map
         const variantToVendor = new Map<string, string>();
         for (const v of variants.variantReadModel) {
             const variantId = Id.create(v.id).value;
             const productId = Id.create(v.productId).value;
-            const product = products.productReadModel.find(p => Id.create(p.id).value === productId);
+            const product = products.productReadModel.find(
+                (p) => Id.create(p.id).value === productId,
+            );
             if (product) {
                 const vendorId = Id.create(product.vendorId).value;
                 variantToVendor.set(variantId, vendorId);
@@ -364,7 +354,7 @@ export class OrderApplicationService extends BaseService {
                     variantId: entry.variantId,
                     quantity: entry.quantity,
                     price: entry.price! as number,
-                    vendorId: Id.create(vendorIdValue),  // now an Id object
+                    vendorId: Id.create(vendorIdValue), // now an Id object
                 };
             });
 
@@ -392,7 +382,7 @@ export class OrderApplicationService extends BaseService {
         const result = await this.verifyReport(actorId, addressId, actorId, items);
         const totalPrice = result.validOrderItems.reduce(
             (sum, ele) => sum + ele.quantity.value * ele.price,
-            0
+            0,
         );
         const order = OrderAggregate.create({
             id: orderId,
@@ -401,17 +391,15 @@ export class OrderApplicationService extends BaseService {
             buyerId: actorId,
             address: result.fullAddress,
         });
-        const orderItems = result.validOrderItems.map((element) => (
-            {
-                id: Id.create(),
-                orderId: orderId,
-                vendorId: element.vendorId,
-                variantId: element.variantId,
-                quantity: element.quantity,
-                waitingTime: waitingTime,
-                price: Money.create(element.price)
-            }
-        ))
+        const orderItems = result.validOrderItems.map((element) => ({
+            id: Id.create(),
+            orderId: orderId,
+            vendorId: element.vendorId,
+            variantId: element.variantId,
+            quantity: element.quantity,
+            waitingTime: waitingTime,
+            price: Money.create(element.price),
+        }));
         await this.commandBus.execute(new CreateItemsCommand(orderItems));
         order.createOrder();
         await this.orderRepo.Create(order);
@@ -420,5 +408,3 @@ export class OrderApplicationService extends BaseService {
         return OrderMessages.orderCreated(orderId, actorId, addressId, response);
     }
 }
-
-

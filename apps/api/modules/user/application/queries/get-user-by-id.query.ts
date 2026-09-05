@@ -1,6 +1,6 @@
+import type { UserReadModel } from '@ecomerece/domain';
 import type { IQuery } from '@ecomerece/domain/query/query-bus.interface';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
-import type { UserReadModel } from '@ecomerece/domain';
 
 export class GetUserByIdQuery implements IQuery<UserReadModel | null> {
     readonly __result?: UserReadModel | null;

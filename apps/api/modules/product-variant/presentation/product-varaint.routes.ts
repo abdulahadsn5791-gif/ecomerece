@@ -9,14 +9,14 @@ export const productVariantRoutes = new Hono();
 
 productVariantRoutes.get('/:id', controller.getVarientsByProductId);
 productVariantRoutes.post('/my', authMiddleware, controller.createMyProductVariant);
-productVariantRoutes.patch('/price/my', authMiddleware, controller.updateMyVariantPrice);
-productVariantRoutes.patch('/meta/my', authMiddleware, controller.updateMyVariantMeta);
+productVariantRoutes.patch('/my/price', authMiddleware, controller.updateMyVariantPrice);
+productVariantRoutes.patch('/my/meta', authMiddleware, controller.updateMyVariantMeta);
 productVariantRoutes.patch(
-    '/appereance/toggle/my',
+    '/my/appereance/toggle',
     authMiddleware,
     controller.toggleMyVaraintAppereance,
 );
-productVariantRoutes.delete('/delete/soft/my', authMiddleware, controller.softDeleteMyVariant);
+productVariantRoutes.delete('/my/delete/soft', authMiddleware, controller.softDeleteMyVariant);
 productVariantRoutes.patch(
     '/recover/:id',
     authMiddleware,

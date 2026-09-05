@@ -1,16 +1,17 @@
+import type { ProductVariantReadModel } from '@ecomerece/domain';
 import type { IQuery } from '@ecomerece/domain/query/query-bus.interface';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
-import type { ProductVariantReadModel } from '@ecomerece/domain';
 
 export class VerifyVariantsAndGetQuery
     implements
-    IQuery<{
-        validIds: Id[];
-        notFoundIds: Id[];
-        deletedIds: Id[];
-        nonActiveIds: Id[];
-        variantReadModel: ProductVariantReadModel[];
-    }> {
+        IQuery<{
+            validIds: Id[];
+            notFoundIds: Id[];
+            deletedIds: Id[];
+            nonActiveIds: Id[];
+            variantReadModel: ProductVariantReadModel[];
+        }>
+{
     readonly __result?: {
         validIds: Id[];
         notFoundIds: Id[];

@@ -1,15 +1,14 @@
+import type { IProductVariantRepository, ProductVariantAggregate } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
-
-
 import { productVariantMapper } from './product-variant.mapper';
 import { ProductVariantModel, type ProductVariantPersistence } from './product-variant.model';
-import { IProductVariantRepository, ProductVariantAggregate } from '@ecomerece/domain';
 
 export class ProductVariantRepository
     extends MongoRepository<ProductVariantPersistence>
-    implements IProductVariantRepository {
+    implements IProductVariantRepository
+{
     constructor() {
         super(ProductVariantModel);
     }

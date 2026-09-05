@@ -1,8 +1,8 @@
-import { ICommandHandler } from "@ecomerece/domain/command/i-command-bus";
-import { Id } from "@ecomerece/domain/value-objects/id.vo";
-import { InventoryReadModel } from "@ecomerece/domain";
-import { ReserveInventoryCommand } from "../commands/reserve-inventory.command";
-import { InventoryInternalServcie } from "../inventory.internal.service";
+import type { InventoryReadModel } from '@ecomerece/domain';
+import type { ICommandHandler } from '@ecomerece/domain/command/i-command-bus';
+import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import type { ReserveInventoryCommand } from '../commands/reserve-inventory.command';
+import type { InventoryInternalServcie } from '../inventory.internal.service';
 
 type ReserveInventoryResult = {
     validIds: Id[];
@@ -13,12 +13,11 @@ type ReserveInventoryResult = {
     inventoriesReadModel: InventoryReadModel[];
 };
 export class ReserveInventoryHandler
-    implements ICommandHandler<ReserveInventoryResult, ReserveInventoryCommand> {
-    constructor(private readonly inventorySvc: InventoryInternalServcie) { }
+    implements ICommandHandler<ReserveInventoryResult, ReserveInventoryCommand>
+{
+    constructor(private readonly inventorySvc: InventoryInternalServcie) {}
 
     async handle(cmd: ReserveInventoryCommand): Promise<ReserveInventoryResult> {
         return await this.inventorySvc.reserveInventories(cmd.items, cmd.actorId);
     }
 }
-
-

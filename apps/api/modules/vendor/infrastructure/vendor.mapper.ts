@@ -1,8 +1,16 @@
+import type { VendorReadModel } from '@ecomerece/domain';
+import {
+    ContactInfoVO,
+    DeleteInfoVO,
+    ImageInfoVO,
+    PhoneNumber,
+    VendorAggregate,
+    VerificationInfoVO,
+} from '@ecomerece/domain';
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
 import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
 import { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
-
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Slug } from '@ecomerece/domain/value-objects/slug.vo';
@@ -16,15 +24,7 @@ import {
 } from '@ecomerece/domain/value-objects/street-address.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
-import type { VendorReadModel } from '@ecomerece/domain';
 import type { VendorResponseReadModel } from '@ecomerece/shared';
-
-import { ContactInfoVO, PhoneNumber } from '@ecomerece/domain';
-import { DeleteInfoVO } from '@ecomerece/domain';
-import { ImageInfoVO } from '@ecomerece/domain';
-
-import { VerificationInfoVO } from '@ecomerece/domain';
-import { VendorAggregate } from '@ecomerece/domain';
 import type { VendorPersistenceWithId } from './vendor.models';
 
 export const VendorMapper = {
@@ -111,8 +111,6 @@ export const VendorMapper = {
             },
 
             createdAt: vendor.createdAt.value,
-
-
         };
     },
 

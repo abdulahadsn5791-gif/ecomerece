@@ -1,4 +1,5 @@
 import { User, Mail, BadgeCheck } from 'lucide-react';
+import React from 'react';
 
 interface ProfileHeaderProps {
     user: any;

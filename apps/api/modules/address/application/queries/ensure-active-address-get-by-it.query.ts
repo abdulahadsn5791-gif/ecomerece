@@ -1,6 +1,6 @@
+import type { AddressReadModel } from '@ecomerece/domain/modules/address/read-models/address.read-models';
 import type { IQuery } from '@ecomerece/domain/query/query-bus.interface';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
-import type { AddressReadModel } from '@ecomerece/domain/modules/address/read-models/address.read-models';
 
 export class EnsureActiveAddressGetByIdQuery
     implements IQuery<{ address: AddressReadModel | null; active: boolean }>

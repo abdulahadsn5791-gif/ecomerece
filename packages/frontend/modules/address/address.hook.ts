@@ -4,6 +4,7 @@ import { addressService, type AddressMutationResult } from './address.service';
 import {
 
     createMyAddressDto,
+    updateMyAddressDtoType,
     type AddressResponseReadModel,
     type createMyAddressDtoType,
 } from '@ecomerece/shared';
@@ -69,6 +70,15 @@ export function useSetMyAddressAsDefault() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (id: string) => addressService.setMyAddressAsDefault(id),
+        onSuccess: (data) => applyAddressMutationResult(queryClient, data),
+    });
+}
+
+export function useUpdateMyAddress() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }: { id: string; data: updateMyAddressDtoType }) =>
+            addressService.updateMyAddress(data, id),
         onSuccess: (data) => applyAddressMutationResult(queryClient, data),
     });
 }

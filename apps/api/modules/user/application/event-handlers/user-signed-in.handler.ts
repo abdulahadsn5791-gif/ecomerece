@@ -1,5 +1,5 @@
-import type { IEventHandler } from '@ecomerece/domain/events/event-bus.interface';
 import type { UserSignedInEvent } from '@ecomerece/domain';
+import type { IEventHandler } from '@ecomerece/domain/events/event-bus.interface';
 
 export class UserSignedInHandler implements IEventHandler<UserSignedInEvent['payload']> {
     async handle(event: UserSignedInEvent) {

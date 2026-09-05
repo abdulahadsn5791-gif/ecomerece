@@ -1,4 +1,3 @@
-
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { AddressInternalService } from './application/address.app.internal.service';
 import { AddressApplicationService } from './application/address.app.service';

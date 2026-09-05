@@ -1,9 +1,19 @@
-import { BlockInfoVO, CategoryAggregate, categoryReadModels, DeleteInfoVO, EffectiveDate, Id, Quantity, Reason, Title, UrlVO } from "@ecomerece/domain";
-import { CategoryPersistence } from "./category.models";
-import { categoryResponseReadModels } from "@ecomerece/shared";
+import {
+    BlockInfoVO,
+    CategoryAggregate,
+    type categoryReadModels,
+    DeleteInfoVO,
+    EffectiveDate,
+    Id,
+    Quantity,
+    Reason,
+    Title,
+    UrlVO,
+} from '@ecomerece/domain';
+import type { categoryResponseReadModels } from '@ecomerece/shared';
+import type { CategoryPersistence } from './category.models';
 
 export const CategoryMapper = {
-
     persistenceToAggregate(doc: CategoryPersistence): CategoryAggregate {
         return CategoryAggregate.rehydrate(
             Id.rehydrate(doc._id),
@@ -23,7 +33,8 @@ export const CategoryMapper = {
                 doc.block.reason ? Reason.create(doc.block.reason) : null,
             ),
             Quantity.rehydrate(doc.version),
-            EffectiveDate.rehydrate(doc.createdAt))
+            EffectiveDate.rehydrate(doc.createdAt),
+        );
     },
     aggregateToPersistence(category: CategoryAggregate) {
         return {
@@ -44,8 +55,7 @@ export const CategoryMapper = {
                 reason: category.block.reason?.toString() ?? null,
             },
             createdAt: category.createdAt.value,
-
-        }
+        };
     },
 
     aggregateToReadModel(category: CategoryAggregate): categoryReadModels {
@@ -57,7 +67,7 @@ export const CategoryMapper = {
             isDeleted: category.delete.isDeleted,
             idBlocked: category.block.isBlocked,
             createdAt: category.createdAt.value,
-        }
+        };
     },
     persistenceToReadModel(doc: CategoryPersistence): categoryReadModels {
         return {
@@ -68,7 +78,7 @@ export const CategoryMapper = {
             isDeleted: doc.deleted.deleted,
             idBlocked: doc.block.blocked,
             createdAt: doc.createdAt,
-        }
+        };
     },
     aggregateToResponseReadModel(category: CategoryAggregate): categoryResponseReadModels {
         return {
@@ -76,7 +86,6 @@ export const CategoryMapper = {
             image: category.image.value,
             title: category.title.value,
             createdAt: category.createdAt.value,
-        }
-    }
-
-}
+        };
+    },
+};

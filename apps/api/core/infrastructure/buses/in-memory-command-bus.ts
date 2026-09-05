@@ -2,10 +2,7 @@ import type { ICommand, ICommandBus, ICommandHandler } from '@ecomerece/domain';
 export class InMemoryCommandBus implements ICommandBus {
     private handlers = new Map<string, ICommandHandler<any, any>>();
 
-    register(
-        commandName: string,
-        handler: ICommandHandler<any, any>,
-    ): void {
+    register(commandName: string, handler: ICommandHandler<any, any>): void {
         this.handlers.set(commandName, handler);
     }
 

@@ -1,6 +1,5 @@
 import mongoose, { type HydratedDocument, Schema } from 'mongoose';
 
-
 const deletedSchema = new mongoose.Schema(
     {
         deleted: { type: Boolean, default: false, required: true },
@@ -10,7 +9,6 @@ const deletedSchema = new mongoose.Schema(
     },
     { _id: false },
 );
-
 
 const OrderModelSchema = new Schema(
     {
@@ -40,7 +38,6 @@ const OrderModelSchema = new Schema(
             type: deletedSchema,
             required: true,
         },
-
     },
     {
         timestamps: true,

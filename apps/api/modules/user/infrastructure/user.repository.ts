@@ -1,9 +1,8 @@
+import type { IUserRepository, UserAggregate } from '@ecomerece/domain';
 import type { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { ConcurrencyError, NotFoundError } from '../../../errors/app-error';
-import type { IUserRepository } from '@ecomerece/domain';
-import type { UserAggregate } from '@ecomerece/domain';
 import { UserMapper } from './user.mapper';
 import { UserModel, type UserPersistence } from './user.models';
 

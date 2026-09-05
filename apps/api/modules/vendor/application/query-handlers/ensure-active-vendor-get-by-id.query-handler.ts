@@ -5,7 +5,7 @@ import type { VendorInternalService } from '../vendor.internal.service';
 
 export class EnsureActiveVendorGetByIdHandler {
     readonly type = 'EnsureActiveVendorGetByIdQuery';
-    constructor(private readonly internalService: VendorInternalService) { }
+    constructor(private readonly internalService: VendorInternalService) {}
     async handle(
         query: EnsureActiveVendorGetByIdQuery,
     ): Promise<{ vendor: VendorReadModel | null; active: boolean }> {

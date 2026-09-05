@@ -1,15 +1,18 @@
+import {
+    createMyProductVariantDto,
+    softDeleteMyVariantDto,
+    toggleVariantApperaaracneDto,
+    upadteMyVariantMetaDto,
+    updateMyVariatPriceDto,
+} from '@ecomerece/shared';
 import type { Context } from 'hono';
-
+import { idSchema } from '../../../../../packages/shared/dtos/id-schema';
 import { BaseController } from '../../../core/controller/base.controller';
 import type { productVariantApplicationService } from '../application/product-variant.app.service';
 
-import { idSchema } from '../../../../../packages/shared/dtos/id-schema';
-import { createMyProductVariantDto, softDeleteMyVariantDto, toggleVariantApperaaracneDto, upadteMyVariantMetaDto, updateMyVariatPriceDto } from '@ecomerece/shared';
-
 export class ProductVariantController extends BaseController<productVariantApplicationService> {
     createMyProductVariant = async (c: Context) => {
-        const data = await this.body(c, createMyProductVariantDto
-        );
+        const data = await this.body(c, createMyProductVariantDto);
         const actor = c.get('user');
         return this.ok(c, await this.service.createMyProductVariant(data, actor));
     };

@@ -1,8 +1,23 @@
-
-
-import { BanInfoVO, BlockInfoVO, DeleteInfoVO, EffectiveDate, EmailVO, ExpirationDate, Id, NameInfoVO, PersonName, Quantity, Reason, RoleInfoVO, UrlVO, UserAggregate, UserReadModel, UserRoleVO } from '@ecomerece/domain';
+import {
+    BanInfoVO,
+    BlockInfoVO,
+    DeleteInfoVO,
+    EffectiveDate,
+    EmailVO,
+    ExpirationDate,
+    Id,
+    NameInfoVO,
+    PersonName,
+    Quantity,
+    Reason,
+    RoleInfoVO,
+    UrlVO,
+    UserAggregate,
+    type UserReadModel,
+    UserRoleVO,
+} from '@ecomerece/domain';
+import type { UserResponseReadModel } from '@ecomerece/shared';
 import type { UserPersistence } from './user.models';
-import { UserResponseReadModel } from '@ecomerece/shared';
 
 export const UserMapper = {
     persistenceToAggregate(doc: UserPersistence): UserAggregate {

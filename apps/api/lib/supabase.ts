@@ -5,7 +5,7 @@ import { NotFoundError } from '../errors/app-error';
 export const supabaseAdmin = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SECRET_KEY!, // Never expose this on the client!
-    { auth: { persistSession: false } }
+    { auth: { persistSession: false } },
 );
 
 // Fetch user by their unique ID

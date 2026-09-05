@@ -1,3 +1,10 @@
+import {
+    DisclaimerVO,
+    ImagesVO,
+    IngredientsVO,
+    ProductAggregate,
+    type ProductReadModel,
+} from '@ecomerece/domain';
 import { AltVO } from '@ecomerece/domain/value-objects/alt.vo';
 import { AppearanceVO } from '@ecomerece/domain/value-objects/appearance.vo';
 import { BlockInfoVO } from '@ecomerece/domain/value-objects/block-info.vo';
@@ -11,10 +18,8 @@ import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
-
+import type { ProductResponseReadModel } from '@ecomerece/shared';
 import type { ProductPersistence } from './product.model';
-import { DisclaimerVO, ImagesVO, IngredientsVO, ProductAggregate, ProductReadModel } from '@ecomerece/domain';
-import { ProductResponseReadModel } from '@ecomerece/shared';
 
 export const ProductMapper = {
     persistenceToAggregate(doc: ProductPersistence): ProductAggregate {

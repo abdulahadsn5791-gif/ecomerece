@@ -1,5 +1,11 @@
-import type { FilterQuery, InsertManyOptions, Model, MongooseBulkWriteOptions, QueryOptions, UpdateQuery } from 'mongoose';
-
+import type {
+    FilterQuery,
+    InsertManyOptions,
+    Model,
+    MongooseBulkWriteOptions,
+    QueryOptions,
+    UpdateQuery,
+} from 'mongoose';
 
 import { getCurrentSession } from '../database/transaction-context';
 import { BaseRepository } from './base.repository';
@@ -189,6 +195,6 @@ export class MongoRepository<T> extends BaseRepository<T> {
             session: this.session ?? undefined,
         });
         // Return plain objects (lean)
-        return inserted.map(doc => doc.toObject());
+        return inserted.map((doc) => doc.toObject());
     }
 }

@@ -25,13 +25,6 @@ export class UserService {
         return http.get<UserResponseReadModel>(`/users/${id}`);
     }
 
-    signIn(id: string): Promise<UserMutationResult> {
-        return http.post<UserMutationResult>(`/users/${id}/signup`);
-    }
-
-    login(): Promise<UserMutationResult> {
-        return http.post<UserMutationResult>('/users/login');
-    }
 
     assignRole(data: UserRoleDto): Promise<UserMutationResult> {
         return http.patch<UserMutationResult>('/users/role', data);
@@ -42,7 +35,7 @@ export class UserService {
     }
 
     softDeleteMe(data?: DeleteMeDTO): Promise<UserMutationResult> {
-        return http.delete<UserMutationResult>('/users/soft/me', data);
+        return http.delete<UserMutationResult>('/users/me/soft', data);
     }
 
     recoverUser(userId: string): Promise<UserMutationResult> {

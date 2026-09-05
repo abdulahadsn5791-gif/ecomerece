@@ -1,3 +1,5 @@
+import { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
+import type { AddressReadModel } from '@ecomerece/domain/modules/address/read-models/address.read-models';
 import { DeleteInfoVO } from '@ecomerece/domain/value-objects/delete-info.vo';
 import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
@@ -11,9 +13,7 @@ import {
     StateVO,
     StreetAddressVO,
 } from '@ecomerece/domain/value-objects/street-address.vo';
-import { AddressResponseReadModel } from "@ecomerece/shared"
-import { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
-import type { AddressReadModel } from '@ecomerece/domain/modules/address/read-models/address.read-models';
+import type { AddressResponseReadModel } from '@ecomerece/shared';
 
 import type { AddressPersistence } from './address.models';
 

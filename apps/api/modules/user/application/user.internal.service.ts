@@ -1,7 +1,6 @@
+import type { IUserRepository, UserReadModel } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { BaseService } from '../../../core/services/base.services';
-import type { IUserRepository } from '@ecomerece/domain';
-import type { UserReadModel } from '@ecomerece/domain';
 import { UserMapper } from '../infrastructure/user.mapper';
 
 export class UserInternalService extends BaseService {

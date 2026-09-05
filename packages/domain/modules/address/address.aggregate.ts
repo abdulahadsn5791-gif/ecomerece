@@ -8,7 +8,6 @@ export type createAddressProps = {
     _id: Id;
     _ownerId: Id;
     _streetAddress: StreetAddressVO;
-
     _city: CityVO;
     _state: StateVO;
     _postalCode: PostalCodeVO;
@@ -104,6 +103,7 @@ export class AddressAggregate extends AggregateRoot {
     }
 
     updateAddress(data: AddressVO, actorId: Id) {
+        if (actorId.value !== this.ownerId.value) throw new BadRequestError("You can update your own address only")
         this._address = data;
     }
     deleteAddress(reason: Reason, actorId: Id) {

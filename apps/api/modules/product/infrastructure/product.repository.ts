@@ -1,14 +1,14 @@
+import type { IProductRepository, ProductAggregate } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError, NotFoundError } from '../../../errors/app-error';
-import type { IProductRepository } from '@ecomerece/domain';
-import type { ProductAggregate } from '@ecomerece/domain';
 import { ProductMapper } from './product.mapper';
 import { ProductModel, type ProductPersistence } from './product.model';
 
 export class ProductRepository
     extends MongoRepository<ProductPersistence>
-    implements IProductRepository {
+    implements IProductRepository
+{
     constructor() {
         super(ProductModel);
     }

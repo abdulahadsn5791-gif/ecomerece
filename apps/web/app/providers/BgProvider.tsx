@@ -5,7 +5,7 @@ import React, { ReactNode } from 'react'
 function BgProvider({ children }: { children: ReactNode }) {
     const { darkMode } = useThemeStore();
     return (
-        <div className={`h-fit ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
+        <div className={`h-screen transition-colors duration-300 ${darkMode ? 'bg-neutral-950 border-neutral-900' : 'bg-white border-neutral-100'
             }`}>
             {children}
         </div>

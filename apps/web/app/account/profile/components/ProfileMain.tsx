@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import { useProfileManager, useThemeStore } from '@ecomerece/frontend';
 import { motion } from 'framer-motion';
 import { ProfileSkeleton } from './ProfileSkeleton';
@@ -24,19 +25,29 @@ export default function ProfileMain() {
         formatDate,
     } = useProfileManager();
 
-    if (isLoading) return <main className="lg:col-span-3"><ProfileSkeleton darkMode={darkMode} /></main>;
+    if (isLoading) {
+        return (
+            <main className="lg:col-span-3">
+                <ProfileSkeleton darkMode={darkMode} />
+            </main>
+        );
+    }
 
     if (error || !user) {
-        return <ProfileErrorState darkMode={darkMode} refetch={refetch} isFetching={isFetching} />;
+        return (
+            <main className="lg:col-span-3">
+                <ProfileErrorState darkMode={darkMode} refetch={refetch} isFetching={isFetching} />
+            </main>
+        );
     }
 
     return (
-        <main className="lg:col-span-3 relative">
+        <main className="lg:col-span-3">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className={`border rounded-3xl p-8 shadow-sm transition-colors duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
+                className={`rounded-[28px] p-6 sm:p-8 transition-colors duration-300 ${darkMode ? 'bg-neutral-900' : 'bg-white shadow-sm'
                     }`}
             >
                 <ProfileHeader user={user} darkMode={darkMode} />

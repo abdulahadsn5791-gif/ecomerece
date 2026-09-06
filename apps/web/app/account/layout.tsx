@@ -11,14 +11,14 @@ export default function DashboardLayout({
     return (
         <BgProvider>
             <Navbar />
-            <div className="max-w-7xl h-screen bg-inheri mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                <div className="grid grid-cols-1 bg-inheri lg:grid-cols-4 gap-8">
+            <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div className="grid grid-cols-1 h-fit lg:grid-cols-4 gap-8">
 
                     <div className=""><Aside /></div>
                     {children}
                 </div>
             </div>
-            <Footer />
+            <div> <Footer /></div>
         </BgProvider>
     );
 }

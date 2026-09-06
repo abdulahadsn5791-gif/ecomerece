@@ -8,8 +8,6 @@ import { ProfileHeader } from './components/ProfileHeader';
 import { ProfileStats } from './components/ProfileStats';
 import { DangerZone } from './components/DangerZone';
 
-
-
 export default function ProfileMain() {
     const { darkMode } = useThemeStore();
     const {
@@ -37,7 +35,9 @@ export default function ProfileMain() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className={`border rounded-3xl p-8 shadow-sm transition-colors duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
+                className={`border rounded-[28px] p-6 sm:p-8 shadow-sm transition-colors duration-300 ${darkMode
+                    ? 'bg-neutral-900 border-neutral-800'
+                    : 'bg-white border-neutral-100'
                     }`}
             >
                 <ProfileHeader user={user} darkMode={darkMode} />

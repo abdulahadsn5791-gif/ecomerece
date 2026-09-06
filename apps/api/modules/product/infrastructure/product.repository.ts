@@ -1,4 +1,4 @@
-import type { IProductRepository, ProductAggregate } from '@ecomerece/domain';
+import type { IProductRepository, ProductAggregate, Quantity } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError, NotFoundError } from '../../../errors/app-error';
@@ -7,8 +7,7 @@ import { ProductModel, type ProductPersistence } from './product.model';
 
 export class ProductRepository
     extends MongoRepository<ProductPersistence>
-    implements IProductRepository
-{
+    implements IProductRepository {
     constructor() {
         super(ProductModel);
     }
@@ -64,6 +63,33 @@ export class ProductRepository
 
         return ProductMapper.persistenceToAggregate(doc);
     }
+
+    async FindPaginated(params: {
+        filter?: {};
+        cursor?: Id;
+        limit?: Quantity;
+        direction?: 'next' | 'prev';
+    }): Promise<{
+        data: any;
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
+    }> {
+        const info = {
+            filter: params.filter,
+            cursor: params.cursor?.value,
+            limit: params.limit?.value,
+            direction: params.direction,
+        };
+        const result = await this.paginateByCursor(info);
+        return {
+            data: result,
+            meta: result.meta,
+        };
+    }
+
 
     async FindByVendorIdOrThrow(id: Id): Promise<ProductAggregate> {
         const doc = await super.findOne({

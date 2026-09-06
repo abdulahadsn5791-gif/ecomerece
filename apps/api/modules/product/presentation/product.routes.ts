@@ -7,7 +7,10 @@ export const productRoutes = new Hono();
 
 const { productController } = createProductModule();
 
+
+
 productRoutes.get('/:id', productController.getProductById);
+productRoutes.get('/related/:id', productController.getRelatedProductsByCategoryId)
 productRoutes.post(`/my`, authMiddleware, productController.createMyProudct);
 productRoutes.delete(`/my/soft`, authMiddleware, productController.softDeleteMyProduct);
 productRoutes.patch(`/my/recover`, authMiddleware, productController.recoverMyProduct);

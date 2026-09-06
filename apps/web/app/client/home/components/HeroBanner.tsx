@@ -163,31 +163,10 @@ export default function HeroBanner() {
                                 {slide.subtitle}
                             </p>
 
-                            <div className="flex flex-wrap gap-4 mb-8">
-                                <a
-                                    href="#"
-                                    className={`group inline-flex items-center gap-2.5 px-6 py-3 sm:px-7 sm:py-3.5 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-[var(--accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-text)] focus-visible:ring-offset-2 ${darkMode
-                                            ? "bg-white text-black focus-visible:ring-offset-neutral-950"
-                                            : "bg-neutral-900 text-white focus-visible:ring-offset-white"
-                                        }`}
-                                >
-                                    <ShoppingBag className="w-5 h-5 transition-transform group-hover:scale-110" />
-                                    Shop the collection
-                                </a>
-                                <a
-                                    href="#"
-                                    className={`group inline-flex items-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 rounded-full font-semibold border transition-all duration-300 hover:border-[var(--accent-text)] hover:text-[var(--accent-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-text)] focus-visible:ring-offset-2 ${darkMode
-                                            ? "border-neutral-700 text-white focus-visible:ring-offset-neutral-950"
-                                            : "border-neutral-300 text-neutral-900 focus-visible:ring-offset-white"
-                                        }`}
-                                >
-                                    View deals
-                                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                                </a>
-                            </div>
+
                         </div>
 
-                        {/* Trust strip stays put across slide changes, no reason to re-animate it */}
+
                         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-neutral-500">
                             <span className="pr-0 sm:pr-5 border-r-0 sm:border-r border-neutral-500/25">
                                 10K+ products
@@ -195,7 +174,7 @@ export default function HeroBanner() {
                             <span className="pr-0 sm:pr-5 border-r-0 sm:border-r border-neutral-500/25">
                                 50K+ happy customers
                             </span>
-                            <span>4.8★ average rating</span>
+
                         </div>
                     </div>
                 </div>

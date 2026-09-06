@@ -369,4 +369,14 @@ export class ProductApplicationService extends BaseService {
         await this.productRepo.Save(product);
         return productMessages.ingredientsUpdated(productId, actorId);
     }
+
+
+    async getRelatedProductsByCategoryId(id: string): Promise<ProductResponseReadModel[]> {
+        const categoryId = Id.create(id);
+        const filter = { categoryId: categoryId.value }
+        const limit = Quantity.create(10);
+        const categories = await this.productRepo.FindPaginated({ filter, limit });
+        return categories.data.data;
+
+    }
 }

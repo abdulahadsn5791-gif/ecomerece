@@ -1,3 +1,4 @@
+import React from 'react';
 import { useThemeStore } from '@ecomerece/frontend';
 import type { AddressResponseReadModel } from '@ecomerece/shared';
 import AddressSkeleton from './AddressSkeleton';
@@ -14,7 +15,7 @@ interface AddressListProps {
     openCreateForm: () => void;
     refetch: () => void;
     openEditForm: (address: AddressResponseReadModel) => void;
-    error: Error | null
+    error: Error | null;
 }
 
 export default function AddressList({
@@ -26,14 +27,12 @@ export default function AddressList({
     openEditForm,
     refetch,
     isFetching,
-    error
+    error,
 }: AddressListProps) {
-
-
-    const { darkMode } = useThemeStore();
+    useThemeStore();
 
     if (isLoading) return <AddressSkeleton />;
-    if (error) return <AddressErrorState refetch={refetch} isFetching={isFetching} />
+    if (error) return <AddressErrorState refetch={refetch} isFetching={isFetching} />;
     if (!addresses?.length) return <EmptyAddresses openCreateForm={openCreateForm} />;
 
     return (

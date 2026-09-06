@@ -1,17 +1,16 @@
 "use client";
 
+import React from 'react';
+import { motion } from 'framer-motion';
 import { useAddressManager, useThemeStore } from '@ecomerece/frontend';
-import Aside from '@/components/aside/Aside';
-
-import AddressFormModal from './components/AddressFormModal';
-import DeleteAddressModal from './components/DeleteAddressModal';
 import AddressHeader from './components/AddressHeader';
 import AddressList from './components/AddressList';
-import { motion } from 'framer-motion';
+import AddressFormModal from './components/AddressFormModal';
+import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+
 export default function AddressesPage() {
     const { darkMode } = useThemeStore();
     const {
-
         addresses,
         isLoading,
         formOpen,
@@ -35,16 +34,16 @@ export default function AddressesPage() {
     } = useAddressManager();
 
     return (
-        <main className="lg:col-span-3  ">
+        <main className="lg:col-span-3">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className={`border rounded-3xl p-8 shadow-sm transition-colors duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
+                className={`border rounded-3xl p-6 sm:p-8 shadow-sm transition-colors duration-300 ${darkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-100'
                     }`}
             >
-
                 <AddressHeader openCreateForm={openCreateForm} />
+
                 <AddressList
                     addresses={addresses}
                     isLoading={isLoading}
@@ -57,7 +56,7 @@ export default function AddressesPage() {
                     isFetching={isFetching}
                 />
 
-
+                {/* Edit / Create Form Modal */}
                 {formOpen && (
                     <AddressFormModal
                         editId={editId}
@@ -70,14 +69,17 @@ export default function AddressesPage() {
                     />
                 )}
 
-                {deleteId && (
-                    <DeleteAddressModal
-                        deleteId={deleteId}
-                        setDeleteId={setDeleteId}
-                        handleDelete={handleDelete}
-                        isPending={isDeleting}
-                    />
-                )}
+                {/* Replaced DeleteAddressModal with GenericConfirmModal */}
+                <GenericConfirmModal<{ id: string }>
+                    isOpen={Boolean(deleteId)}
+                    onClose={() => setDeleteId(null)}
+                    variant="danger"
+                    title="Delete Address?"
+                    message="Are you sure you want to remove this address? This action cannot be undone."
+                    confirmText="Delete Address"
+                    isLoading={isDeleting}
+                    onConfirm={() => deleteId && handleDelete(deleteId)}
+                />
             </motion.div>
         </main>
     );

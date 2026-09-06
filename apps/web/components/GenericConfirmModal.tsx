@@ -5,17 +5,14 @@ import { parseModalError, ParsedFieldError, useThemeStore } from '@ecomerece/fro
 
 // ─── Variant Config ───────────────────────────────────────────────────────────
 
-type ModalVariant = 'danger' | 'warning' | 'info' | 'success' | 'confirm';
+export type ModalVariant = 'danger' | 'warning' | 'info' | 'success' | 'confirm';
 
 interface VariantStyle {
     icon: React.ElementType;
-    /** Icon wrapper background + text in light mode */
     lightIconBg: string;
     lightIconText: string;
-    /** Icon wrapper background + text in dark mode */
     darkIconBg: string;
     darkIconText: string;
-    /** Confirm button colours (same for both modes) */
     confirmBtn: string;
 }
 
@@ -62,7 +59,7 @@ const VARIANT_STYLES: Record<ModalVariant, VariantStyle> = {
     },
 };
 
-// ─── Error banner accent per variant ─────────────────────────────────────────
+// ─── Error banner styles ──────────────────────────────────────────────────────
 
 const ERROR_STYLES = {
     light: 'bg-red-50/80 border-red-200/80 text-red-700',
@@ -71,18 +68,18 @@ const ERROR_STYLES = {
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
-interface GenericConfirmModalProps<T> {
+export interface GenericConfirmModalProps<T> {
     isOpen: boolean;
     onClose: () => void;
     title: string;
     message: React.ReactNode;
-    /** Controls icon and confirm-button colour. Defaults to "danger". */
+    /** Controls icon and confirm button color. Defaults to "danger". */
     variant?: ModalVariant;
     confirmText?: string;
     cancelText?: string;
     isLoading?: boolean;
     error?: string | unknown | null;
-    defaultPayload: Partial<T>;
+    defaultPayload?: Partial<T>;
     onConfirm: (payload: T) => void;
 
     renderFields?: (
@@ -93,7 +90,7 @@ interface GenericConfirmModalProps<T> {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function GenericConfirmModal<T>({
+export function GenericConfirmModal<T = Record<string, unknown>>({
     isOpen,
     onClose,
     title,
@@ -103,19 +100,43 @@ export function GenericConfirmModal<T>({
     cancelText = 'Cancel',
     isLoading = false,
     error,
-    defaultPayload,
+    defaultPayload = {},
     onConfirm,
-
     renderFields,
 }: GenericConfirmModalProps<T>) {
     const [localPayload, setLocalPayload] = useState<Partial<T>>(defaultPayload);
     const prevIsOpenRef = useRef(false);
     const { darkMode } = useThemeStore();
+
+    // Reset local payload state when opening
     useEffect(() => {
         if (isOpen && !prevIsOpenRef.current) {
             setLocalPayload(defaultPayload);
         }
         prevIsOpenRef.current = isOpen;
+    }, [isOpen, defaultPayload]);
+
+    // Keyboard support: Escape key closes modal
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen && !isLoading) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, isLoading, onClose]);
+
+    // Prevent background scrolling while modal is active
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
     }, [isOpen]);
 
     const handleUpdate = (updates: Partial<T>) => {
@@ -127,7 +148,6 @@ export function GenericConfirmModal<T>({
     };
 
     const parsedErrors: ParsedFieldError[] = parseModalError(error);
-
     const vs = VARIANT_STYLES[variant];
     const Icon = vs.icon;
 
@@ -138,10 +158,16 @@ export function GenericConfirmModal<T>({
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="modal-title"
+                    aria-describedby="modal-description"
+                >
                     {/* Backdrop */}
                     <motion.div
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -152,8 +178,8 @@ export function GenericConfirmModal<T>({
                     {/* Modal Card */}
                     <motion.div
                         className={`relative z-10 w-full max-w-md p-6 rounded-3xl shadow-2xl border transition-colors ${darkMode
-                            ? 'bg-gray-900 border-gray-800 text-white'
-                            : 'bg-white border-gray-100 text-gray-900'
+                                ? 'bg-neutral-900 border-neutral-800 text-white'
+                                : 'bg-white border-neutral-100 text-neutral-900'
                             }`}
                         initial={{ opacity: 0, scale: 0.95, y: 15 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -167,11 +193,13 @@ export function GenericConfirmModal<T>({
                                 <Icon className="w-6 h-6" />
                             </div>
                             <button
+                                type="button"
                                 onClick={onClose}
                                 disabled={isLoading}
+                                aria-label="Close modal"
                                 className={`p-2 rounded-full transition-colors disabled:opacity-50 ${darkMode
-                                    ? 'hover:bg-gray-800 text-gray-400'
-                                    : 'hover:bg-gray-100 text-gray-500'
+                                        ? 'hover:bg-neutral-800 text-neutral-400 hover:text-white'
+                                        : 'hover:bg-neutral-100 text-neutral-500 hover:text-black'
                                     }`}
                             >
                                 <X className="w-5 h-5" />
@@ -179,8 +207,13 @@ export function GenericConfirmModal<T>({
                         </div>
 
                         {/* Title & Message */}
-                        <h3 className="text-xl font-bold mb-2">{title}</h3>
-                        <div className={`text-sm leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <h3 id="modal-title" className="text-xl font-bold mb-2">
+                            {title}
+                        </h3>
+                        <div
+                            id="modal-description"
+                            className={`text-sm leading-relaxed ${darkMode ? 'text-neutral-400' : 'text-neutral-600'}`}
+                        >
                             {message}
                         </div>
 
@@ -207,10 +240,12 @@ export function GenericConfirmModal<T>({
                                             <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-500" />
                                             <div className="flex flex-wrap items-center gap-1.5 leading-normal">
                                                 {err.field && (
-                                                    <span className={`font-mono text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${darkMode
-                                                        ? 'bg-red-900/60 border-red-700 text-red-200'
-                                                        : 'bg-red-100 border-red-300 text-red-800'
-                                                        }`}>
+                                                    <span
+                                                        className={`font-mono text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${darkMode
+                                                                ? 'bg-red-900/60 border-red-700 text-red-200'
+                                                                : 'bg-red-100 border-red-300 text-red-800'
+                                                            }`}
+                                                    >
                                                         {err.field}
                                                     </span>
                                                 )}
@@ -225,16 +260,18 @@ export function GenericConfirmModal<T>({
                         {/* Action Buttons */}
                         <div className="flex gap-3 mt-6">
                             <button
+                                type="button"
                                 onClick={onClose}
                                 disabled={isLoading}
                                 className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 ${darkMode
-                                    ? 'bg-gray-800 hover:bg-gray-700 text-gray-200'
-                                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                                        ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-200'
+                                        : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
                                     }`}
                             >
                                 {cancelText}
                             </button>
                             <button
+                                type="button"
                                 onClick={handleConfirm}
                                 disabled={isLoading}
                                 className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-white transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${vs.confirmBtn}`}

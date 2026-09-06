@@ -123,4 +123,9 @@ export class ProductController extends BaseController<ProductApplicationService>
         const actor = c.get('user');
         return this.ok(c, await this.service.removeMyProductIngredients(data, actor));
     };
+    getRelatedProductsByCategoryId = async (c: Context) => {
+        const id = this.param(c, 'id', idSchema);
+        return this.ok(c, await this.service.getRelatedProductsByCategoryId(id));
+
+    }
 }

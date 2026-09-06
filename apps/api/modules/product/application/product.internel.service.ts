@@ -1,4 +1,4 @@
-import type { ProductReadModel } from '@ecomerece/domain';
+import type { Money, ProductReadModel } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { BaseService } from '../../../core/services/base.services';
 import { ProductMapper } from '../infrastructure/product.mapper';
@@ -45,5 +45,25 @@ export class ProductInternelService extends BaseService {
             blockedIds,
             productReadModel,
         };
+    }
+
+    async updatePrice(
+        productId: Id,
+        price: {
+            minPrice: Money,
+            maxPrice: Money,
+            minDiscountedPrice: Money,
+            maxDiscountedPrice: Money,
+        }, actorId: Id): Promise<{ ok: boolean }> {
+        console.log('1')
+        const product = await this.productRepo.FindById(productId);
+        console.log('2')
+        if (!product) return { ok: false };
+        product.updatePricingSummary(price.minPrice, price.maxPrice, price.minDiscountedPrice, price.maxDiscountedPrice, actorId)
+        console.log('3')
+        await this.productRepo.Save(product).catch(() => { return { ok: false } });
+
+        return { ok: true }
+
     }
 }

@@ -20,6 +20,9 @@ export class Money extends NumberVO {
     times(quantity: number): Money {
         return new Money(this.value * quantity);
     }
+    static zero(): Money {
+        return new Money(0);
+    }
 
     get isZero(): boolean {
         return this.value === 0;

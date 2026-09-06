@@ -1,3 +1,4 @@
+import { commandBus } from '../../core/infrastructure/buses/in-memory-command-bus';
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { productVariantInternalService } from './application/product-varaint.internal.service';
 import { productVariantApplicationService } from './application/product-variant.app.service';
@@ -11,7 +12,7 @@ import { ProductVariantController } from './presentation/product-variant.control
 export function createProductVaraintModule() {
     const repo = new ProductVariantRepository();
     const internalService = new productVariantInternalService(repo, queryBus);
-    const applicationService = new productVariantApplicationService(repo, queryBus);
+    const applicationService = new productVariantApplicationService(repo, queryBus, commandBus);
     queryBus.register(
         EnsureActiveVariantGetByIdQuery,
         new EnsureActiveVariantGetByIdHandler(internalService),

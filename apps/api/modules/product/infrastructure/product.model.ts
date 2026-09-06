@@ -1,5 +1,27 @@
 import mongoose, { type HydratedDocument, type InferSchemaType, Schema } from 'mongoose';
 
+
+const productPriceSchema = new Schema({
+    minPrice: {
+        type: Number,
+        required: true
+    },
+    maxPrice: {
+        type: Number,
+        required: true
+    },
+    minDiscountedPrice: {
+        type: Number,
+        required: true
+    },
+    maxDiscountedPrice: {
+        type: Number,
+        required: true
+    },
+})
+
+
+
 const ProductImageSchema = new Schema(
     {
         url: {
@@ -163,7 +185,10 @@ const ProductModelSchema = new Schema(
             required: true,
             type: DisclaimerInfoSchema,
         },
-
+        price: {
+            type: productPriceSchema
+        }
+        ,
         image: {
             type: ImageInfoSchema,
             required: true,

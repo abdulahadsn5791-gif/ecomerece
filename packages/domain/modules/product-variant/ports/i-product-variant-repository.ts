@@ -10,4 +10,5 @@ export interface IProductVariantRepository {
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;
     Create(user: ProductVariantAggregate): Promise<void>;
+    FindActiveByProductId(id: Id): Promise<ProductVariantAggregate[] | null>;
 }

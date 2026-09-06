@@ -26,11 +26,14 @@ import {
     type ProductVaraintMessagesType,
     productVaraintMessages,
 } from '../presentation/product-variant.messages';
+import { InMemoryCommandBus } from '../../../core/infrastructure/buses/in-memory-command-bus';
+import { UpdatePriceCommand } from '../../product/application/commands/update-price.command';
 
 export class productVariantApplicationService extends BaseService {
     constructor(
         private readonly vairiantRepo: ProductVariantRepository,
         private readonly queryBus: InMemoryQueryBus,
+        private readonly commandBus: InMemoryCommandBus
     ) {
         super();
     }
@@ -64,6 +67,7 @@ export class productVariantApplicationService extends BaseService {
         const actorId = Id.create(actor._id);
         const productId = Id.create(data.productId);
         const discountedPrice = Money.create(data.discountedPrice);
+
         const price = Money.create(data.price);
         const title = Title.create(data.title);
         await this.canActorEditProductVaraintOrThrow(productId, actorId);
@@ -76,6 +80,7 @@ export class productVariantApplicationService extends BaseService {
             active: data.active,
         });
         await this.vairiantRepo.Create(varaint);
+        await this.syncPricingSummary(productId.value, actor);
         return productVaraintMessages.varaintCreated(varaintId, productId, actorId);
     }
 
@@ -107,6 +112,7 @@ export class productVariantApplicationService extends BaseService {
         await this.canActorEditProductVaraintOrThrow(productId, actorId);
         variant.updatePrice(price, discountedPrice, actorId);
         await this.vairiantRepo.Save(variant);
+        await this.syncPricingSummary(variant.productId.value, actor);
         return productVaraintMessages.priceUpdated(price, discountedPrice, actorId, variantId);
     }
 
@@ -137,10 +143,12 @@ export class productVariantApplicationService extends BaseService {
         if (data.appearance) {
             variant.activate(actorId);
             this.vairiantRepo.Save(variant);
+            await this.syncPricingSummary(variant.productId.value, actor);
             return productVaraintMessages.variantActivated(variantId, actorId);
         } else {
             variant.deActivate(actorId);
             this.vairiantRepo.Save(variant);
+            await this.syncPricingSummary(variant.productId.value, actor);
             return productVaraintMessages.variantDisabled(variantId, actorId);
         }
     }
@@ -157,6 +165,7 @@ export class productVariantApplicationService extends BaseService {
         await this.canActorEditProductVaraintOrThrow(productId, actorId);
         variant.deleteProduct(actorId, reason);
         await this.vairiantRepo.Save(variant);
+        await this.syncPricingSummary(variant.productId.value, actor);
         return productVaraintMessages.variantDeleted(variantId, actorId);
     }
 
@@ -166,6 +175,39 @@ export class productVariantApplicationService extends BaseService {
         const variant = await this.vairiantRepo.FindByIdOrThrow(variantId);
         variant.recoverProduct(actorId);
         await this.vairiantRepo.Save(variant);
+        await this.syncPricingSummary(variant.productId.value, actor);
         return productVaraintMessages.variantRecovered(variantId, actorId);
     }
+
+    async syncPricingSummary(id: string, actor: UserPersistence) {
+        const productId = Id.create(id);
+        const actorId = Id.create(actor._id);
+        let price;
+        const activeVariants = await this.vairiantRepo.FindActiveByProductId(productId);
+
+        if (!activeVariants || activeVariants.length === 0) {
+            price = {
+                minPrice: Money.zero(),
+                maxPrice: Money.zero(),
+                minDiscountedPrice: Money.zero(),
+                maxDiscountedPrice: Money.zero(),
+            };
+
+        } else {
+
+            const prices = activeVariants.map((v) => v.price.value);
+            const discountedPrices = activeVariants.map((v) => v.discountedPrice.value);
+            price = {
+                minPrice: Money.create(Math.min(...prices)),
+                maxPrice: Money.create(Math.max(...prices)),
+                minDiscountedPrice: Money.create(Math.min(...discountedPrices)),
+                maxDiscountedPrice: Money.create(Math.max(...discountedPrices)),
+
+            };
+        }
+
+        await this.commandBus.execute(new UpdatePriceCommand(productId, price, actorId));
+
+    }
+
 }

@@ -338,15 +338,13 @@ export class OrderApplicationService extends BaseService {
                 const vendorId = Id.create(product.vendorId).value;
                 variantToVendor.set(variantId, vendorId);
             }
-            // if product not found, we don't set; those variants won't be valid anyway
         }
 
-        // Then map trulyValidOrderItems
         const trulyValidOrderItems = enrichedReport
             .filter((entry) => entry.valid)
             .map((entry) => {
                 const vendorIdValue = variantToVendor.get(entry.variantId.value);
-                // Since entry is valid, this should never be undefined, but we guard:
+
                 if (!vendorIdValue) {
                     throw new Error(`Vendor not found for variant ${entry.variantId.value}`);
                 }

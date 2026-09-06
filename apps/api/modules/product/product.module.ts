@@ -1,4 +1,7 @@
+import { commandBus } from '../../core/infrastructure/buses/in-memory-command-bus';
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
+import { UpdatePriceHandler } from './application/command-handlers/update-price.command-handler';
+import { UpdatePriceCommand } from './application/commands/update-price.command';
 import { ProductApplicationService } from './application/product.app.service';
 import { ProductInternelService } from './application/product.internel.service';
 import { EnsureActiveProductGetByIdQuery } from './application/queries/ensure-active-product-get-by-id.query';
@@ -21,7 +24,7 @@ export function createProductModule() {
         VerifyProductAndGetQuery,
         new VerifyProductAndGetHandler(productInternalService),
     );
-
+    commandBus.register(UpdatePriceCommand.name, new UpdatePriceHandler(productInternalService))
     const productController = new ProductController(productApplicationService);
 
     return { productController, productInternalService };

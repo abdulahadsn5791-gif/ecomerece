@@ -24,6 +24,7 @@ const PRODUCT_ACCENT_TEXT = "#2F5F8C";
 interface ProductPageProps {
     product: ProductResponseReadModel;
     variants: ProductVariantResponseReadModel[];
+    relatedProducts: ProductResponseReadModel[]
 }
 
 const reviewsData = [
@@ -41,13 +42,7 @@ const reviewsData = [
     },
 ];
 
-const relatedProducts = [
-    { id: 1, vendor: "SoundMax", name: "Portable Bluetooth Speaker - Deep Bass", price: "$59.99", image: "https://picsum.photos/seed/related1/400/400" },
-    { id: 2, vendor: "TechNova", name: "Wireless Earbuds Pro", price: "$89.99", image: "https://picsum.photos/seed/related2/400/400" },
-    { id: 3, vendor: "AudioTech", name: "Over-Ear Studio Headphones", price: "$199.99", image: "https://picsum.photos/seed/related3/400/400" },
-    { id: 4, vendor: "FitLife", name: "Sports Wireless Earphones", price: "$49.99", image: "https://picsum.photos/seed/related4/400/400" },
-    { id: 5, vendor: "BassBoost", name: "Noise-Cancelling Earbuds", price: "$129.99", image: "https://picsum.photos/seed/related5/400/400" },
-];
+
 
 function StarRating({ rating, size = "w-4 h-4" }: { rating: number; size?: string }) {
     return (
@@ -62,7 +57,7 @@ function StarRating({ rating, size = "w-4 h-4" }: { rating: number; size?: strin
     );
 }
 
-export default function ProductContentPage({ product, variants }: ProductPageProps) {
+export default function ProductContentPage({ product, variants, relatedProducts }: ProductPageProps) {
     const { darkMode } = useThemeStore();
     const activeVariants = variants.filter((v) => v.active);
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantResponseReadModel>(activeVariants[0] || variants[0]);

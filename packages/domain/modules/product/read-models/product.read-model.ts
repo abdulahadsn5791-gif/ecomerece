@@ -3,6 +3,10 @@ export interface ProductReadModel {
     version: number;
     title: string;
     categoryId: string,
+    minPrice: number,
+    maxPrice: number,
+    minDiscountedPrice: number,
+    maxDiscountedPrice: number,
     appearance: 'public' | 'private';
     block: {
         blocked: boolean;

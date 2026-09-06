@@ -1,9 +1,22 @@
-
-
 import { BadRequestError } from '../../../../apps/api/errors/app-error';
 import { desclaimerItem } from '../../../shared';
 import { AggregateRoot } from '../../aggregate-root';
-import { AppearanceVO, BlockInfoVO, DeleteInfoVO, Description, EffectiveDate, Id, ImageVO, Name, Quantity, Reason, Title, UrlVO } from '../../value-objects';
+import {
+    AppearanceVO,
+    BlockInfoVO,
+    DeleteInfoVO,
+    Description,
+    EffectiveDate,
+    Id,
+    ImageVO,
+    Money,
+    Name,
+    Quantity,
+    Reason,
+    Title,
+    UrlVO,
+
+} from '../../value-objects';
 import type { DisclaimerVO } from './value-objects/disclaimer.vo';
 import type { IngredientsVO } from './value-objects/ingredients.vo';
 import type { ImagesVO } from './value-objects/product-images.vo';
@@ -11,7 +24,7 @@ import type { ImagesVO } from './value-objects/product-images.vo';
 type CreateVendorProps = {
     id: Id;
     vendorId: Id;
-    categoryId: Id,
+    categoryId: Id;
     images: ImagesVO;
     title: Title;
     description: Description;
@@ -34,6 +47,10 @@ export class ProductAggregate extends AggregateRoot {
         private _appearance: AppearanceVO,
         private readonly _version: Quantity,
         private readonly _createdAt: EffectiveDate,
+        private _minPrice: Money,
+        private _maxPrice: Money,
+        private _minDiscountedPrice: Money,
+        private _maxDiscountedPrice: Money,
     ) {
         super();
     }
@@ -86,6 +103,21 @@ export class ProductAggregate extends AggregateRoot {
         return this._createdAt;
     }
 
+
+    get minPrice(): Money {
+        return this._minPrice;
+    }
+    get maxPrice(): Money {
+        return this._maxPrice;
+    }
+    get minDiscountedPrice(): Money {
+        return this._minDiscountedPrice;
+    }
+    get maxDiscountedPrice(): Money {
+        return this._maxDiscountedPrice;
+    }
+
+
     static create(data: CreateVendorProps): ProductAggregate {
         return new ProductAggregate(
             data.id,
@@ -101,6 +133,11 @@ export class ProductAggregate extends AggregateRoot {
             AppearanceVO.create('public'),
             Quantity.none(),
             EffectiveDate.today(),
+            Money.zero(),
+            Money.zero(),
+            Money.zero(),
+            Money.zero(),
+
         );
     }
 
@@ -118,6 +155,10 @@ export class ProductAggregate extends AggregateRoot {
         _appearance: AppearanceVO,
         _version: Quantity,
         _createdAt: EffectiveDate,
+        _minPrice: Money,
+        _maxPrice: Money,
+        _minDiscountedPrice: Money,
+        _maxDiscountedPrice: Money,
     ): ProductAggregate {
         return new ProductAggregate(
             _id,
@@ -133,7 +174,29 @@ export class ProductAggregate extends AggregateRoot {
             _appearance,
             _version,
             _createdAt,
+            _minPrice,
+            _maxPrice,
+            _minDiscountedPrice,
+            _maxDiscountedPrice,
         );
+    }
+
+
+    updatePricingSummary(
+        minPrice: Money,
+        maxPrice: Money,
+        minDiscountedPrice: Money,
+        maxDiscountedPrice: Money,
+
+        actorId: Id
+    ): void {
+        this._minPrice = minPrice;
+        this._maxPrice = maxPrice;
+        this._minDiscountedPrice = minDiscountedPrice;
+        this._maxDiscountedPrice = maxDiscountedPrice;
+
+
+
     }
 
     recoverProduct(): void {

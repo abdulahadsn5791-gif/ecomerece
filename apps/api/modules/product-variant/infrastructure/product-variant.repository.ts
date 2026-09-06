@@ -7,8 +7,7 @@ import { ProductVariantModel, type ProductVariantPersistence } from './product-v
 
 export class ProductVariantRepository
     extends MongoRepository<ProductVariantPersistence>
-    implements IProductVariantRepository
-{
+    implements IProductVariantRepository {
     constructor() {
         super(ProductVariantModel);
     }
@@ -27,6 +26,12 @@ export class ProductVariantRepository
 
         const docs = await super.find(filter);
         return docs.map((value) => productVariantMapper.persistenceToAggregate(value));
+    }
+
+    async FindActiveByProductId(id: Id): Promise<ProductVariantAggregate[] | null> {
+        const doc = await super.find({ productId: id.value, active: true, 'deleted.deleted': false })
+        if (!doc) return null
+        return doc.map((doc) => (productVariantMapper.persistenceToAggregate(doc)))
     }
 
     async FindByIdOrThrow(id: Id): Promise<ProductVariantAggregate> {

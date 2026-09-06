@@ -17,6 +17,11 @@ export default async function ProductPage({
     const variantsObj = await variantRes.json();
     if (!variantsObj?.success) throw new Error('Variants not found');
     const variants = variantsObj.data as ProductVariantResponseReadModel[]
+    const relatedRes = await fetch(`${BASE_URL}/product-variant/${id}`)
+    const relatedObj = await relatedRes.json();
+    const relatedProducts = relatedObj.data as ProductResponseReadModel[]
 
-    return <ProductContentPage product={product} variants={variants} />
+    //   { id: 1, vendor: "SoundMax", name: "Portable Bluetooth Speaker - Deep Bass", price: "$59.99", image: "https://picsum.photos/seed/related1/400/400" },
+
+    return <ProductContentPage product={product} variants={variants} relatedProducts={relatedProducts} />
 }

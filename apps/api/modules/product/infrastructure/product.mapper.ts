@@ -2,6 +2,7 @@ import {
     DisclaimerVO,
     ImagesVO,
     IngredientsVO,
+    Money,
     ProductAggregate,
     type ProductReadModel,
 } from '@ecomerece/domain';
@@ -40,7 +41,6 @@ export const ProductMapper = {
                     title: Title.rehydrate(value.title),
                 })),
             ),
-
             ImagesVO.rehydrate(
                 doc.image.images.map((image) =>
                     ImageVO.rehydrate(
@@ -65,6 +65,11 @@ export const ProductMapper = {
             AppearanceVO.create(doc.appearance),
             Quantity.rehydrate(doc.version),
             EffectiveDate.create(doc.createdAt),
+            Money.create(doc.price?.minPrice ?? 0),
+            Money.create(doc.price?.maxPrice ?? 0),
+            Money.create(doc.price?.minDiscountedPrice ?? 0),
+            Money.create(doc.price?.maxDiscountedPrice ?? 0),
+
         );
     },
 
@@ -88,6 +93,12 @@ export const ProductMapper = {
             },
             image: {
                 images: product.images.value.map((value) => value.toObject()),
+            },
+            price: {
+                minPrice: product.minPrice.value,
+                maxPrice: product.maxPrice.value,
+                minDiscountedPrice: product.minDiscountedPrice.value,
+                maxDiscountedPrice: product.maxDiscountedPrice.value,
             },
             deleted: {
                 deleted: product.delete.deleted,
@@ -131,6 +142,12 @@ export const ProductMapper = {
             image: {
                 images: product.images.value.map((val) => val.toObject()),
             },
+
+            minPrice: product.minPrice.value,
+            maxPrice: product.maxPrice.value,
+            minDiscountedPrice: product.minDiscountedPrice.value,
+            maxDiscountedPrice: product.maxDiscountedPrice.value,
+
             block: {
                 blocked: product.block.isBlocked,
                 blockedFrom: product.block.from?.value ?? null,
@@ -174,6 +191,11 @@ export const ProductMapper = {
                     default: img.default,
                 })),
             },
+            minPrice: doc.price?.minPrice ?? 0,
+            maxPrice: doc.price?.maxPrice ?? 0,
+            minDiscountedPrice: doc.price?.minDiscountedPrice ?? 0,
+            maxDiscountedPrice: doc.price?.maxDiscountedPrice ?? 0,
+
             block: {
                 blocked: doc.block.blocked,
                 blockedFrom: doc.block.blockedFrom ?? null,
@@ -213,6 +235,13 @@ export const ProductMapper = {
             image: {
                 images: product.images.value.map((val) => val.toObject()),
             },
+
+            minPrice: product.minPrice.value,
+            maxPrice: product.maxPrice.value,
+            minDiscountedPrice: product.minDiscountedPrice.value,
+            maxDiscountedPrice: product.maxDiscountedPrice.value,
+
+
             createdAt: product.createdAt.value,
         };
     },

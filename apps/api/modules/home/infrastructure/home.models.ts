@@ -43,8 +43,8 @@ const homeSlideSchema = new Schema(
 const homePromoSchema = new Schema(
     {
         id: { type: String, required: true },
-        title: { type: String, required: true },
-        subtitle: { type: String, required: true },
+        title: { type: String, required: true, unique: true },
+        subtitle: { type: String, required: true, unique: true },
         image: { type: String, required: true },
         accent: { type: String, required: true },
         link: { type: String, default: "https://example.com/client/home" },

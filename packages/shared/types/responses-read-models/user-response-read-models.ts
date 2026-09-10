@@ -1,4 +1,4 @@
-import type { UserRolesType } from '../../../domain/modules/user/value-objects/role-info.vo';
+export type UserRolesType = 'admin' | 'vendor' | 'customer';
 
 export interface UserResponseReadModel {
     id: string;

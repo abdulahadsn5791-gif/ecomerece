@@ -11,6 +11,6 @@ export class ReveiwController extends BaseController<ReviewApplicationService> {
         const data = await this.body(c, createMyReviewDtoSchema);
         const actor = c.get('user');
         return this.ok(c, await this.service.createReview(data, actor));
-    },
-    query = async (c: Context) => { }
+    };
+    query = async (c: Context) => { };
 }

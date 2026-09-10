@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
-export const idSchema = z.uuid();
+export const idSchema = z.uuid({ message: 'Must be a valid UUID' });
 export const optionalIdSchema = idSchema.optional();
-
 
 export type idType = z.infer<typeof idSchema>;
 export type optionalIdType = z.infer<typeof optionalIdSchema>;

@@ -26,3 +26,6 @@ export * from './street-address.vo';
 export * from './string-vo';
 export * from './title.vo';
 export * from './url.vo';
+export * from './color.vo';
+export * from './icon.vo';
+export * from './query.vo';

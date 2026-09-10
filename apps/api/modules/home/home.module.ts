@@ -8,5 +8,5 @@ export const createHomeModule = () => {
     const homeAppSvc = new HomeAppService(homeRepo);
     const homeController = new HomeController(homeAppSvc);
 
-    return { homeAppSvc, , homeController };
+    return { homeAppSvc, homeController };
 };

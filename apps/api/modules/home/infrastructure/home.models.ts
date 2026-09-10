@@ -7,6 +7,7 @@ import mongoose, { type HydratedDocument, type InferSchemaType, Schema } from 'm
 // --- Home Sub-Schemas ---
 const homeCategorySchema = new Schema(
     {
+        id: { type: String, required: true },
         name: { type: String, required: true },
         icon: { type: String, required: true },
         image: { type: String, required: true },
@@ -17,6 +18,7 @@ const homeCategorySchema = new Schema(
 
 const homeFeatureSchema = new Schema(
     {
+        id: { type: String, required: true },
         title: { type: String, required: true },
         detail: { type: String, required: true },
         icon: { type: String, required: true },
@@ -27,6 +29,7 @@ const homeFeatureSchema = new Schema(
 
 const homeSlideSchema = new Schema(
     {
+        id: { type: String, required: true },
         tag: { type: String, required: true },
         title: { type: String, required: true },
         subhead: { type: String, default: "" },
@@ -34,19 +37,23 @@ const homeSlideSchema = new Schema(
         cta: { type: String, required: true },
         image: { type: String, required: true },
         accent: { type: String, required: true },
+        displayOrder: { type: Number, default: 0 },
     },
     { _id: false },
 );
 
 const homePromoSchema = new Schema(
     {
+        id: { type: String, required: true },
         title: { type: String, required: true },
         subtitle: { type: String, required: true },
         image: { type: String, required: true },
         accent: { type: String, required: true },
+        link: { type: String, default: "https://example.com/client/home" },
     },
     { _id: false },
 );
+
 
 const baseQuerySchema = new Schema(
     {

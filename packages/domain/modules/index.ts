@@ -6,4 +6,5 @@ export * from './product';
 export * from './product-variant';
 export * from './user';
 export * from './vendor';
-export * from './category'
+export * from './category';
+export * from './home';

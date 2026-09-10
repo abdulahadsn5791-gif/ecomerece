@@ -1,31 +1,36 @@
 import { z } from 'zod';
 
 export const CreateVendorDtoSchema = z.object({
-    title: z.string().trim().min(3).max(100),
-    description: z.string().trim().min(10).max(1000),
-
+    title: z
+        .string()
+        .trim()
+        .min(3, 'Title must be at least 3 characters')
+        .max(100, 'Title must not exceed 100 characters'),
+    description: z
+        .string()
+        .trim()
+        .min(10, 'Description must be at least 10 characters')
+        .max(1000, 'Description must not exceed 1000 characters'),
     slug: z
         .string()
         .trim()
-        .min(3)
-        .max(100)
-        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid slug'),
-
+        .min(3, 'Slug must be at least 3 characters')
+        .max(100, 'Slug must not exceed 100 characters')
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid slug format'),
     contacts: z.object({
-        phone: z.string(),
-        email: z.email(),
+        phone: z.string().min(1, 'Phone number is required'),
+        email: z.email({ message: 'Must be a valid email address' }),
         address: z.object({
-            streetAddress: z.string().min(1),
-            city: z.string().min(1),
-            state: z.string().min(1),
-            postalCode: z.string().min(1),
-            country: z.string().min(1),
+            streetAddress: z.string().min(1, 'Street address is required'),
+            city: z.string().min(1, 'City is required'),
+            state: z.string().min(1, 'State is required'),
+            postalCode: z.string().min(1, 'Postal code is required'),
+            country: z.string().min(1, 'Country is required'),
         }),
     }),
-
     image: z.object({
-        logo: z.url(),
-        banner: z.url(),
+        logo: z.url({ message: 'Logo must be a valid URL' }),
+        banner: z.url({ message: 'Banner must be a valid URL' }),
     }),
 });
 

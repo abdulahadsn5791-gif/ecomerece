@@ -8,6 +8,7 @@ import { productRoutes } from '../modules/product/presentation/product.routes';
 import { productVariantRoutes } from '../modules/product-variant/presentation/product-varaint.routes';
 import usersRoutes from '../modules/user/presentation/user.routes';
 import vendorRoutes from '../modules/vendor/presentation/vendor.routes';
+import homeRoutes from '../modules/home/presentation/home.routes';
 
 const routes = new Hono();
 
@@ -20,5 +21,6 @@ routes.route('/category', CategoryRoutes);
 routes.route('/address', AddressRoutes);
 routes.route('/users', usersRoutes);
 routes.route('/vendor', vendorRoutes);
+routes.route('/home', homeRoutes);
 
 export default routes;

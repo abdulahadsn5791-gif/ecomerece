@@ -5,7 +5,6 @@ import {
     Description,
     FeatureVO,
     HomeAggregate,
-    IconVO,
     Id,
     ProductContainerVO,
     PromoVO,
@@ -14,6 +13,7 @@ import {
     Title,
     UrlVO,
 } from '@ecomerece/domain';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import { BaseQueryVO } from '@ecomerece/domain/value-objects/query.vo';
 import { HomeMapper } from '../infrastructure/home.mapper';
 import { HomeAppService } from '../application/home.app.service';
@@ -42,6 +42,14 @@ class InMemoryHomeRepo implements IHomeRepository {
     }
 }
 
+class InMemoryEventBus implements IEventBus {
+    register<T>(eventType: string): void {}
+
+    async publish<T>(): Promise<void> {}
+
+    clear(): void {}
+}
+
 describe('HomeAggregate Domain Invariants', () => {
     it('should initialize an empty home aggregate', () => {
         const home = HomeAggregate.create(Id.create('home-main'));
@@ -58,7 +66,6 @@ describe('HomeAggregate Domain Invariants', () => {
         const cat1 = CategoryVO.create({
             id: Id.create('cat-1'),
             name: Title.create('Laptops'),
-            icon: IconVO.create('laptop'),
             image: UrlVO.create('https://example.com/laptops.jpg'),
             accent: ColorVO.create('#3B82F6'),
         });
@@ -74,7 +81,6 @@ describe('HomeAggregate Domain Invariants', () => {
         const cat1Updated = CategoryVO.create({
             id: Id.create('cat-1'),
             name: Title.create('Gaming Laptops'),
-            icon: IconVO.create('laptop'),
             image: UrlVO.create('https://example.com/laptops.jpg'),
             accent: ColorVO.create('#3B82F6'),
         });
@@ -152,14 +158,14 @@ describe('HomeAggregate Domain Invariants', () => {
 describe('HomeAppService Full CRUD Operations', () => {
     it('should perform complete categories lifecycle', async () => {
         const repo = new InMemoryHomeRepo();
-        const service = new HomeAppService(repo as any);
+        const bus = new InMemoryEventBus();
+        const service = new HomeAppService(repo as any, bus);
 
         // 1. Add Category
         await service.addCategory(
             {
                 id: 'cat-phones',
                 name: 'Smartphones',
-                icon: 'smartphone',
                 image: 'https://example.com/phone.jpg',
                 accent: '#3B82F6',
             },
@@ -190,7 +196,8 @@ describe('HomeAppService Full CRUD Operations', () => {
 
     it('should perform complete slides lifecycle', async () => {
         const repo = new InMemoryHomeRepo();
-        const service = new HomeAppService(repo as any);
+        const bus = new InMemoryEventBus();
+        const service = new HomeAppService(repo as any, bus);
 
         await service.addSlide(
             {
@@ -228,7 +235,8 @@ describe('HomeAppService Full CRUD Operations', () => {
 
     it('should perform complete promos lifecycle', async () => {
         const repo = new InMemoryHomeRepo();
-        const service = new HomeAppService(repo as any);
+        const bus = new InMemoryEventBus();
+        const service = new HomeAppService(repo as any, bus);
 
         await service.addPromo(
             {
@@ -264,7 +272,8 @@ describe('HomeAppService Full CRUD Operations', () => {
 
     it('should perform complete features lifecycle and setFeatures', async () => {
         const repo = new InMemoryHomeRepo();
-        const service = new HomeAppService(repo as any);
+        const bus = new InMemoryEventBus();
+        const service = new HomeAppService(repo as any, bus);
 
         await service.setFeatures(
             {
@@ -273,14 +282,12 @@ describe('HomeAppService Full CRUD Operations', () => {
                         id: 'feat-1',
                         title: 'Free Shipping',
                         detail: 'On all orders nationwide over Rs. 2,500',
-                        icon: 'truck',
                         accent: '#10B981',
                     },
                     {
                         id: 'feat-2',
                         title: 'Official Warranty',
                         detail: '100% genuine brand warranty covered',
-                        icon: 'shield',
                         accent: '#3B82F6',
                     },
                 ],
@@ -310,7 +317,8 @@ describe('HomeAppService Full CRUD Operations', () => {
 
     it('should perform complete product containers lifecycle', async () => {
         const repo = new InMemoryHomeRepo();
-        const service = new HomeAppService(repo as any);
+        const bus = new InMemoryEventBus();
+        const service = new HomeAppService(repo as any, bus);
 
         await service.addProductContainer(
             {

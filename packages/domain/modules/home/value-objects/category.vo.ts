@@ -1,11 +1,9 @@
 import { Id, Title, UrlVO } from '../../../value-objects';
 import { ColorVO } from '../../../value-objects/color.vo';
-import { IconVO } from '../../../value-objects/icon.vo';
 
 export type CategoryVOProps = {
     id?: Id;
     name: Title;
-    icon: IconVO;
     image: UrlVO;
     accent: ColorVO;
 };
@@ -14,7 +12,6 @@ export class CategoryVO {
     private constructor(
         private readonly _id: Id,
         private readonly _name: Title,
-        private readonly _icon: IconVO,
         private readonly _image: UrlVO,
         private readonly _accent: ColorVO,
     ) {}
@@ -24,9 +21,6 @@ export class CategoryVO {
     }
     get name(): Title {
         return this._name;
-    }
-    get icon(): IconVO {
-        return this._icon;
     }
     get image(): UrlVO {
         return this._image;
@@ -39,7 +33,6 @@ export class CategoryVO {
         return new CategoryVO(
             props.id ?? Id.create(),
             props.name,
-            props.icon,
             props.image,
             props.accent,
         );
@@ -48,10 +41,9 @@ export class CategoryVO {
     static rehydrate(
         id: Id,
         name: Title,
-        icon: IconVO,
         image: UrlVO,
         accent: ColorVO,
     ): CategoryVO {
-        return new CategoryVO(id, name, icon, image, accent);
+        return new CategoryVO(id, name, image, accent);
     }
 }

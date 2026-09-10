@@ -5,7 +5,6 @@ import {
     Description,
     FeatureVO,
     HomeAggregate,
-    IconVO,
     Id,
     ProductContainerVO,
     PromoVO,
@@ -14,6 +13,7 @@ import {
     Title,
     UrlVO,
 } from '@ecomerece/domain';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import { BaseQueryVO } from '@ecomerece/domain/value-objects/query.vo';
 import type {
     CreateFeatureDtoType,
@@ -44,12 +44,22 @@ import type { HomeRepository } from '../infrastructure/home.repository';
 import { HomeMessages, type HomeMessagesType } from '../presentation/home.messages';
 
 export class HomeAppService extends BaseService {
-    constructor(private readonly homeRepo: HomeRepository) {
+    constructor(
+        private readonly homeRepo: HomeRepository,
+        private readonly eventBus: IEventBus,
+    ) {
         super();
     }
 
     private async getHomeAggregate(): Promise<HomeAggregate> {
         return this.homeRepo.getHomeMain();
+    }
+
+    private async publishEvents(home: HomeAggregate): Promise<void> {
+        const events = home.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
     }
 
     // --- Read Storefront Layout ---
@@ -66,12 +76,12 @@ export class HomeAppService extends BaseService {
             CategoryVO.create({
                 id: categoryId,
                 name: Title.create(data.name),
-                icon: IconVO.create(data.icon),
                 image: UrlVO.create(data.image),
                 accent: ColorVO.create(data.accent),
             }),
         );
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.categoryAdded(actorId);
     }
 
@@ -85,12 +95,12 @@ export class HomeAppService extends BaseService {
         const updated = CategoryVO.create({
             id: existing.id,
             name: data.name ? Title.create(data.name) : existing.name,
-            icon: data.icon ? IconVO.create(data.icon) : existing.icon,
             image: data.image ? UrlVO.create(data.image) : existing.image,
             accent: data.accent ? ColorVO.create(data.accent) : existing.accent,
         });
         home.updateCategory(targetId, updated);
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.categoryUpdated(data.id, actorId);
     }
 
@@ -98,6 +108,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.removeCategory(Id.create(data.id));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.categoryRemoved(data.id, actorId);
     }
 
@@ -105,6 +116,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.reorderCategories(data.orderedIds.map((id) => Id.create(id)));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.categoriesReordered(actorId);
     }
 
@@ -129,6 +141,7 @@ export class HomeAppService extends BaseService {
             }),
         );
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.slideAdded(actorId);
     }
 
@@ -152,6 +165,7 @@ export class HomeAppService extends BaseService {
         });
         home.updateSlide(targetId, updated);
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.slideUpdated(data.id, actorId);
     }
 
@@ -159,6 +173,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.removeSlide(Id.create(data.id));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.slideRemoved(data.id, actorId);
     }
 
@@ -166,6 +181,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.reorderSlides(data.orderedIds.map((id) => Id.create(id)));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.slidesReordered(actorId);
     }
 
@@ -184,6 +200,7 @@ export class HomeAppService extends BaseService {
             }),
         );
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.promoAdded(actorId);
     }
 
@@ -204,6 +221,7 @@ export class HomeAppService extends BaseService {
         });
         home.updatePromo(targetId, updated);
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.promoUpdated(data.id, actorId);
     }
 
@@ -211,6 +229,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.removePromo(Id.create(data.id));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.promoRemoved(data.id, actorId);
     }
 
@@ -223,11 +242,11 @@ export class HomeAppService extends BaseService {
                 id: featureId,
                 title: Title.create(data.title),
                 detail: Description.create(data.detail),
-                icon: IconVO.create(data.icon),
                 accent: ColorVO.create(data.accent),
             }),
         );
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.featureAdded(actorId);
     }
 
@@ -242,11 +261,11 @@ export class HomeAppService extends BaseService {
             id: existing.id,
             title: data.title ? Title.create(data.title) : existing.title,
             detail: data.detail ? Description.create(data.detail) : existing.detail,
-            icon: data.icon ? IconVO.create(data.icon) : existing.icon,
             accent: data.accent ? ColorVO.create(data.accent) : existing.accent,
         });
         home.updateFeature(targetId, updated);
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.featureUpdated(data.id, actorId);
     }
 
@@ -254,6 +273,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.removeFeature(Id.create(data.id));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.featureRemoved(data.id, actorId);
     }
 
@@ -264,12 +284,12 @@ export class HomeAppService extends BaseService {
                 id: f.id ? Id.create(f.id) : Id.create(),
                 title: Title.create(f.title),
                 detail: Description.create(f.detail),
-                icon: IconVO.create(f.icon),
                 accent: ColorVO.create(f.accent),
             }),
         );
         home.setFeatures(features);
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.featuresSet(actorId);
     }
 
@@ -296,6 +316,7 @@ export class HomeAppService extends BaseService {
             }),
         );
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.containerAdded(containerId.value, actorId);
     }
 
@@ -326,6 +347,7 @@ export class HomeAppService extends BaseService {
         });
         home.updateProductContainer(updated);
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.containerUpdated(data.id, actorId);
     }
 
@@ -333,6 +355,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.removeProductContainer(Id.create(data.id));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.containerRemoved(data.id, actorId);
     }
 
@@ -340,6 +363,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         home.reorderProductContainers(data.orderedIds.map((id) => Id.create(id)));
         await this.homeRepo.save(home);
+        await this.publishEvents(home);
         return HomeMessages.containersReordered(actorId);
     }
 }

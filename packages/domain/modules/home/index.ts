@@ -1,4 +1,5 @@
 export * from './home.aggregate';
+export * from './events';
 export * from './ports/i-home-repository';
 export * from './read-models/home.read-model';
 export * from './value-objects/category.vo';

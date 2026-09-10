@@ -9,7 +9,6 @@ const homeCategorySchema = new Schema(
     {
         id: { type: String, required: true },
         name: { type: String, required: true },
-        icon: { type: String, required: true },
         image: { type: String, required: true },
         accent: { type: String, required: true },
     },
@@ -21,7 +20,6 @@ const homeFeatureSchema = new Schema(
         id: { type: String, required: true },
         title: { type: String, required: true },
         detail: { type: String, required: true },
-        icon: { type: String, required: true },
         accent: { type: String, required: true },
     },
     { _id: false },

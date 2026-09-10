@@ -1,7 +1,6 @@
 export type HomeCategoryReadModel = {
     id: string;
     name: string;
-    icon: string;
     image: string;
     accent: string;
 };
@@ -10,7 +9,6 @@ export type HomeFeatureReadModel = {
     id: string;
     title: string;
     detail: string;
-    icon: string;
     accent: string;
 };
 

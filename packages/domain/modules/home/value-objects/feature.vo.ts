@@ -1,12 +1,10 @@
 import { Description, Id, Title } from '../../../value-objects';
 import { ColorVO } from '../../../value-objects/color.vo';
-import { IconVO } from '../../../value-objects/icon.vo';
 
 export type FeatureVOProps = {
     id?: Id;
     title: Title;
     detail: Description;
-    icon: IconVO;
     accent: ColorVO;
 };
 
@@ -15,7 +13,6 @@ export class FeatureVO {
         private readonly _id: Id,
         private readonly _title: Title,
         private readonly _detail: Description,
-        private readonly _icon: IconVO,
         private readonly _accent: ColorVO,
     ) {}
 
@@ -28,9 +25,6 @@ export class FeatureVO {
     get detail(): Description {
         return this._detail;
     }
-    get icon(): IconVO {
-        return this._icon;
-    }
     get accent(): ColorVO {
         return this._accent;
     }
@@ -40,7 +34,6 @@ export class FeatureVO {
             props.id ?? Id.create(),
             props.title,
             props.detail,
-            props.icon,
             props.accent,
         );
     }
@@ -49,10 +42,8 @@ export class FeatureVO {
         id: Id,
         title: Title,
         detail: Description,
-        icon: IconVO,
         accent: ColorVO,
     ): FeatureVO {
-        return new FeatureVO(id, title, detail, icon, accent);
+        return new FeatureVO(id, title, detail, accent);
     }
 }
-

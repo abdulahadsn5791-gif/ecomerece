@@ -5,6 +5,27 @@ import { FeatureVO } from './value-objects/feature.vo';
 import { ProductContainerVO } from './value-objects/product-container.vo';
 import { PromoVO } from './value-objects/promo.vo';
 import { SlideVO } from './value-objects/slide.vo';
+import {
+    HomeCategoriesReorderedEvent,
+    HomeCategoryAddedEvent,
+    HomeCategoryRemovedEvent,
+    HomeCategoryUpdatedEvent,
+    HomeContainerAddedEvent,
+    HomeContainerRemovedEvent,
+    HomeContainerUpdatedEvent,
+    HomeContainersReorderedEvent,
+    HomeFeatureAddedEvent,
+    HomeFeatureRemovedEvent,
+    HomeFeatureUpdatedEvent,
+    HomeFeaturesSetEvent,
+    HomePromoAddedEvent,
+    HomePromoRemovedEvent,
+    HomePromoUpdatedEvent,
+    HomeSlideAddedEvent,
+    HomeSlideRemovedEvent,
+    HomeSlideUpdatedEvent,
+    HomeSlidesReorderedEvent,
+} from './events';
 
 export class HomeAggregate extends AggregateRoot {
     public static readonly MAX_CATEGORIES = 24;
@@ -96,6 +117,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._categories.push(category);
         this.touch();
+        this.raise(new HomeCategoryAddedEvent({ homeId: this._id, categoryId: category.id }));
     }
 
     updateCategory(id: Id, category: CategoryVO): void {
@@ -112,6 +134,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._categories[index] = category;
         this.touch();
+        this.raise(new HomeCategoryUpdatedEvent({ homeId: this._id, categoryId: id }));
     }
 
     removeCategory(id: Id): void {
@@ -121,6 +144,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._categories.splice(index, 1);
         this.touch();
+        this.raise(new HomeCategoryRemovedEvent({ homeId: this._id, categoryId: id }));
     }
 
     reorderCategories(orderedIds: Id[]): void {
@@ -143,6 +167,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._categories = reordered;
         this.touch();
+        this.raise(new HomeCategoriesReorderedEvent({ homeId: this._id }));
     }
 
     // --- Features ---
@@ -156,6 +181,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._features = features;
         this.touch();
+        this.raise(new HomeFeaturesSetEvent({ homeId: this._id }));
     }
 
     addFeature(feature: FeatureVO): void {
@@ -167,6 +193,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._features.push(feature);
         this.touch();
+        this.raise(new HomeFeatureAddedEvent({ homeId: this._id, featureId: feature.id }));
     }
 
     updateFeature(id: Id, feature: FeatureVO): void {
@@ -176,6 +203,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._features[index] = feature;
         this.touch();
+        this.raise(new HomeFeatureUpdatedEvent({ homeId: this._id, featureId: id }));
     }
 
     removeFeature(id: Id): void {
@@ -185,6 +213,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._features.splice(index, 1);
         this.touch();
+        this.raise(new HomeFeatureRemovedEvent({ homeId: this._id, featureId: id }));
     }
 
     // --- Slides ---
@@ -198,6 +227,7 @@ export class HomeAggregate extends AggregateRoot {
         slide.updateDisplayOrder(Quantity.create(this._slides.length));
         this._slides.push(slide);
         this.touch();
+        this.raise(new HomeSlideAddedEvent({ homeId: this._id, slideId: slide.id }));
     }
 
     updateSlide(id: Id, slide: SlideVO): void {
@@ -209,6 +239,7 @@ export class HomeAggregate extends AggregateRoot {
         slide.updateDisplayOrder(existingOrder);
         this._slides[index] = slide;
         this.touch();
+        this.raise(new HomeSlideUpdatedEvent({ homeId: this._id, slideId: id }));
     }
 
     removeSlide(id: Id): void {
@@ -220,6 +251,7 @@ export class HomeAggregate extends AggregateRoot {
         // Normalize display orders after removal
         this._slides.forEach((s, idx) => s.updateDisplayOrder(Quantity.create(idx)));
         this.touch();
+        this.raise(new HomeSlideRemovedEvent({ homeId: this._id, slideId: id }));
     }
 
     reorderSlides(orderedIds: Id[]): void {
@@ -243,6 +275,7 @@ export class HomeAggregate extends AggregateRoot {
         });
         this._slides = reordered;
         this.touch();
+        this.raise(new HomeSlidesReorderedEvent({ homeId: this._id }));
     }
 
     // --- Promos ---
@@ -255,6 +288,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._promos.push(promo);
         this.touch();
+        this.raise(new HomePromoAddedEvent({ homeId: this._id, promoId: promo.id }));
     }
 
     updatePromo(id: Id, promo: PromoVO): void {
@@ -264,6 +298,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._promos[index] = promo;
         this.touch();
+        this.raise(new HomePromoUpdatedEvent({ homeId: this._id, promoId: id }));
     }
 
     removePromo(id: Id): void {
@@ -273,6 +308,7 @@ export class HomeAggregate extends AggregateRoot {
         }
         this._promos.splice(index, 1);
         this.touch();
+        this.raise(new HomePromoRemovedEvent({ homeId: this._id, promoId: id }));
     }
 
     // --- Product Containers ---
@@ -288,6 +324,7 @@ export class HomeAggregate extends AggregateRoot {
         container.updateDisplayOrder(Quantity.create(this._productContainers.length));
         this._productContainers.push(container);
         this.touch();
+        this.raise(new HomeContainerAddedEvent({ homeId: this._id, containerId: container.id }));
     }
 
     updateProductContainer(container: ProductContainerVO): void {
@@ -299,6 +336,7 @@ export class HomeAggregate extends AggregateRoot {
         container.updateDisplayOrder(existingOrder);
         this._productContainers[index] = container;
         this.touch();
+        this.raise(new HomeContainerUpdatedEvent({ homeId: this._id, containerId: container.id }));
     }
 
     removeProductContainer(id: Id): void {
@@ -309,6 +347,7 @@ export class HomeAggregate extends AggregateRoot {
         this._productContainers.splice(index, 1);
         this._productContainers.forEach((c, idx) => c.updateDisplayOrder(Quantity.create(idx)));
         this.touch();
+        this.raise(new HomeContainerRemovedEvent({ homeId: this._id, containerId: id }));
     }
 
     reorderProductContainers(orderedIds: Id[]): void {
@@ -332,5 +371,6 @@ export class HomeAggregate extends AggregateRoot {
         });
         this._productContainers = reordered;
         this.touch();
+        this.raise(new HomeContainersReorderedEvent({ homeId: this._id }));
     }
 }

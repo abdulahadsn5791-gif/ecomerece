@@ -1,5 +1,5 @@
 import { CategoryVO, FeatureVO, HomeAggregate, ProductContainerVO, PromoVO, SlideVO, type HomeReadModel } from '@ecomerece/domain';
-import { ColorVO, Description, EffectiveDate, IconVO, Id, Quantity, Title, UrlVO } from '@ecomerece/domain/value-objects';
+import { ColorVO, Description, EffectiveDate, Id, Quantity, Title, UrlVO } from '@ecomerece/domain/value-objects';
 import { BaseQueryVO } from '@ecomerece/domain/value-objects/query.vo';
 import type { HomeResponseReadModel } from '@ecomerece/shared';
 import type { HomePersistence } from './home.models';
@@ -10,7 +10,6 @@ export const HomeMapper = {
             CategoryVO.rehydrate(
                 Id.create(c.id),
                 Title.create(c.name),
-                IconVO.create(c.icon),
                 UrlVO.create(c.image),
                 ColorVO.create(c.accent),
             ),
@@ -20,7 +19,6 @@ export const HomeMapper = {
                 Id.create(f.id),
                 Title.create(f.title),
                 Description.create(f.detail),
-                IconVO.create(f.icon),
                 ColorVO.create(f.accent),
             ),
         );
@@ -80,7 +78,6 @@ export const HomeMapper = {
             categories: home.categories.map((c) => ({
                 id: c.id.value,
                 name: c.name.value,
-                icon: c.icon.name,
                 image: c.image.value,
                 accent: c.accent.value,
             })),
@@ -88,7 +85,6 @@ export const HomeMapper = {
                 id: f.id.value,
                 title: f.title.value,
                 detail: f.detail.value,
-                icon: f.icon.name,
                 accent: f.accent.value,
             })),
             slides: home.slides.map((s) => ({
@@ -133,7 +129,6 @@ export const HomeMapper = {
             categories: home.categories.map((c) => ({
                 id: c.id.value,
                 name: c.name.value,
-                icon: c.icon.name,
                 image: c.image.value,
                 accent: c.accent.value,
             })),
@@ -141,7 +136,6 @@ export const HomeMapper = {
                 id: f.id.value,
                 title: f.title.value,
                 detail: f.detail.value,
-                icon: f.icon.name,
                 accent: f.accent.value,
             })),
             slides: home.slides.map((s) => ({

@@ -24,6 +24,7 @@ import type {
     toggleDiscalimerDtoType,
     toggleIngredientsDtoType,
     updateProductMetaDtoType,
+    GetPaginatedProductsQueryDto,
 } from '@ecomerece/shared';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
@@ -33,6 +34,8 @@ import { GetVendorByUserIdQuery } from '../../vendor/application/queries/get-ven
 import { ProductMapper } from '../infrastructure/product.mapper';
 import type { ProductRepository } from '../infrastructure/product.repository';
 import { productMessages, type productMessagesType } from '../presentation/product.messages';
+import { FilterQuery } from 'mongoose';
+import { ProductPersistence } from '../infrastructure/product.model';
 
 export class ProductApplicationService extends BaseService {
     constructor(
@@ -41,6 +44,7 @@ export class ProductApplicationService extends BaseService {
     ) {
         super();
     }
+
 
     async getProductById(id: string): Promise<ProductResponseReadModel> {
         const productId = Id.create(id);
@@ -371,12 +375,34 @@ export class ProductApplicationService extends BaseService {
     }
 
 
-    async getRelatedProductsByCategoryId(id: string): Promise<ProductResponseReadModel[]> {
-        const categoryId = Id.create(id);
-        const filter = { categoryId: categoryId.value }
-        const limit = Quantity.create(10);
-        const categories = await this.productRepo.FindPaginated({ filter, limit });
-        return categories.data.data;
+    async findPaginatedProducts(query: GetPaginatedProductsQueryDto) {
+        const filter: FilterQuery<ProductPersistence> = {
+            'deleted.deleted': false,
+            'block.blocked': false,
+        };
 
+        if (query.categoryId) filter.categoryId = query.categoryId;
+        if (query.vendorId) filter.vendorId = query.vendorId;
+        if (query.appearance) filter.appearance = query.appearance;
+        if (query.search) {
+            filter.title = { $regex: query.search, $options: 'i' } as any;
+        }
+
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+
+        const result = await this.productRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+
+        return {
+            data: result.data.map((aggregate) => (ProductMapper.aggregateToResponseReadModel(aggregate))),
+            meta: result.meta,
+        };
     }
+
+
 }

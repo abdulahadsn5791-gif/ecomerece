@@ -24,7 +24,9 @@ export class Quantity extends NumberVO {
     static none() {
         return new Quantity(0);
     }
-
+    static zero() {
+        return new Quantity(0);
+    }
     static create(quantity: number) {
         return new Quantity(quantity);
     }

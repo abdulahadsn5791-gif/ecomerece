@@ -24,8 +24,7 @@ import {
 import HeroBanner from './client/home/components/HeroBanner';
 import FeaturesStrip from './client/home/components/FeaturesStrip';
 import Categories from './client/home/components/Categories';
-import FeaturedProducts from './client/home/components/FeaturedProducts';
-import NewArrivals from './client/home/components/NewArrivals';
+import Products from './client/home/components/Products';
 import Navbar from '@/components/navbar/NavBar';
 import Footer from '@/components/footer/Footer';
 
@@ -45,14 +44,10 @@ export default function Home() {
       <Navbar />
       <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
         <HeroBanner />
-        {/* Features Strip */}
-        <FeaturesStrip />
-        {/* Categories */}
         <Categories />
-        {/* Featured Products */}
-        <FeaturedProducts />
-        {/* New Arrivals */}
-        <NewArrivals />
+        <Products />
+
+        <FeaturesStrip />
         <Footer />
       </div>
     </div>

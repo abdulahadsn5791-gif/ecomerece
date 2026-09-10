@@ -7,6 +7,10 @@ export interface ProductReadModel {
     maxPrice: number,
     minDiscountedPrice: number,
     maxDiscountedPrice: number,
+    averageRating: number,
+    vendorTitle: string,
+    inStock: boolean,
+    totalReviews: number,
     appearance: 'public' | 'private';
     block: {
         blocked: boolean;

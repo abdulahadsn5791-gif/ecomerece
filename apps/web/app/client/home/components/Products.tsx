@@ -1,11 +1,67 @@
-// components/NewArrivals.tsx
+// components/FeaturedProducts.tsx
 "use client";
 
-import { useThemeStore } from '@ecomerece/frontend';
-import { ArrowRight, ShoppingCart, Sparkles, Star, Eye } from 'lucide-react';
-import React, { useRef } from 'react';
+import { useThemeStore } from "@ecomerece/frontend";
+import { ProductResponseReadModel } from "@ecomerece/shared";
+import { ShoppingCart, ArrowRight, Sparkles, Star, Eye } from "lucide-react";
+import { useRef } from "react";
 
-const newArrivals = [
+const featuredProducts = [
+    {
+        id: 1,
+        vendor: 'TechNova',
+        name: 'Wireless Noise-Cancelling Headphones Pro',
+        rating: 5,
+        reviews: '2,345',
+        price: '$149.99',
+        originalPrice: '$199.99',
+        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+        badge: 'Save 25%',
+    },
+    {
+        id: 2,
+        vendor: 'FitLife',
+        name: 'SmartWatch Series 8 - Fitness Tracker',
+        rating: 5,
+        reviews: '1,890',
+        price: '$299.00',
+        originalPrice: '$349.00',
+        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+        badge: 'Best Seller',
+    },
+    {
+        id: 3,
+        vendor: 'RunWay',
+        name: 'Premium Running Sneakers - Comfort Fit',
+        rating: 4,
+        reviews: '1,234',
+        price: '$89.99',
+        originalPrice: '$129.99',
+        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
+        badge: 'Popular',
+    },
+    {
+        id: 4,
+        vendor: 'Luxe',
+        name: 'Luxury Leather Handbag - Brown',
+        rating: 5,
+        reviews: '987',
+        price: '$179.99',
+        originalPrice: '$299.99',
+        image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&q=80',
+        badge: 'Limited',
+    },
+    {
+        id: 5,
+        vendor: 'SoundMax',
+        name: 'Portable Bluetooth Speaker - Deep Bass',
+        rating: 4,
+        reviews: '1,876',
+        price: '$59.99',
+        originalPrice: '$79.99',
+        image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&q=80',
+        badge: 'Trending',
+    },
     {
         id: 6,
         vendor: 'BrightHome',
@@ -96,7 +152,7 @@ const newArrivals = [
     },
 ];
 
-export default function NewArrivals() {
+export default function Products({ title, heading, products }: { title: string, heading: string, products: ProductResponseReadModel[] }) {
     const { darkMode } = useThemeStore();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -118,19 +174,19 @@ export default function NewArrivals() {
                         <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 sm:mb-4 border shadow-sm ${darkMode ? "border-neutral-800 bg-neutral-900 text-neutral-300" : "border-neutral-200 bg-neutral-50 text-neutral-700"
                             }`}>
                             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                            <span>Just Dropped</span>
+                            <span>Handpicked Selection</span>
                         </div>
                         <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-                            New Arrivals
+                            Featured Products
                         </h2>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        {/* Mobile Scroll Control Buttons */}
+                        {/* Desktop/Tablet Scroll Control Buttons */}
                         <div className="hidden sm:flex items-center gap-2">
                             <button
                                 onClick={() => scroll('left')}
-                                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-neutral-50 text-neutral-900 hover:bg-neutral-100"
+                                className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-neutral-50 text-neutral-900 hover:bg-neutral-100"
                                     }`}
                                 aria-label="Scroll left"
                             >
@@ -138,7 +194,7 @@ export default function NewArrivals() {
                             </button>
                             <button
                                 onClick={() => scroll('right')}
-                                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-neutral-50 text-neutral-900 hover:bg-neutral-100"
+                                className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-neutral-50 text-neutral-900 hover:bg-neutral-100"
                                     }`}
                                 aria-label="Scroll right"
                             >
@@ -157,37 +213,37 @@ export default function NewArrivals() {
                 {/* Mobile Swipeable Carousel / Desktop Grid */}
                 <div
                     ref={scrollContainerRef}
-                    className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory pb-4 sm:pb-0 scrollbar-none [-webkit-overflow-scrolling:touch]"
+                    className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory pb-4 sm:pb-0 scrollbar-none [-webkit-overflow-scrolling:touch]"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                    {newArrivals.map((product) => (
+                    {featuredProducts.map((product) => (
                         <div
                             key={product.id}
-                            className={`group rounded-[1.75rem] sm:rounded-[2rem] overflow-hidden border flex flex-col justify-between transition-all duration-500 hover:-translate-y-1 shadow-md hover:shadow-xl shrink-0 w-[78%] sm:w-auto snap-start ${darkMode
-                                    ? "bg-neutral-900/80 border-neutral-800 hover:border-neutral-700"
-                                    : "bg-neutral-50/80 border-neutral-200 hover:border-neutral-300"
+                            className={`group rounded-xl sm:rounded-2xl overflow-hidden border flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 shadow-md hover:shadow-2xl shrink-0 w-[78%] sm:w-auto snap-start ${darkMode
+                                ? "bg-neutral-900/80 border-neutral-800 hover:border-neutral-700"
+                                : "bg-neutral-50/80 border-neutral-200 hover:border-neutral-300"
                                 }`}
                         >
                             {/* Product Image & Badges Container */}
-                            <div className={`aspect-square m-2.5 sm:m-3 rounded-2xl overflow-hidden relative shadow-inner ${darkMode ? "bg-neutral-950" : "bg-neutral-200"
+                            <div className={`aspect-square m-2.5 sm:m-3 rounded-lg overflow-hidden relative shadow-inner ${darkMode ? "bg-neutral-950" : "bg-neutral-200"
                                 }`}>
                                 <img
                                     src={product.image}
                                     alt={product.name}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                                     loading="lazy"
                                 />
 
                                 {/* Glassmorphic Badge */}
                                 <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10">
-                                    <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold tracking-wider uppercase bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                                    <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md text-[9px] sm:text-[10px] font-bold tracking-wider uppercase bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-sm">
                                         {product.badge}
                                     </span>
                                 </div>
 
-                                {/* Quick View Hover Action Button (Hidden on touch devices for cleaner tap UX) */}
+                                {/* Quick View Hover Action Button */}
                                 <div className="absolute inset-0 bg-neutral-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center justify-center">
-                                    <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md text-neutral-900 flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:scale-110">
+                                    <button className="w-10 h-10 rounded-lg bg-white/90 backdrop-blur-md text-neutral-900 flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:scale-110">
                                         <Eye className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -227,9 +283,9 @@ export default function NewArrivals() {
                                         </span>
                                     </div>
 
-                                    <button className={`inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full font-semibold transition-all duration-300 shadow-md active:scale-95 sm:hover:scale-110 ${darkMode
-                                            ? "bg-white text-black hover:bg-neutral-200"
-                                            : "bg-neutral-900 text-white hover:bg-neutral-800"
+                                    <button className={`inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg font-semibold transition-all duration-300 shadow-md active:scale-95 sm:hover:scale-110 ${darkMode
+                                        ? "bg-white text-black hover:bg-neutral-200"
+                                        : "bg-neutral-900 text-white hover:bg-neutral-800"
                                         }`} aria-label="Add to cart">
                                         <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                     </button>

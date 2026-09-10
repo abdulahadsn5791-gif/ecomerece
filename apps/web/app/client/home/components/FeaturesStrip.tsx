@@ -42,11 +42,20 @@ export default function FeaturesStrip() {
                             <div
                                 key={f.title}
                                 style={{ "--accent": f.accent } as React.CSSProperties}
-                                className={`group flex items-center gap-3 sm:gap-4 px-3 py-6 sm:px-6 transition-colors duration-300 ${borderColor} ${mobileBorderR} ${mobileBorderB} ${lgBorderL} lg:border-r-0 lg:border-b-0`}
+                                className={`group relative flex items-center gap-3 sm:gap-4 px-3 py-6 sm:px-6 transition-colors duration-300 hover:bg-[var(--accent)]/5 ${borderColor} ${mobileBorderR} ${mobileBorderB} ${lgBorderL} lg:border-r-0 lg:border-b-0`}
                             >
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shrink-0 bg-[var(--accent)]/10 text-[var(--accent)] transition-colors duration-300 group-hover:bg-[var(--accent)] group-hover:text-white">
-                                    <Icon className="w-5 h-5" />
+                                {/* Activation line — replaces the old full-circle hover fill */}
+                                <span className="absolute top-0 left-0 right-0 h-[2px] bg-[var(--accent)] origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
+
+                                {/* Icon mark: corner brackets instead of a rounded/pill badge */}
+                                <div className="relative w-10 h-10 sm:w-11 sm:h-11 shrink-0">
+                                    <span className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--accent)] transition-all duration-300 group-hover:w-3.5 group-hover:h-3.5" />
+                                    <span className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[var(--accent)] transition-all duration-300 group-hover:w-3.5 group-hover:h-3.5" />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Icon className="w-[18px] h-[18px] sm:w-5 sm:h-5 text-[var(--accent)]" strokeWidth={1.75} />
+                                    </div>
                                 </div>
+
                                 <div className="min-w-0">
                                     <h4
                                         className={`font-semibold text-sm sm:text-base mb-0.5 truncate ${darkMode ? "text-white" : "text-neutral-900"
@@ -54,7 +63,9 @@ export default function FeaturesStrip() {
                                     >
                                         {f.title}
                                     </h4>
-                                    <p className="text-xs sm:text-sm text-neutral-500 truncate">{f.detail}</p>
+                                    <p className={`text-xs sm:text-sm truncate ${darkMode ? "text-neutral-400" : "text-neutral-500"}`}>
+                                        {f.detail}
+                                    </p>
                                 </div>
                             </div>
                         );

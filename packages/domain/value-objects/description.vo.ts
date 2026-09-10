@@ -18,4 +18,7 @@ export class Description extends StringVO {
     static create(title: string): Description {
         return new Description(title);
     }
+    static rehydrate(title: string): Description {
+        return new Description(title);
+    }
 }

@@ -4,6 +4,7 @@ import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError, NotFoundError } from '../../../errors/app-error';
 import { ProductMapper } from './product.mapper';
 import { ProductModel, type ProductPersistence } from './product.model';
+import { FilterQuery } from 'mongoose';
 
 export class ProductRepository
     extends MongoRepository<ProductPersistence>
@@ -64,31 +65,7 @@ export class ProductRepository
         return ProductMapper.persistenceToAggregate(doc);
     }
 
-    async FindPaginated(params: {
-        filter?: {};
-        cursor?: Id;
-        limit?: Quantity;
-        direction?: 'next' | 'prev';
-    }): Promise<{
-        data: any;
-        meta: {
-            nextCursor: string | null;
-            prevCursor: string | null;
-            hasMore: boolean;
-        };
-    }> {
-        const info = {
-            filter: params.filter,
-            cursor: params.cursor?.value,
-            limit: params.limit?.value,
-            direction: params.direction,
-        };
-        const result = await this.paginateByCursor(info);
-        return {
-            data: result,
-            meta: result.meta,
-        };
-    }
+
 
 
     async FindByVendorIdOrThrow(id: Id): Promise<ProductAggregate> {
@@ -138,4 +115,42 @@ export class ProductRepository
             _id: id.value,
         }));
     }
+
+
+    async FindPaginated(params: {
+        filter?: FilterQuery<ProductPersistence>;
+        cursor?: Id;
+        limit?: Quantity;
+        direction?: 'next' | 'prev';
+    }): Promise<{
+        data: ProductAggregate[];
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
+    }> {
+        const info = {
+            filter: params.filter,
+            cursor: params.cursor?.value,
+            limit: params.limit?.value,
+            direction: params.direction,
+        };
+
+        const result = await this.paginateByCursor(info);
+
+        const aggregates = result.data.map((doc: ProductPersistence) =>
+            ProductMapper.persistenceToAggregate(doc)
+        );
+
+        return {
+            data: aggregates,
+            meta: result.meta,
+        };
+    }
+
+
+
+
+
 }

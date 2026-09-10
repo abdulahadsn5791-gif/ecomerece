@@ -4,6 +4,7 @@ import {
     CreateMyProductDtoSchema,
     deafultImageDto,
     disclaimerItemsDto,
+    getPaginatedProductsQuerySchema,
     imagesDto,
     ingredientsDto,
     productAppereanceDto,
@@ -19,6 +20,15 @@ import { BaseController } from '../../../core/controller/base.controller';
 import type { ProductApplicationService } from '../application/product.app.service';
 
 export class ProductController extends BaseController<ProductApplicationService> {
+
+
+    getPaginatedProducts = async (c: Context) => {
+        const query = this.query(c, getPaginatedProductsQuerySchema);
+        const result = await this.service.findPaginatedProducts(query);
+        return this.ok(c, result);
+    };
+
+
     getProductById = async (c: Context) => {
         const id = this.param(c, 'id', idSchema);
         return this.ok(c, await this.service.getProductById(id));
@@ -123,9 +133,5 @@ export class ProductController extends BaseController<ProductApplicationService>
         const actor = c.get('user');
         return this.ok(c, await this.service.removeMyProductIngredients(data, actor));
     };
-    getRelatedProductsByCategoryId = async (c: Context) => {
-        const id = this.param(c, 'id', idSchema);
-        return this.ok(c, await this.service.getRelatedProductsByCategoryId(id));
-
-    }
+  
 }

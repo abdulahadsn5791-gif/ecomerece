@@ -27,6 +27,9 @@ export class PersonName extends StringVO {
     static create(name: string) {
         return new PersonName(name);
     }
+    static rehydrate(name: string) {
+        return new PersonName(name);
+    }
 }
 
 export class Name extends StringVO {

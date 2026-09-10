@@ -15,7 +15,6 @@ import {
     Reason,
     Title,
     UrlVO,
-
 } from '../../value-objects';
 import type { DisclaimerVO } from './value-objects/disclaimer.vo';
 import type { IngredientsVO } from './value-objects/ingredients.vo';
@@ -24,6 +23,7 @@ import type { ImagesVO } from './value-objects/product-images.vo';
 type CreateVendorProps = {
     id: Id;
     vendorId: Id;
+    vendorTitle: Title,
     categoryId: Id;
     images: ImagesVO;
     title: Title;
@@ -37,6 +37,8 @@ export class ProductAggregate extends AggregateRoot {
         private readonly _id: Id,
         private readonly _vendorId: Id,
         private readonly _categoryId: Id,
+        private readonly _vendorTitle: Title,
+        private _inStock: boolean = false,
         private _title: Title,
         private _description: Description,
         private _ingredients: IngredientsVO,
@@ -51,6 +53,8 @@ export class ProductAggregate extends AggregateRoot {
         private _maxPrice: Money,
         private _minDiscountedPrice: Money,
         private _maxDiscountedPrice: Money,
+        private _averageRating: Quantity,
+        private _totalReviews: Quantity,
     ) {
         super();
     }
@@ -58,11 +62,16 @@ export class ProductAggregate extends AggregateRoot {
     get categoryId(): Id {
         return this._categoryId;
     }
+    get vendorTitle(): Title {
+        return this._vendorTitle;
+    }
 
     get id(): Id {
         return this._id;
     }
-
+    get inStock(): boolean {
+        return this._inStock;
+    }
     get vendorId(): Id {
         return this._vendorId;
     }
@@ -90,39 +99,58 @@ export class ProductAggregate extends AggregateRoot {
     get delete(): DeleteInfoVO {
         return this._delete;
     }
+
     get block(): BlockInfoVO {
         return this._block;
     }
+
     get appearance(): AppearanceVO {
         return this._appearance;
     }
+
     get version(): Quantity {
         return this._version;
     }
+
     get createdAt(): EffectiveDate {
         return this._createdAt;
     }
 
-
     get minPrice(): Money {
         return this._minPrice;
     }
+
     get maxPrice(): Money {
         return this._maxPrice;
     }
+
     get minDiscountedPrice(): Money {
         return this._minDiscountedPrice;
     }
+
     get maxDiscountedPrice(): Money {
         return this._maxDiscountedPrice;
     }
 
+    get averageRating(): Quantity {
+        return this._averageRating;
+    }
+
+    get totalReviews(): Quantity {
+        return this._totalReviews;
+    }
+
+    get hasMultipleVariants(): boolean {
+        return !this._minPrice.equals(this._maxPrice);
+    }
 
     static create(data: CreateVendorProps): ProductAggregate {
         return new ProductAggregate(
             data.id,
             data.vendorId,
             data.categoryId,
+            data.vendorTitle,
+            false,
             data.title,
             data.description,
             data.ingredients,
@@ -137,7 +165,8 @@ export class ProductAggregate extends AggregateRoot {
             Money.zero(),
             Money.zero(),
             Money.zero(),
-
+            Quantity.none(),
+            Quantity.zero(),
         );
     }
 
@@ -145,7 +174,9 @@ export class ProductAggregate extends AggregateRoot {
         _id: Id,
         _vendorId: Id,
         _categoryId: Id,
+        _vendorTitle: Title,
         _title: Title,
+        _inStock: boolean,
         _description: Description,
         _ingredients: IngredientsVO,
         _disclaimer: DisclaimerVO,
@@ -159,11 +190,15 @@ export class ProductAggregate extends AggregateRoot {
         _maxPrice: Money,
         _minDiscountedPrice: Money,
         _maxDiscountedPrice: Money,
+        _averageRating: Quantity,
+        _totalReviews: Quantity,
     ): ProductAggregate {
         return new ProductAggregate(
             _id,
             _vendorId,
             _categoryId,
+            _vendorTitle,
+            _inStock,
             _title,
             _description,
             _ingredients,
@@ -178,25 +213,33 @@ export class ProductAggregate extends AggregateRoot {
             _maxPrice,
             _minDiscountedPrice,
             _maxDiscountedPrice,
+            _averageRating,
+            _totalReviews,
         );
     }
-
 
     updatePricingSummary(
         minPrice: Money,
         maxPrice: Money,
         minDiscountedPrice: Money,
         maxDiscountedPrice: Money,
-
-        actorId: Id
+        actorId?: Id,
     ): void {
         this._minPrice = minPrice;
         this._maxPrice = maxPrice;
         this._minDiscountedPrice = minDiscountedPrice;
         this._maxDiscountedPrice = maxDiscountedPrice;
+    }
 
-
-
+    updateRatingSummary(averageRating: number, totalReviews: number): void {
+        if (averageRating < 0 || averageRating > 5) {
+            throw new BadRequestError('Rating must be between 0 and 5');
+        }
+        if (totalReviews < 0) {
+            throw new BadRequestError('Total reviews cannot be negative');
+        }
+        this._averageRating = Quantity.create(Math.round(averageRating * 10) / 10);
+        this._totalReviews = Quantity.create(totalReviews);
     }
 
     recoverProduct(): void {
@@ -208,22 +251,27 @@ export class ProductAggregate extends AggregateRoot {
         if (this._delete.deleted) throw new BadRequestError('Product was already removed');
         this._delete = DeleteInfoVO.create(actor, reason);
     }
+
     blockProduct(actor: Id, reason: Reason): void {
         if (this._block.isBlocked) throw new BadRequestError('Product was already blocked');
         this._block = this._block.block(actor, reason);
     }
+
     unBlockProduct(actor: Id): void {
         if (!this._block.isBlocked) throw new BadRequestError('Product was already active');
         this._block = this._block.unblock();
     }
+
     makeProductPublic(): void {
         if (this._appearance.isPublic) throw new BadRequestError('Product was already public');
         this._appearance = this._appearance.makePublic();
     }
+
     makeProductPrivate(): void {
         if (this._appearance.isPrivate) throw new BadRequestError('Product was already private');
         this._appearance = this._appearance.makePrivate();
     }
+
     updateMeta(title: Title, description: Description, actorId: Id): void {
         this._title = title;
         this._description = description;
@@ -245,6 +293,10 @@ export class ProductAggregate extends AggregateRoot {
         this._disclaimer = this._disclaimer.addMany(items);
     }
 
+    setInStock(inStock: boolean, actorId: Id) {
+        this._inStock = inStock;
+    }
+
     removeDisclaimers(data: desclaimerItem[], actorId: Id) {
         const items = data.map((value) => ({
             name: Name.create(value.name),
@@ -264,6 +316,7 @@ export class ProductAggregate extends AggregateRoot {
     removeImages(urls: UrlVO | UrlVO[], actorId: Id): void {
         this._images = this._images.remove(urls);
     }
+
     setDefault(index: Quantity, actorId: Id) {
         this._images.setDefault(index);
     }
@@ -295,6 +348,7 @@ export class ProductAggregate extends AggregateRoot {
     hasImages(): boolean {
         return !this._images.isEmpty;
     }
+
     enableIngredients(actorId: Id): void {
         this._ingredients = this._ingredients.enable();
     }
@@ -302,6 +356,7 @@ export class ProductAggregate extends AggregateRoot {
     disableIngredients(actorId: Id): void {
         this._ingredients = this._ingredients.disable();
     }
+
     addIngredients(items: string | string[], actorId: Id): void {
         const ingredientList = Array.isArray(items) ? items : [items];
 
@@ -310,8 +365,8 @@ export class ProductAggregate extends AggregateRoot {
                 this._ingredients.add(ingredient);
             }
         });
-        console.log(this._ingredients.value);
     }
+
     removeIngredients(items: string | string[], actorId: Id): void {
         const ingredientList = Array.isArray(items) ? items : [items];
         ingredientList.forEach((ingredient) => {

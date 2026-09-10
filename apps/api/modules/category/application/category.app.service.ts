@@ -3,7 +3,6 @@ import {
     type createCategoryDtoType,
     type deleteCategoryType,
     type getPaginatedDtoType,
-    idSchema,
 } from '@ecomerece/shared';
 import { BaseService } from '../../../core/services/base.services';
 import type { UserPersistence } from '../../user/infrastructure/user.models';

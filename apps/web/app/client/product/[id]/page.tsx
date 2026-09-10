@@ -9,19 +9,29 @@ export default async function ProductPage({
     const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     const { id } = await params;
 
-    const proudctRes = await fetch(`${BASE_URL}/product/${id}`);
-    const productObj = await proudctRes.json();
+    const productRes = await fetch(`${BASE_URL}/product/${id}`);
+    const productObj = await productRes.json();
     if (!productObj?.success) throw new Error('Product not found');
-    const product = productObj.data as ProductResponseReadModel
-    const variantRes = await fetch(`${BASE_URL}/product-variant/${id}`);
+    const product = productObj.data as ProductResponseReadModel;
+
+    const relatedParams = new URLSearchParams({
+        limit: '20',
+        categoryId: product.categoryId,
+    });
+
+    const [variantRes, relatedRes] = await Promise.all([
+        fetch(`${BASE_URL}/product-variant/${id}`),
+        fetch(`${BASE_URL}/product?${relatedParams.toString()}`),
+    ]);
+
     const variantsObj = await variantRes.json();
     if (!variantsObj?.success) throw new Error('Variants not found');
-    const variants = variantsObj.data as ProductVariantResponseReadModel[]
-    const relatedRes = await fetch(`${BASE_URL}/product-variant/${id}`)
+    const variants = variantsObj.data as ProductVariantResponseReadModel[];
+
     const relatedObj = await relatedRes.json();
-    const relatedProducts = relatedObj.data as ProductResponseReadModel[]
 
-    //   { id: 1, vendor: "SoundMax", name: "Portable Bluetooth Speaker - Deep Bass", price: "$59.99", image: "https://picsum.photos/seed/related1/400/400" },
+    const rawRelated = (relatedObj.data?.data ?? relatedObj.data ?? []) as ProductResponseReadModel[];
+    const relatedProducts = rawRelated.filter((p) => p.id !== product.id);
 
-    return <ProductContentPage product={product} variants={variants} relatedProducts={relatedProducts} />
+    return <ProductContentPage product={product} variants={variants} relatedProducts={relatedProducts} />;
 }

@@ -5,8 +5,12 @@ export interface ProductResponseReadModel {
     minDiscountedPrice: number;
     maxDiscountedPrice: number;
     version: number;
+    averageRating: number,
+    totalReviews: number,
     categoryId: string,
-    title: string;
+    title: string,
+    vendorTitle: string,
+    inStock: boolean,
     appearance: 'public' | 'private';
     description: string;
     vendorId: string;

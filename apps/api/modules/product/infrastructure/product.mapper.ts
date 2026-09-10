@@ -28,7 +28,9 @@ export const ProductMapper = {
             Id.create(doc._id.toString()),
             Id.create(doc.vendorId),
             Id.create(doc.categoryId),
+            Title.create(doc.vendorTitle),
             Title.create(doc.title),
+            doc.inStock,
             Description.create(doc.description),
             IngredientsVO.rehydrate(
                 doc.ingredient.isIngredients,
@@ -69,7 +71,8 @@ export const ProductMapper = {
             Money.create(doc.price?.maxPrice ?? 0),
             Money.create(doc.price?.minDiscountedPrice ?? 0),
             Money.create(doc.price?.maxDiscountedPrice ?? 0),
-
+            Quantity.rehydrate(doc?.rating?.average ?? 0),
+            Quantity.rehydrate(doc?.rating?.totalCount ?? 0)
         );
     },
 
@@ -79,6 +82,7 @@ export const ProductMapper = {
             vendorId: product.vendorId.value,
             categoryId: product.categoryId.value,
             title: product.title.value,
+            inStock: product.inStock,
             description: product.description.value,
             ingredient: {
                 isIngredients: product.ingredients.isIngredients,
@@ -90,6 +94,10 @@ export const ProductMapper = {
                     name: d.name.value,
                     title: d.title.value,
                 })),
+            },
+            rating: {
+                average: product?.averageRating?.value ?? 0,
+                totalCount: product?.totalReviews?.value ?? 0,
             },
             image: {
                 images: product.images.value.map((value) => value.toObject()),
@@ -122,12 +130,16 @@ export const ProductMapper = {
     aggregateToReadModel(product: ProductAggregate): ProductReadModel {
         return {
             id: product.id.value,
+            inStock: product.inStock,
             categoryId: product.categoryId.value,
             version: product.version.value,
+            vendorTitle: product.vendorTitle.value,
             title: product.title.value,
             appearance: product.appearance.value,
             description: product.description.value,
             vendorId: product.vendorId.value,
+            averageRating: product?.averageRating?.value ?? 0,
+            totalReviews: product?.totalReviews?.value ?? 0,
             ingredient: {
                 isIngredients: product.ingredients.isIngredients,
                 ingredients: product.ingredients.value.map((val) => val.value),
@@ -169,7 +181,9 @@ export const ProductMapper = {
             id: doc._id.toString(),
             categoryId: doc.categoryId,
             version: doc.version,
+            vendorTitle: doc.vendorTitle,
             title: doc.title,
+            inStock: doc.inStock,
             appearance: doc.appearance,
             description: doc.description,
             vendorId: doc.vendorId,
@@ -184,6 +198,8 @@ export const ProductMapper = {
                     title: d.title,
                 })),
             },
+            averageRating: doc?.rating?.average ?? 0,
+            totalReviews: doc?.rating?.totalCount ?? 0,
             image: {
                 images: doc.image.images.map((img) => ({
                     url: img.url,
@@ -217,7 +233,9 @@ export const ProductMapper = {
             id: product.id.value,
             categoryId: product.categoryId.value,
             version: product.version.value,
+            vendorTitle: product.vendorTitle.value,
             title: product.title.value,
+            inStock: product.inStock,
             appearance: product.appearance.value,
             description: product.description.value,
             vendorId: product.vendorId.value,
@@ -235,13 +253,12 @@ export const ProductMapper = {
             image: {
                 images: product.images.value.map((val) => val.toObject()),
             },
-
+            averageRating: product?.averageRating?.value ?? 0,
+            totalReviews: product?.totalReviews?.value ?? 0,
             minPrice: product.minPrice.value,
             maxPrice: product.maxPrice.value,
             minDiscountedPrice: product.minDiscountedPrice.value,
             maxDiscountedPrice: product.maxDiscountedPrice.value,
-
-
             createdAt: product.createdAt.value,
         };
     },

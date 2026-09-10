@@ -1,6 +1,23 @@
 import mongoose, { type HydratedDocument, type InferSchemaType, Schema } from 'mongoose';
 
 
+const RatingSummarySchema = new Schema(
+    {
+        average: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 5,
+        },
+        totalCount: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+    },
+    { _id: false }
+);
+
 const productPriceSchema = new Schema({
     minPrice: {
         type: Number,
@@ -18,7 +35,9 @@ const productPriceSchema = new Schema({
         type: Number,
         required: true
     },
-})
+
+},
+    { _id: false })
 
 
 
@@ -134,7 +153,11 @@ const ProductModelSchema = new Schema(
             type: String,
             required: true,
         },
-
+        inStock: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
         version: {
             type: Number,
             required: true,
@@ -143,6 +166,13 @@ const ProductModelSchema = new Schema(
         categoryId: {
             type: String,
             required: true,
+        },
+
+        vendorTitle: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
         },
         title: {
             type: String,
@@ -175,12 +205,15 @@ const ProductModelSchema = new Schema(
             required: true,
             ref: 'Vendor',
         },
-
         ingredient: {
             required: true,
             type: IngredientSchema,
         },
-
+        rating: {
+            type: RatingSummarySchema,
+            required: true,
+            default: { average: 0, totalCount: 0 },
+        },
         disclaimer: {
             required: true,
             type: DisclaimerInfoSchema,

@@ -13,3 +13,5 @@ export * from './reason-schema';
 export * from './title-schema';
 export * from './url-schema';
 export * from './clerk-id-schema'
+export * from './rating-schema'
+export * from './color-schema'

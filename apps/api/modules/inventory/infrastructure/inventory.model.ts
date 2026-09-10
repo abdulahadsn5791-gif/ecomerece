@@ -47,6 +47,11 @@ const InventoryModelSchema = new Schema(
             type: deletedSchema,
             required: true,
         },
+        inStock: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
     },
     {
         timestamps: true,

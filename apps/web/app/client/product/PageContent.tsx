@@ -20,11 +20,10 @@ import { ProductResponseReadModel, ProductVariantResponseReadModel } from "@ecom
 const PRODUCT_ACCENT = "#4A7FB5";
 const PRODUCT_ACCENT_TEXT = "#2F5F8C";
 
-
 interface ProductPageProps {
     product: ProductResponseReadModel;
-    variants: ProductVariantResponseReadModel[];
-    relatedProducts: ProductResponseReadModel[]
+    variants?: ProductVariantResponseReadModel[];
+    relatedProducts?: ProductResponseReadModel[];
 }
 
 const reviewsData = [
@@ -42,8 +41,6 @@ const reviewsData = [
     },
 ];
 
-
-
 function StarRating({ rating, size = "w-4 h-4" }: { rating: number; size?: string }) {
     return (
         <div className="flex items-center gap-0.5">
@@ -57,10 +54,20 @@ function StarRating({ rating, size = "w-4 h-4" }: { rating: number; size?: strin
     );
 }
 
-export default function ProductContentPage({ product, variants, relatedProducts }: ProductPageProps) {
+export default function ProductContentPage({
+    product,
+    variants = [],
+    relatedProducts = []
+}: ProductPageProps) {
     const { darkMode } = useThemeStore();
-    const activeVariants = variants.filter((v) => v.active);
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariantResponseReadModel>(activeVariants[0] || variants[0]);
+
+    // Safely compute active variants and fallback to empty array if undefined
+    const activeVariants = (variants || []).filter((v) => v?.active);
+
+    // Safely retrieve initial variant
+    const initialVariant = activeVariants[0] || variants?.[0] || null;
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariantResponseReadModel | null>(initialVariant);
+
     const [activeTab, setActiveTab] = useState("description");
     const [activeImage, setActiveImage] = useState(0);
     const [isWishlisted, setIsWishlisted] = useState(false);
@@ -69,9 +76,12 @@ export default function ProductContentPage({ product, variants, relatedProducts 
     const avgRating = 4.8;
     const totalReviews = 2345;
 
-    const hasDiscount = selectedVariant.discountedPrice < selectedVariant.price;
-    const discountPercent = hasDiscount
-        ? Math.round((1 - selectedVariant.discountedPrice / selectedVariant.price) * 100)
+    // Price safety checks
+    const variantPrice = selectedVariant?.price ?? 0;
+    const variantDiscountedPrice = selectedVariant?.discountedPrice ?? variantPrice;
+    const hasDiscount = variantDiscountedPrice < variantPrice;
+    const discountPercent = hasDiscount && variantPrice > 0
+        ? Math.round((1 - variantDiscountedPrice / variantPrice) * 100)
         : 0;
 
     const borderColor = darkMode ? "border-neutral-800" : "border-neutral-200";
@@ -80,7 +90,7 @@ export default function ProductContentPage({ product, variants, relatedProducts 
 
     const tabs = [
         { key: "description", label: "Description" },
-        { key: "materials", label: product.ingredient.isIngredients ? "Ingredients" : "Materials" },
+        { key: "materials", label: product?.ingredient?.isIngredients ? "Ingredients" : "Materials" },
         { key: "goodToKnow", label: "Good to know" },
         { key: "reviews", label: `Reviews (${reviewsData.length})` },
     ];
@@ -100,7 +110,7 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                     <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                     <a href="#" className={`transition-colors ${darkMode ? "hover:text-white" : "hover:text-neutral-900"}`}>Store</a>
                     <ChevronRight className="w-3.5 h-3.5 shrink-0" />
-                    <span className={`font-medium truncate ${headingText}`}>{product.title}</span>
+                    <span className={`font-medium truncate ${headingText}`}>{product?.title}</span>
                 </div>
             </div>
 
@@ -111,8 +121,8 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                     <div className="flex flex-col gap-4">
                         <div className={`aspect-square rounded-2xl overflow-hidden ${darkMode ? "bg-neutral-900" : "bg-neutral-100"}`}>
                             <img
-                                src={`https://picsum.photos/seed/${productImages[activeImage]}/600/600`}
-                                alt={product.title}
+                                src={`https://picsum.photos/seed/${productImages[activeImage] || "product1"}/600/600`}
+                                alt={product?.title || "Product image"}
                                 className="w-full h-full object-cover"
                             />
                         </div>
@@ -132,7 +142,7 @@ export default function ProductContentPage({ product, variants, relatedProducts 
 
                     {/* Product info */}
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">{product.title}</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">{product?.title}</h1>
 
                         <div className="flex items-center gap-2 mb-4">
                             <StarRating rating={avgRating} />
@@ -141,11 +151,11 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                         </div>
 
                         <div className="flex items-baseline gap-3 mb-4 flex-wrap">
-                            <span className="text-3xl font-bold">${selectedVariant.discountedPrice.toFixed(2)}</span>
+                            <span className="text-3xl font-bold">${variantDiscountedPrice.toFixed(2)}</span>
                             {hasDiscount && (
                                 <>
                                     <span className={`text-lg line-through ${mutedText}`}>
-                                        ${selectedVariant.price.toFixed(2)}
+                                        ${variantPrice.toFixed(2)}
                                     </span>
                                     <span className="bg-[var(--accent)] text-white px-2.5 py-1 rounded-full text-sm font-semibold">
                                         Save {discountPercent}%
@@ -155,11 +165,11 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                         </div>
 
                         <p className={`mb-6 leading-relaxed ${mutedText}`}>
-                            {product.description}
+                            {product?.description}
                         </p>
 
                         {/* Variant selector */}
-                        {activeVariants.length > 0 && (
+                        {activeVariants.length > 0 && selectedVariant && (
                             <div className="mb-6">
                                 <span className="font-semibold block mb-2 text-sm">Variant ({selectedVariant.title})</span>
                                 <div className="flex gap-2 flex-wrap">
@@ -167,7 +177,7 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                                         <button
                                             key={variant.id}
                                             onClick={() => setSelectedVariant(variant)}
-                                            className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${selectedVariant.id === variant.id
+                                            className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${selectedVariant?.id === variant.id
                                                 ? "bg-[var(--accent)] text-white border-[var(--accent)]"
                                                 : `${borderColor} ${darkMode ? "text-neutral-300" : "text-neutral-700"} hover:border-[var(--accent-text)]`}`}
                                         >
@@ -233,18 +243,18 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                         {activeTab === "description" && (
                             <div>
                                 <h3 className={`text-xl font-semibold mb-4 ${headingText}`}>Product description</h3>
-                                <p className="leading-relaxed">{product.description}</p>
+                                <p className="leading-relaxed">{product?.description}</p>
                             </div>
                         )}
                         {activeTab === "materials" && (
                             <div>
                                 <h3 className={`text-xl font-semibold mb-4 ${headingText}`}>
-                                    {product.ingredient.isIngredients ? "Ingredients" : "Materials & Composition"}
+                                    {product?.ingredient?.isIngredients ? "Ingredients" : "Materials & Composition"}
                                 </h3>
                                 <ul className="list-disc pl-6 space-y-1">
-                                    {product.ingredient.ingredients.map((item, idx) => (
+                                    {product?.ingredient?.ingredients?.map((item, idx) => (
                                         <li key={idx}>{item}</li>
-                                    ))}
+                                    )) || <li>No ingredient data available</li>}
                                 </ul>
                             </div>
                         )}
@@ -252,8 +262,8 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                             <div>
                                 <h3 className={`text-xl font-semibold mb-4 ${headingText}`}>Good to know</h3>
                                 <ul className="list-disc pl-6 space-y-1">
-                                    <li>Appearance setting: {product.appearance}</li>
-                                    <li>Product version: {product.version}</li>
+                                    <li>Appearance setting: {product?.appearance}</li>
+                                    <li>Product version: {product?.version}</li>
                                     <li>Carefully inspected and securely packaged prior to dispatch.</li>
                                 </ul>
                             </div>
@@ -296,23 +306,26 @@ export default function ProductContentPage({ product, variants, relatedProducts 
                     <h2 className="text-xl sm:text-2xl font-bold tracking-tight mb-6">You might also like</h2>
                     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
                         <div className="flex gap-4 w-max">
-                            {relatedProducts.map((related) => (
+                            {relatedProducts?.map((related) => (
                                 <a
                                     key={related.id}
-                                    href="#"
+                                    href={`/product/${related.id}`}
                                     className={`group rounded-2xl overflow-hidden border w-44 sm:w-48 shrink-0 transition-all duration-300 hover:shadow-lg ${darkMode ? "bg-neutral-900 border-neutral-800" : "bg-white border-neutral-200"}`}
                                 >
                                     <div className={`m-2 aspect-square rounded-xl overflow-hidden ${darkMode ? "bg-neutral-800" : "bg-neutral-100"}`}>
                                         <img
-                                            src={related.image}
-                                            alt={related.name}
+                                            src={
+                                                related.image?.images?.find((img) => img.default)?.url ||
+                                                related.image?.images?.[0]?.url ||
+                                                '/placeholder.jpg'
+                                            }
+                                            alt={related.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                     </div>
                                     <div className="px-3 pb-3">
-                                        <div className={`text-xs mb-0.5 ${mutedText}`}>{related.vendor}</div>
-                                        <div className="text-sm font-semibold leading-snug mb-1">{related.name}</div>
-                                        <div className="text-base font-bold">{related.price}</div>
+                                        <div className="text-sm font-semibold leading-snug mb-1">{related.title}</div>
+                                        <div className="text-base font-bold">${related.minDiscountedPrice}</div>
                                     </div>
                                 </a>
                             ))}

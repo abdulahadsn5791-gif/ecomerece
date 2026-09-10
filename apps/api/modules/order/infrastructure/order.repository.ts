@@ -19,13 +19,13 @@ export class OrderRepository extends MongoRepository<OrderPersistence> implement
     async EnsureUniqueImpodentKey(key: Id): Promise<void> {
         const doc = await super.findOne({ idempotentKey: key.value });
         if (doc) {
-            throw new BadRequestError('This order was already created');
+            throw new BadRequestError('This order was already created with the same idempotency key.');
         }
     }
 
     async FindByIdOrThrow(id: Id): Promise<OrderAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError('Order not found with this id');
+        if (!doc) throw new BadRequestError('Order not found.');
         return OrderMapper.persistenceToAggregate(doc);
     }
 

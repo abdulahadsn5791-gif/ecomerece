@@ -6,7 +6,7 @@ export class Reason extends StringVO {
         super(value);
 
         if (value.length < 10) throw new BadRequestError('Reason too short.');
-        if (value.length > 100) throw new BadRequestError('Reason too long');
+        if (value.length > 100) throw new BadRequestError('Reason is too long.');
     }
     static create(reason: string) {
         return new Reason(reason);

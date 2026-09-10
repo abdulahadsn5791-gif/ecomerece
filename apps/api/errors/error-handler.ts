@@ -16,7 +16,7 @@ export function registerErrorHandler(app: any) {
 
         let status = 500;
         let code = 'INTERNAL_ERROR';
-        let message = 'Internal Server Error';
+        let message = 'An internal server error occurred. Please try again later.';
         let stack: string | undefined;
         let issues: any;
 
@@ -24,7 +24,7 @@ export function registerErrorHandler(app: any) {
         if (err instanceof ZodError) {
             status = 400;
             code = 'VALIDATION_ERROR';
-            message = 'Validation failed';
+            message = 'The request is invalid. Please review the highlighted fields.';
 
             issues = err.issues.map((issue) => ({
                 field: issue.path.join('.'),
@@ -47,14 +47,16 @@ export function registerErrorHandler(app: any) {
 
             const field = Object.keys((err as any).keyPattern || {})[0];
 
-            message = field ? `${field} already exists` : 'Duplicate value already exists';
+            message = field
+                ? `The ${field} you provided already exists.`
+                : 'A record with the same value already exists.';
         }
 
         // Mongoose Validation Error
         else if (err instanceof mongoose.Error.ValidationError) {
             status = 400;
             code = 'VALIDATION_ERROR';
-            message = 'Validation failed';
+            message = 'The provided data is invalid. Please review the highlighted fields.';
 
             issues = Object.values(err.errors).map((e: any) => ({
                 field: e.path,
@@ -66,7 +68,7 @@ export function registerErrorHandler(app: any) {
         else if (err instanceof mongoose.Error.CastError) {
             status = 400;
             code = 'INVALID_ID';
-            message = 'Invalid ID format';
+            message = 'The provided identifier is not in a valid format.';
         }
 
         // Generic Errors
@@ -75,7 +77,7 @@ export function registerErrorHandler(app: any) {
                 message = err.message;
                 stack = err.stack;
             } else {
-                message = 'Something went wrong';
+                message = 'An unexpected error occurred. Please try again later.';
             }
         }
 
@@ -99,7 +101,7 @@ export function registerErrorHandler(app: any) {
                 success: false,
                 error: {
                     code: 'NOT_FOUND',
-                    message: 'Route not found',
+                    message: 'The requested route was not found.',
                 },
             },
             404 as any,

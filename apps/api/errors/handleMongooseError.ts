@@ -8,12 +8,12 @@ export function handleMongooseError(err: any): Error {
     }
 
     if (err instanceof mongoose.Error.CastError) {
-        return new BadRequestError('Invalid ID format');
+        return new BadRequestError('The provided identifier is not in a valid format.');
     }
 
     if (err?.code === 11000) {
         const field = Object.keys(err.keyPattern || {})[0];
-        return new ConflictError(`${field} already exists`);
+        return new ConflictError(field ? `The ${field} you provided already exists.` : 'A record with the same value already exists.');
     }
 
     return err;

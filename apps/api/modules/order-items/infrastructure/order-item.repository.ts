@@ -21,7 +21,7 @@ export class OrderItemsRepository
     }
     async FindByIdOrThrow(id: Id): Promise<OrderItemsAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError('Order Items not found with this Id');
+        if (!doc) throw new BadRequestError('Order item not found.');
         return OrderItemsMapper.persistenceToAggregate(doc);
     }
 

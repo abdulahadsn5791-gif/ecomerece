@@ -34,12 +34,12 @@ export class UserRepository extends MongoRepository<UserPersistence> implements 
 
     async FindByIdOrThrow(id: Id): Promise<UserAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new NotFoundError('User not found with this Id');
+        if (!doc) throw new NotFoundError('User not found.');
         return UserMapper.persistenceToAggregate(doc);
     }
     async FindByEmailOrThrow(email: EmailVO): Promise<UserAggregate> {
         const doc = await super.findOne({ email: email.value });
-        if (!doc) throw new NotFoundError('User not found with this email');
+        if (!doc) throw new NotFoundError('No user exists with this email.');
         return UserMapper.persistenceToAggregate(doc);
     }
 

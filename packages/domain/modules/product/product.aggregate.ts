@@ -233,42 +233,42 @@ export class ProductAggregate extends AggregateRoot {
 
     updateRatingSummary(averageRating: number, totalReviews: number): void {
         if (averageRating < 0 || averageRating > 5) {
-            throw new BadRequestError('Rating must be between 0 and 5');
+            throw new BadRequestError('Rating must be between 0 and 5.');
         }
         if (totalReviews < 0) {
-            throw new BadRequestError('Total reviews cannot be negative');
+            throw new BadRequestError('The total number of reviews cannot be negative.');
         }
         this._averageRating = Quantity.create(Math.round(averageRating * 10) / 10);
         this._totalReviews = Quantity.create(totalReviews);
     }
 
     recoverProduct(): void {
-        if (!this._delete.deleted) throw new BadRequestError('Product was already recovered');
+        if (!this._delete.deleted) throw new BadRequestError('This product has already been recovered.');
         this._delete = DeleteInfoVO.none();
     }
 
     deleteProduct(actor: Id, reason: Reason): void {
-        if (this._delete.deleted) throw new BadRequestError('Product was already removed');
+        if (this._delete.deleted) throw new BadRequestError('This product has already been removed.');
         this._delete = DeleteInfoVO.create(actor, reason);
     }
 
     blockProduct(actor: Id, reason: Reason): void {
-        if (this._block.isBlocked) throw new BadRequestError('Product was already blocked');
+        if (this._block.isBlocked) throw new BadRequestError('This product is already blocked.');
         this._block = this._block.block(actor, reason);
     }
 
     unBlockProduct(actor: Id): void {
-        if (!this._block.isBlocked) throw new BadRequestError('Product was already active');
+        if (!this._block.isBlocked) throw new BadRequestError('This product is not blocked.');
         this._block = this._block.unblock();
     }
 
     makeProductPublic(): void {
-        if (this._appearance.isPublic) throw new BadRequestError('Product was already public');
+        if (this._appearance.isPublic) throw new BadRequestError('This product is already public.');
         this._appearance = this._appearance.makePublic();
     }
 
     makeProductPrivate(): void {
-        if (this._appearance.isPrivate) throw new BadRequestError('Product was already private');
+        if (this._appearance.isPrivate) throw new BadRequestError('This product is already private.');
         this._appearance = this._appearance.makePrivate();
     }
 

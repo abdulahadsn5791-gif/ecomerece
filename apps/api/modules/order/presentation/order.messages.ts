@@ -16,12 +16,12 @@ export const OrderMessages = {
     ): OrderMessagesType {
         return {
             updatedData,
-            message: `Order ${orderId.value} has been created by ${actorId.value} for addressId ${addressId.value} on ${EffectiveDate.today().value}`,
+            message: `Order ${orderId.value} was created by ${actorId.value} for address ${addressId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     orderDeleted(orderId: Id, actorId: Id, addressId: Id): OrderMessagesType {
         return {
-            message: `Order ${orderId.value} has been deleted by ${actorId.value} for addressId ${addressId.value} on ${EffectiveDate.today().value}`,
+            message: `Order ${orderId.value} was deleted by ${actorId.value} for address ${addressId.value} on ${EffectiveDate.today().value}.`,
         };
     },
 };

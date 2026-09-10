@@ -71,7 +71,7 @@ export class HomeAppService extends BaseService {
     // --- Categories ---
     async addCategory(data: CreateHomeCategoryDtoType, actorId: string): Promise<HomeMessagesType> {
         const home = await this.getHomeAggregate();
-        const categoryId = data.id ? Id.create(data.id) : Id.create();
+        const categoryId = Id.create()
         home.addCategory(
             CategoryVO.create({
                 id: categoryId,
@@ -90,7 +90,7 @@ export class HomeAppService extends BaseService {
         const targetId = Id.create(data.id);
         const existing = home.categories.find((c) => c.id.equals(targetId));
         if (!existing) {
-            throw new NotFoundError(`Category with ID '${data.id}' not found`);
+            throw new NotFoundError(`Category with ID '${data.id}' was not found.`);
         }
         const updated = CategoryVO.create({
             id: existing.id,
@@ -123,7 +123,7 @@ export class HomeAppService extends BaseService {
     // --- Slides ---
     async addSlide(data: CreateSlideDtoType, actorId: string): Promise<HomeMessagesType> {
         const home = await this.getHomeAggregate();
-        const slideId = data.id ? Id.create(data.id) : Id.create();
+        const slideId = Id.create();
         home.addSlide(
             SlideVO.create({
                 id: slideId,
@@ -150,7 +150,7 @@ export class HomeAppService extends BaseService {
         const targetId = Id.create(data.id);
         const existing = home.slides.find((s) => s.id.equals(targetId));
         if (!existing) {
-            throw new NotFoundError(`Slide with ID '${data.id}' not found`);
+            throw new NotFoundError(`Slide with ID '${data.id}' was not found.`);
         }
         const updated = SlideVO.create({
             id: existing.id,
@@ -188,7 +188,7 @@ export class HomeAppService extends BaseService {
     // --- Promos ---
     async addPromo(data: CreatePromoDtoType, actorId: string): Promise<HomeMessagesType> {
         const home = await this.getHomeAggregate();
-        const promoId = data.id ? Id.create(data.id) : Id.create();
+        const promoId = Id.create()
         home.addPromo(
             PromoVO.create({
                 id: promoId,
@@ -209,7 +209,7 @@ export class HomeAppService extends BaseService {
         const targetId = Id.create(data.id);
         const existing = home.promos.find((p) => p.id.equals(targetId));
         if (!existing) {
-            throw new NotFoundError(`Promo with ID '${data.id}' not found`);
+            throw new NotFoundError(`Promo with ID '${data.id}' was not found.`);
         }
         const updated = PromoVO.create({
             id: existing.id,
@@ -236,7 +236,7 @@ export class HomeAppService extends BaseService {
     // --- Features ---
     async addFeature(data: CreateFeatureDtoType, actorId: string): Promise<HomeMessagesType> {
         const home = await this.getHomeAggregate();
-        const featureId = data.id ? Id.create(data.id) : Id.create();
+        const featureId = Id.create()
         home.addFeature(
             FeatureVO.create({
                 id: featureId,
@@ -255,7 +255,7 @@ export class HomeAppService extends BaseService {
         const targetId = Id.create(data.id);
         const existing = home.features.find((f) => f.id.equals(targetId));
         if (!existing) {
-            throw new NotFoundError(`Feature with ID '${data.id}' not found`);
+            throw new NotFoundError(`Feature with ID '${data.id}' was not found.`);
         }
         const updated = FeatureVO.create({
             id: existing.id,
@@ -281,7 +281,7 @@ export class HomeAppService extends BaseService {
         const home = await this.getHomeAggregate();
         const features = data.features.map((f) =>
             FeatureVO.create({
-                id: f.id ? Id.create(f.id) : Id.create(),
+                id: Id.create(),
                 title: Title.create(f.title),
                 detail: Description.create(f.detail),
                 accent: ColorVO.create(f.accent),
@@ -296,7 +296,7 @@ export class HomeAppService extends BaseService {
     // --- Product Containers ---
     async addProductContainer(data: CreateProductContainerDtoType, actorId: string): Promise<HomeMessagesType> {
         const home = await this.getHomeAggregate();
-        const containerId = data.id ? Id.create(data.id) : Id.create();
+        const containerId = Id.create()
         home.addProductContainer(
             ProductContainerVO.create({
                 id: containerId,
@@ -325,7 +325,7 @@ export class HomeAppService extends BaseService {
         const targetId = Id.create(data.id);
         const existing = home.productContainers.find((c) => c.id.equals(targetId));
         if (!existing) {
-            throw new NotFoundError(`Product container with ID '${data.id}' not found`);
+            throw new NotFoundError(`Product container with ID '${data.id}' was not found.`);
         }
         const updated = ProductContainerVO.create({
             id: existing.id,
@@ -333,12 +333,12 @@ export class HomeAppService extends BaseService {
             subTitle: data.subTitle !== undefined ? Title.create(data.subTitle) : existing.subTitle,
             query: data.query
                 ? BaseQueryVO.create({
-                      filter: data.query.filter as Record<string, unknown> | undefined,
-                      cursor: data.query.cursor,
-                      limit: data.query.limit !== undefined ? Quantity.create(data.query.limit) : undefined,
-                      direction: data.query.direction,
-                      sort: data.query.sort as Record<string, 1 | -1> | null | undefined,
-                  })
+                    filter: data.query.filter as Record<string, unknown> | undefined,
+                    cursor: data.query.cursor,
+                    limit: data.query.limit !== undefined ? Quantity.create(data.query.limit) : undefined,
+                    direction: data.query.direction,
+                    sort: data.query.sort as Record<string, 1 | -1> | null | undefined,
+                })
                 : existing.query,
             displayOrder:
                 data.displayOrder !== undefined

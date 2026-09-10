@@ -103,15 +103,15 @@ export class AddressAggregate extends AggregateRoot {
     }
 
     updateAddress(data: AddressVO, actorId: Id) {
-        if (actorId.value !== this.ownerId.value) throw new BadRequestError("You can update your own address only")
+        if (actorId.value !== this.ownerId.value) throw new BadRequestError('You can only update your own address.')
         this._address = data;
     }
     deleteAddress(reason: Reason, actorId: Id) {
-        if (this._delete.isDeleted) throw new BadRequestError('Address was already removed');
+        if (this._delete.isDeleted) throw new BadRequestError('This address has already been removed.');
         this._delete = DeleteInfoVO.create(actorId, reason);
     }
     recoverAddress(actorId: Id) {
-        if (!this._delete.isDeleted) throw new BadRequestError('Address was already recovered');
+        if (!this._delete.isDeleted) throw new BadRequestError('This address has already been recovered.');
         this._delete = DeleteInfoVO.none();
     }
     setAsDefault() {

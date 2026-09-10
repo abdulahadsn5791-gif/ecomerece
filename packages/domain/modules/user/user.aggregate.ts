@@ -133,11 +133,9 @@ export class UserAggregate extends AggregateRoot {
 
     banUser(actor: Id, days: number, reason: Reason): void {
         if (this._ban.isBan)
-            throw new BadRequestError(
-                `User already is banned for ${this._ban.until?.remainingDays} days `,
-            );
-        if (this._id.value === actor.value) throw new BadRequestError('Actor cannot ban himself');
-        if (this._role.isAdmin) throw new BadRequestError('Cannot ban admin');
+            throw new BadRequestError(`This user is already banned for ${this._ban.until?.remainingDays} days.`);
+        if (this._id.value === actor.value) throw new BadRequestError('You cannot ban yourself.');
+        if (this._role.isAdmin) throw new BadRequestError('Administrators cannot be banned.');
         this._ban = BanInfoVO.create(
             actor,
             EffectiveDate.today(),
@@ -148,24 +146,24 @@ export class UserAggregate extends AggregateRoot {
     }
 
     blockUser(actor: Id, reason: Reason): void {
-        if (this._block.isBlocked) throw new BadRequestError('User is already blocked');
-        if (this._id.value === actor.value) throw new BadRequestError('Actor cannot block himself');
-        if (this._role.isAdmin) throw new BadRequestError('Cannot block admin');
+        if (this._block.isBlocked) throw new BadRequestError('This user is already blocked.');
+        if (this._id.value === actor.value) throw new BadRequestError('You cannot block yourself.');
+        if (this._role.isAdmin) throw new BadRequestError('Administrators cannot be blocked.');
         this._block = BlockInfoVO.create(actor, reason);
         this.raise(new UserBlockedEvent({ userId: this._id, blockInfo: this._block }));
     }
 
     deleteUser(actor: Id, reason: Reason): void {
-        if (this._delete.isDeleted) throw new BadRequestError('User already deleted');
-        if (this._role.isAdmin) throw new BadRequestError('Cannot delete admin');
+        if (this._delete.isDeleted) throw new BadRequestError('This user has already been deleted.');
+        if (this._role.isAdmin) throw new BadRequestError('Administrators cannot be deleted.');
         this._delete = DeleteInfoVO.create(actor, reason);
         this.raise(new UserDeletedEvent({ userId: this._id, deleteInfo: this._delete }));
     }
     loginUser(): void {
         if (this._ban.isBan)
-            throw new BadRequestError(`User is ban for ${this._ban.until?.remainingDays} days `);
-        if (this._block.isBlocked) throw new BadRequestError('User is banned');
-        if (this._delete.isDeleted) throw new BadRequestError('User was removed');
+            throw new BadRequestError(`This user is banned for ${this._ban.until?.remainingDays} days.`);
+        if (this._block.isBlocked) throw new BadRequestError('This user is banned.');
+        if (this._delete.isDeleted) throw new BadRequestError('This user was removed.');
         this._lastLogin = EffectiveDate.today();
         this.raise(new UserLoggedInEvent({ userId: this._id }));
     }
@@ -173,35 +171,35 @@ export class UserAggregate extends AggregateRoot {
     extendBan(actor: Id, days: number): void {
         if (!this._ban.isBan) throw new BadRequestError('User is not banned.');
         if (this._id.value === actor.value)
-            throw new BadRequestError('Actor cannot extend his own ban.');
-        if (this._role.isAdmin) throw new BadRequestError('Cannot extend ban for admin.');
+            throw new BadRequestError('You cannot extend your own ban period.');
+        if (this._role.isAdmin) throw new BadRequestError('An administrator ban period cannot be extended.');
         this._ban = this._ban.extend(days);
     }
 
     shortenBan(actor: Id, days: number): void {
         if (!this._ban.isBan)
-            throw new BadRequestError('Cannot short ban period of an active user');
-        if (this._id.value === actor.value) throw new BadRequestError('Cannot short ban your self');
+            throw new BadRequestError('The user must be banned before the ban period can be shortened.');
+        if (this._id.value === actor.value) throw new BadRequestError('You cannot shorten your own ban period.');
         this._ban = this._ban.shorten(days);
     }
 
     unBanUser(actor: Id): void {
-        if (!this._ban.isBan) throw new BadRequestError('Cannot recover an active user');
-        if (this._id.value === actor.value) throw new BadRequestError('Cannot recover your self');
+        if (!this._ban.isBan) throw new BadRequestError('This user is not currently banned.');
+        if (this._id.value === actor.value) throw new BadRequestError('You cannot unban yourself.');
         this._ban = BanInfoVO.none();
         this.raise(new UserBanLiftedEvent({ userId: this._id, banInfo: this._ban }));
     }
 
     unBlockUser(actor: Id): void {
-        if (!this._block.isBlocked) throw new BadRequestError('Cannot recover an active user');
-        if (this._id.value === actor.value) throw new BadRequestError('Cannot recover your self');
+        if (!this._block.isBlocked) throw new BadRequestError('This user is not currently blocked.');
+        if (this._id.value === actor.value) throw new BadRequestError('You cannot unblock yourself.');
         this._block = BlockInfoVO.none();
         this.raise(new UserUnBlockLiftedEvent({ userId: this._id, blockInfo: this._block }));
     }
 
     recoverUser(actor: Id): void {
-        if (!this._delete.isDeleted) throw new BadRequestError('Cannot recover an active user');
-        if (this._id.value === actor.value) throw new BadRequestError('Cannot recover your self');
+        if (!this._delete.isDeleted) throw new BadRequestError('This user has not been deleted.');
+        if (this._id.value === actor.value) throw new BadRequestError('You cannot recover yourself.');
         this._delete = DeleteInfoVO.none();
         this.raise(new UserDeleteLiftedEvent({ userId: this._id, recoverInfo: this._delete }));
     }

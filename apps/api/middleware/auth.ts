@@ -10,7 +10,7 @@ export const authMiddleware = createMiddleware(async (c, next) => {
     const token = getBearerToken(authHeader);
 
     if (!token) {
-        throw new UnauthorizedError('Missing token');
+        throw new UnauthorizedError('An authentication token is required.');
     }
 
     // Verify the token securely via Supabase's server-side Auth API
@@ -20,27 +20,27 @@ export const authMiddleware = createMiddleware(async (c, next) => {
     } = await supabaseAdmin.auth.getUser(token);
 
     if (error || !supabaseUser) {
-        throw new UnauthorizedError('Invalid or expired token');
+        throw new UnauthorizedError('The provided token is invalid or has expired.');
     }
 
     const userId = String(supabaseUser.id);
     const email = String(supabaseUser.email);
     if (!userId) {
-        throw new UnauthorizedError('Invalid token payload');
+        throw new UnauthorizedError('The token payload is invalid.');
     }
 
     const user = await UserModel.findById(userId);
 
     if (!user || user.deleted?.deleted) {
-        throw new UnauthorizedError('User not found');
+        throw new UnauthorizedError('User not found.');
     }
 
     if (user.block?.blocked) {
-        throw new ForbiddenError('User blocked');
+        throw new ForbiddenError('This user account is blocked.');
     }
 
     if (user.ban?.banned) {
-        throw new ForbiddenError('User banned');
+        throw new ForbiddenError('This user account is banned.');
     }
 
     c.set('email', email);

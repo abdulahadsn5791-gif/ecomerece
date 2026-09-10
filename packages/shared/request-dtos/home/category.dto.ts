@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { colorSchema, idSchema, titleSchema, urlSchema } from '../../dtos';
 
 export const createHomeCategoryDtoSchema = z.object({
-    id: idSchema.optional(),
     name: titleSchema,
     image: urlSchema,
     accent: colorSchema.default('#3B82F6'),

@@ -5,7 +5,7 @@ export const adminMiddleware = createMiddleware(async (c, next) => {
     const role = c.get('role');
 
     if (role !== 'admin') {
-        throw new ForbiddenError('Admin access required');
+        throw new ForbiddenError('Administrator access is required for this action.');
     }
 
     await next();

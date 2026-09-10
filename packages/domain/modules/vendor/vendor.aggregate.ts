@@ -137,8 +137,8 @@ export class VendorAggregate extends AggregateRoot {
     }
 
     verifyVendor(actor: Id) {
-        if (this._ownerId === actor) throw new BadRequestError('Cannot verify your own vendor');
-        if (this._delete.isDeleted) throw new BadRequestError('Cannot verify an in active vendor');
+        if (this._ownerId === actor) throw new BadRequestError('You cannot verify your own vendor.');
+        if (this._delete.isDeleted) throw new BadRequestError('An inactive vendor cannot be verified.');
         this._verification = this._verification.verify(EffectiveDate.today());
         this.raise(
             new VendorVerifiedEvent({
@@ -150,7 +150,7 @@ export class VendorAggregate extends AggregateRoot {
 
     rejectVerification(actor: Id, reason: Reason) {
         if (this._ownerId === actor)
-            throw new BadRequestError('Cannot reject your own vendor verification');
+            throw new BadRequestError('You cannot reject the verification of your own vendor.');
         this._verification = this._verification.reject(reason);
         this.raise(
             new VendorVerificationRejectedEvent({
@@ -178,13 +178,13 @@ export class VendorAggregate extends AggregateRoot {
     }
 
     deleteVendor(actor: Id, reason: Reason): void {
-        if (this._delete.isDeleted) throw new BadRequestError('Vendor already deleted');
+        if (this._delete.isDeleted) throw new BadRequestError('This vendor has already been deleted.');
         this._delete = DeleteInfoVO.create(actor, reason);
         this.raise(new VendorDeletedEvent({ vendorId: this._id, deletionInfo: this._delete }));
     }
 
     recoverVendor(actor: Id) {
-        if (this._ownerId === actor) throw new BadRequestError('Cannot recover your own vendor');
+        if (this._ownerId === actor) throw new BadRequestError('You cannot recover your own vendor.');;
         this._delete = DeleteInfoVO.none();
         this.raise(
             new VendorRecoverEvent({

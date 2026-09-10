@@ -161,10 +161,9 @@ describe('HomeAppService Full CRUD Operations', () => {
         const bus = new InMemoryEventBus();
         const service = new HomeAppService(repo as any, bus);
 
-        // 1. Add Category
+        // 1. Add Category (id must be server-generated)
         await service.addCategory(
             {
-                id: 'cat-phones',
                 name: 'Smartphones',
                 image: 'https://example.com/phone.jpg',
                 accent: '#3B82F6',
@@ -173,23 +172,24 @@ describe('HomeAppService Full CRUD Operations', () => {
         );
 
         let layout = await service.getHome();
+        const catId = layout.categories[0].id;
         expect(layout.categories.length).toBe(1);
-        expect(layout.categories[0].id).toBe('cat-phones');
 
         // 2. Update Category
         await service.updateCategory(
             {
-                id: 'cat-phones',
+                id: catId,
                 name: 'Flagship Phones',
             },
             'admin-1',
         );
 
         layout = await service.getHome();
+        expect(layout.categories[0].id).toBe(catId);
         expect(layout.categories[0].name).toBe('Flagship Phones');
 
         // 3. Remove Category
-        await service.removeCategory({ id: 'cat-phones' }, 'admin-1');
+        await service.removeCategory({ id: catId }, 'admin-1');
         layout = await service.getHome();
         expect(layout.categories.length).toBe(0);
     });
@@ -201,7 +201,6 @@ describe('HomeAppService Full CRUD Operations', () => {
 
         await service.addSlide(
             {
-                id: 'slide-1',
                 tag: 'Summer Sale',
                 title: 'Audio Fest',
                 subhead: 'Up to 40% Off',
@@ -215,20 +214,22 @@ describe('HomeAppService Full CRUD Operations', () => {
 
         let layout = await service.getHome();
         expect(layout.slides.length).toBe(1);
+        const slideId = layout.slides[0].id;
         expect(layout.slides[0].title).toBe('Audio Fest');
 
         await service.updateSlide(
             {
-                id: 'slide-1',
+                id: slideId,
                 title: 'Winter Fest',
             },
             'admin-1',
         );
 
         layout = await service.getHome();
+        expect(layout.slides[0].id).toBe(slideId);
         expect(layout.slides[0].title).toBe('Winter Fest');
 
-        await service.removeSlide({ id: 'slide-1' }, 'admin-1');
+        await service.removeSlide({ id: slideId }, 'admin-1');
         layout = await service.getHome();
         expect(layout.slides.length).toBe(0);
     });
@@ -240,7 +241,6 @@ describe('HomeAppService Full CRUD Operations', () => {
 
         await service.addPromo(
             {
-                id: 'promo-1',
                 title: 'Gaming Deals',
                 subtitle: 'Desktops & GPUs',
                 image: 'https://example.com/promo.jpg',
@@ -252,20 +252,22 @@ describe('HomeAppService Full CRUD Operations', () => {
 
         let layout = await service.getHome();
         expect(layout.promos.length).toBe(1);
+        const promoId = layout.promos[0].id;
         expect(layout.promos[0].title).toBe('Gaming Deals');
 
         await service.updatePromo(
             {
-                id: 'promo-1',
+                id: promoId,
                 title: 'Next-Gen Gaming Deals',
             },
             'admin-1',
         );
 
         layout = await service.getHome();
+        expect(layout.promos[0].id).toBe(promoId);
         expect(layout.promos[0].title).toBe('Next-Gen Gaming Deals');
 
-        await service.removePromo({ id: 'promo-1' }, 'admin-1');
+        await service.removePromo({ id: promoId }, 'admin-1');
         layout = await service.getHome();
         expect(layout.promos.length).toBe(0);
     });
@@ -279,13 +281,11 @@ describe('HomeAppService Full CRUD Operations', () => {
             {
                 features: [
                     {
-                        id: 'feat-1',
                         title: 'Free Shipping',
                         detail: 'On all orders nationwide over Rs. 2,500',
                         accent: '#10B981',
                     },
                     {
-                        id: 'feat-2',
                         title: 'Official Warranty',
                         detail: '100% genuine brand warranty covered',
                         accent: '#3B82F6',
@@ -297,20 +297,23 @@ describe('HomeAppService Full CRUD Operations', () => {
 
         let layout = await service.getHome();
         expect(layout.features.length).toBe(2);
+        const feat1 = layout.features[0].id;
+        const feat2 = layout.features[1].id;
         expect(layout.features[0].title).toBe('Free Shipping');
 
         await service.updateFeature(
             {
-                id: 'feat-1',
+                id: feat1,
                 title: 'Express Shipping',
             },
             'admin-1',
         );
 
         layout = await service.getHome();
+        expect(layout.features[0].id).toBe(feat1);
         expect(layout.features[0].title).toBe('Express Shipping');
 
-        await service.removeFeature({ id: 'feat-2' }, 'admin-1');
+        await service.removeFeature({ id: feat2 }, 'admin-1');
         layout = await service.getHome();
         expect(layout.features.length).toBe(1);
     });
@@ -322,7 +325,6 @@ describe('HomeAppService Full CRUD Operations', () => {
 
         await service.addProductContainer(
             {
-                id: 'shelf-new',
                 heading: 'New Arrivals',
                 subTitle: 'Check out the freshest arrivals',
                 query: {
@@ -336,20 +338,22 @@ describe('HomeAppService Full CRUD Operations', () => {
 
         let layout = await service.getHome();
         expect(layout.productContainers.length).toBe(1);
+        const containerId = layout.productContainers[0].id;
         expect(layout.productContainers[0].heading).toBe('New Arrivals');
 
         await service.updateProductContainer(
             {
-                id: 'shelf-new',
+                id: containerId,
                 heading: 'Featured Arrivals',
             },
             'admin-1',
         );
 
         layout = await service.getHome();
+        expect(layout.productContainers[0].id).toBe(containerId);
         expect(layout.productContainers[0].heading).toBe('Featured Arrivals');
 
-        await service.removeProductContainer({ id: 'shelf-new' }, 'admin-1');
+        await service.removeProductContainer({ id: containerId }, 'admin-1');
         layout = await service.getHome();
         expect(layout.productContainers.length).toBe(0);
     });

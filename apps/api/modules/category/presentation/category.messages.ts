@@ -8,12 +8,12 @@ export type CategoryMessagesType = {
 export const CategoryMessags = {
     created(id: Id, actorId: Id): CategoryMessagesType {
         return {
-            message: `Category ${id.value} has been created by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Category ${id.value} was created by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     deleted(id: Id, actorId: Id): CategoryMessagesType {
         return {
-            message: `Category ${id.value} has been deleted by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Category ${id.value} was deleted by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
 };

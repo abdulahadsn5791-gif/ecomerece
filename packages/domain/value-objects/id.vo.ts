@@ -7,14 +7,14 @@ export class Id extends Identifier<string> {
         super(value);
 
         if (typeof value !== 'string') {
-            throw new BadRequestError('Id must be a string');
+            throw new BadRequestError('Id must be a string.');
         }
 
         if (value.length < 5) {
-            throw new BadRequestError('Id too short.');
+            throw new BadRequestError('Id is too short.');
         }
         if (value.length > 40) {
-            throw new BadRequestError('Id too long');
+            throw new BadRequestError('Id is too long.');
         }
     }
 

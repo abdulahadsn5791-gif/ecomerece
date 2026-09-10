@@ -36,7 +36,7 @@ export class ProductVariantRepository
 
     async FindByIdOrThrow(id: Id): Promise<ProductVariantAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError('Product Varient not found with this id');
+        if (!doc) throw new BadRequestError('Product variant not found.');
         return productVariantMapper.persistenceToAggregate(doc);
     }
     async FindByProductId(productId: Id): Promise<ProductVariantAggregate[] | null> {
@@ -50,7 +50,7 @@ export class ProductVariantRepository
         variantId: Id,
     ): Promise<ProductVariantAggregate> {
         const doc = await super.findOne({ productId: productId.value, _id: variantId.value });
-        if (!doc) throw new BadRequestError('Product dont own that varaint');
+        if (!doc) throw new BadRequestError('You do not own this product variant.');
         return productVariantMapper.persistenceToAggregate(doc);
     }
     async Save(product: ProductVariantAggregate): Promise<void> {

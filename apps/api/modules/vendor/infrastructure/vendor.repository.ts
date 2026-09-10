@@ -21,7 +21,7 @@ export class VendorRepository
     }
     async EnsureOwnershipOrThrow(vendorId: Id, userId: Id): Promise<VendorAggregate> {
         const doc = await super.findOne({ _id: vendorId, ownerId: userId });
-        if (!doc) throw new BadRequestError('User dont own this vendor');
+        if (!doc) throw new BadRequestError('You do not own this vendor.');
         return VendorMapper.persistenceToAggregate(doc);
     }
 
@@ -44,7 +44,7 @@ export class VendorRepository
         const doc = await super.findById(id.value);
 
         if (!doc) {
-            throw new NotFoundError('Vendor not found with this Id');
+            throw new NotFoundError('Vendor not found.');
         }
 
         return VendorMapper.persistenceToAggregate(doc);
@@ -53,7 +53,7 @@ export class VendorRepository
         const doc = await super.findOne({ ownerId: id });
 
         if (!doc) {
-            throw new NotFoundError('Vendor not found with this Id');
+            throw new NotFoundError('Vendor not found.');
         }
 
         return VendorMapper.persistenceToAggregate(doc);

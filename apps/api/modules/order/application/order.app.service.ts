@@ -239,12 +239,12 @@ export class OrderApplicationService extends BaseService {
             new EnsureActiveAddressGetByIdQuery({ addressId }),
         );
         const user = await this.queryBus.execute(new EnsureActiveUserGetByIdQuery({ userId }));
-        if (!address.active) throw new BadRequestError('Address is not active');
-        if (!address.address) throw new BadRequestError('Address not found');
-        if (!user.active) throw new BadRequestError('User is not active');
-        if (!user.user) throw new BadRequestError('User not found');
+        if (!address.active) throw new BadRequestError('Address is not active.');
+        if (!address.address) throw new BadRequestError('Address not found.');
+        if (!user.active) throw new BadRequestError('User is not active.');
+        if (!user.user) throw new BadRequestError('User not found.');
         if (!address.address.fullAddress)
-            throw new BadRequestError('Address details are incomplete');
+            throw new BadRequestError('Address details are incomplete.');
 
         // ----- 2. Fetch variants, products, vendors, owners -----
         const variantIds = items.map((item) => item.variantId);

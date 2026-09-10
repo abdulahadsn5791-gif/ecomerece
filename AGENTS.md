@@ -62,6 +62,7 @@ bun test --watch            # watch mode
 - **Formatter:** Biome, spaces (indent 2), line width 100, single quotes
 - `noExplicitAny` is OFF (allows `any`)
 - Aggregates: private state, public command methods, `this.raise()` for events, `this.getEvents()` / `this.clearEvents()` in app service after save
+- **ID generation rule:** NEVER accept an ID from the API client when creating any document/aggregate. Always generate it server-side with `Id.create()` (random UUID v7). Client-supplied IDs are only allowed when addressing an existing resource (update/delete/remove/lookup) — never on `create*`/`add*` paths.
 
 ## Gotchas
 

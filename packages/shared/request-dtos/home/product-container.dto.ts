@@ -12,7 +12,6 @@ export const baseQueryDtoSchema = z.object({
 export type BaseQueryDtoType = z.infer<typeof baseQueryDtoSchema>;
 
 export const createProductContainerDtoSchema = z.object({
-    id: idSchema.optional(),
     heading: titleSchema,
     subTitle: titleSchema.default(''),
     query: baseQueryDtoSchema.default({ filter: {}, limit: 20, direction: 'next' }),

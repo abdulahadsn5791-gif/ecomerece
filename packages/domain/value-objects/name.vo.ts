@@ -8,7 +8,7 @@ export class PersonName extends StringVO {
         const trimmed = value.trim();
 
         if (trimmed.length < 1) {
-            throw new BadRequestError('Name must be at least 1 characters.');
+            throw new BadRequestError('Name must contain at least one character.');
         }
 
         if (trimmed.length > 50) {
@@ -39,7 +39,7 @@ export class Name extends StringVO {
         const trimmed = value.trim();
 
         if (trimmed.length < 1) {
-            throw new BadRequestError('Name must be at least 1 characters.');
+            throw new BadRequestError('Name must contain at least one character.');
         }
 
         if (trimmed.length > 50) {

@@ -33,28 +33,28 @@ export class InventoryApplicationService extends BaseService {
         const activeVariant = await this.queryBus.execute(
             new EnsureActiveVariantGetByIdQuery({ variantId: variantId }),
         );
-        if (!activeVariant.variant) throw new BadRequestError('Variant is not found');
-        if (!activeVariant.active) throw new BadRequestError('Variant is not active');
+        if (!activeVariant.variant) throw new BadRequestError('Variant not found.');
+        if (!activeVariant.active) throw new BadRequestError('Variant is not active.');
         const productId = Id.create(activeVariant.variant.productId);
         const activeProduct = await this.queryBus.execute(
             new EnsureActiveProductGetByIdQuery({ productId: productId }),
         );
-        if (!activeProduct.product) throw new BadRequestError('Product not found');
-        if (!activeProduct.active) throw new BadRequestError('Product is not active');
+        if (!activeProduct.product) throw new BadRequestError('Product not found.');
+        if (!activeProduct.active) throw new BadRequestError('Product is not active.');
         const vendorId = Id.create(activeProduct.product.vendorId);
         const activeVendor = await this.queryBus.execute(
             new EnsureActiveVendorGetByIdQuery({ vendorId: vendorId }),
         );
-        if (!activeVendor.vendor) throw new BadRequestError('Vendor not found');
-        if (!activeVendor.active) throw new BadRequestError('Vendor is not active');
+        if (!activeVendor.vendor) throw new BadRequestError('Vendor not found.');
+        if (!activeVendor.active) throw new BadRequestError('Vendor is not active.');
         if (activeVendor.vendor.ownerId !== actorId.value)
-            throw new BadRequestError('Owner don`t that variant');
+            throw new BadRequestError('This variant does not belong to the current owner.');
         const userId = Id.create(activeVendor.vendor.ownerId);
         const activeUser = await this.queryBus.execute(
             new EnsureActiveUserGetByIdQuery({ userId: userId }),
         );
-        if (!activeUser.user) throw new BadRequestError('User is not found');
-        if (!activeUser.active) throw new BadRequestError('User is not active');
+        if (!activeUser.user) throw new BadRequestError('User not found.');
+        if (!activeUser.active) throw new BadRequestError('User is not active.');
     }
 
     async createMyInventory(

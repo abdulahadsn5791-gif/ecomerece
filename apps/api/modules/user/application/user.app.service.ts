@@ -33,7 +33,7 @@ export class UserAppService extends BaseService {
     async initUser(userId: string) {
         const SupabaseUser = await getUserById(userId);
 
-        if (!SupabaseUser.email) throw new BadRequestError('Invalid user');
+        if (!SupabaseUser.email) throw new BadRequestError('Invalid user.');
 
         const email = EmailVO.create(SupabaseUser.email);
 
@@ -44,7 +44,7 @@ export class UserAppService extends BaseService {
             user.loginUser();
             await this.userRepo.Save(user);
 
-            return UserMessages.initailized(id);
+            return UserMessages.initialized(id);
         }
 
         const image = new UrlVO(
@@ -68,7 +68,7 @@ export class UserAppService extends BaseService {
         });
         User.signIn(User.id);
         await this.userRepo.Create(User);
-        return UserMessages.initailized(id);
+        return UserMessages.initialized(id);
     }
 
     async getUserById(userId: string): Promise<UserResponseReadModel> {

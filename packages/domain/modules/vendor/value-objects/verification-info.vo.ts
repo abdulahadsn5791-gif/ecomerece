@@ -31,7 +31,7 @@ export class VerificationInfoVO {
 
     reject(reason: Reason): VerificationInfoVO {
         if (!this.isVerified) {
-            throw new BadRequestError('Verified was already non verified');
+            throw new BadRequestError('This vendor has not been verified yet.');
         }
 
         return new VerificationInfoVO(false, null, reason);

@@ -32,13 +32,13 @@ export class InventoryReposityory
 
     async FindByIdOrThrow(id: Id): Promise<InventoryAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError('Inventory not found with this id');
+        if (!doc) throw new BadRequestError('Inventory not found.');
         return InventoryMapper.persistenceToAggregate(doc);
     }
 
     async FindByVariantIdOrThrow(id: Id): Promise<InventoryAggregate> {
         const doc = await super.findOne({ variantId: id.value });
-        if (!doc) throw new BadRequestError('Variant dont own this id');
+        if (!doc) throw new BadRequestError('No inventory exists for this variant.');
         return InventoryMapper.persistenceToAggregate(doc);
     }
 
@@ -88,7 +88,7 @@ export class InventoryReposityory
 
     async Delete(id: Id): Promise<void> {
         const doc = await super.findByIdAndDelete(id.value);
-        if (!doc) throw new BadRequestError('Inventory not found with this id');
+        if (!doc) throw new BadRequestError('Inventory not found.');
     }
 
     async Exists(id: Id): Promise<boolean> {

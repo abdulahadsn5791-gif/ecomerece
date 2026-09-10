@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { colorSchema, idSchema, positiveNumberSchema, titleSchema, urlSchema } from '../../dtos';
 
 export const createSlideDtoSchema = z.object({
-    id: idSchema.optional(),
     tag: titleSchema,
     title: titleSchema,
     subhead: titleSchema.default(''),

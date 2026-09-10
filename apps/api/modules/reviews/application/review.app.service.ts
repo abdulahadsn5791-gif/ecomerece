@@ -14,7 +14,7 @@ import { GetVendorByUserIdQuery } from '../../vendor/application/queries/get-ven
 import { reviewMapper } from '../infrastructure/review.mapper';
 import type { ReviewRepository } from '../infrastructure/review.repository';
 import { ReviewResponseReadModel } from '../../../../../packages/shared/types/responses-read-models/review.response-read-model';
-import { reviewMessages, ReviewMessagesType } from '../presentation/review.messgaes';
+import { reviewMessages, ReviewMessagesType } from '../presentation/review.messages';
 import { PersonName } from '@ecomerece/domain';
 import { ReviewAggregate } from '@ecomerece/domain/modules/reviews/reviews.aggregate';
 import { createMyReviewDtoType } from '../../../../../packages/shared/request-dtos/review/create-my-review.dto';

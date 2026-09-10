@@ -22,37 +22,37 @@ export class AppError extends Error {
 }
 
 export class NotFoundError extends AppError {
-    constructor(message = 'Resource not found') {
+    constructor(message = 'The requested resource was not found.') {
         super(message, 'NOT_FOUND', 404);
     }
 }
 
 export class UnauthorizedError extends AppError {
-    constructor(message = 'Unauthorized access') {
+    constructor(message = 'Authentication is required to access this resource.') {
         super(message, 'UNAUTHORIZED', 401);
     }
 }
 
 export class ForbiddenError extends AppError {
-    constructor(message = 'Access denied') {
+    constructor(message = 'You do not have permission to perform this action.') {
         super(message, 'FORBIDDEN', 403);
     }
 }
 
 export class ConflictError extends AppError {
-    constructor(message = 'Already exists') {
+    constructor(message = 'A resource with the same identifier already exists.') {
         super(message, 'CONFLICT', 409);
     }
 }
 
 export class BadRequestError extends AppError {
-    constructor(message = 'Bad request') {
+    constructor(message = 'The request is invalid. Please check the provided data and try again.') {
         super(message, 'BAD_REQUEST', 400);
     }
 }
 
 export class TooManyRequestError extends AppError {
-    constructor(message = 'Too Many request') {
+    constructor(message = 'Too many requests. Please try again later.') {
         super(message, 'TOO_MANY_REQUEST', 429);
     }
 }

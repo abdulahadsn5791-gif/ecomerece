@@ -15,7 +15,7 @@ export const InventoryMessages = {
     ): inventoryMessagesType {
         return {
             updatedData: inventory,
-            message: `Inventory ${inventoryId.value} has been created by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Inventory ${inventoryId.value} was created by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     inventoryBought(
@@ -26,7 +26,7 @@ export const InventoryMessages = {
     ): inventoryMessagesType {
         return {
             updatedData: inventory,
-            message: `Inventory ${inventoryId.value} has been bought by ${actorId.value} if (quantity: ${items.value}) units on ${EffectiveDate.today().value}.`,
+            message: `Inventory ${inventoryId.value} was restocked by ${actorId.value} with ${items.value} units on ${EffectiveDate.today().value}.`,
         };
     },
     inventoryRemoved(
@@ -37,7 +37,7 @@ export const InventoryMessages = {
     ): inventoryMessagesType {
         return {
             updatedData: inventory,
-            message: `Inventory ${inventoryId.value} has been removed by ${actorId.value} if (quantity: ${items.value}) units on ${EffectiveDate.today().value}.`,
+            message: `${items.value} units were removed from inventory ${inventoryId.value} by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     lowStockThresholdUpdated(
@@ -48,7 +48,7 @@ export const InventoryMessages = {
     ): inventoryMessagesType {
         return {
             updatedData: inventory,
-            message: `LowStockThreshold has been updated to (quantity: ${items.value}) for inventory ${inventoryId.value}  by ${actorId.value}  on ${EffectiveDate.today().value}.`,
+            message: `The low-stock threshold for inventory ${inventoryId.value} was set to ${items.value} units by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
 };

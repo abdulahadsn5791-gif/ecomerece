@@ -42,21 +42,21 @@ export class productVariantApplicationService extends BaseService {
         const activeUser = await this.queryBus.execute(
             new EnsureActiveUserGetByIdQuery({ userId: actorId }),
         );
-        if (!activeUser.user) throw new BadRequestError('User is not found');
-        if (!activeUser.active) throw new BadRequestError('User is not active');
+        if (!activeUser.user) throw new BadRequestError('User not found.');
+        if (!activeUser.active) throw new BadRequestError('User is not active.');
         const activeProduct = await this.queryBus.execute(
             new EnsureActiveProductGetByIdQuery({ productId: productId }),
         );
-        if (!activeProduct.product) throw new BadRequestError('Product not found');
-        if (!activeProduct.active) throw new BadRequestError('Product is not active');
+        if (!activeProduct.product) throw new BadRequestError('Product not found.');
+        if (!activeProduct.active) throw new BadRequestError('Product is not active.');
         const vendorId = Id.create(activeProduct.product.vendorId);
         const activeVendor = await this.queryBus.execute(
             new EnsureActiveVendorGetByIdQuery({ vendorId: vendorId }),
         );
-        if (!activeVendor.vendor) throw new BadRequestError('Vendor not found');
-        if (!activeVendor.active) throw new BadRequestError('Vendor is not active');
+        if (!activeVendor.vendor) throw new BadRequestError('Vendor not found.');
+        if (!activeVendor.active) throw new BadRequestError('Vendor is not active.');
         if (activeVendor.vendor.ownerId !== actorId.value)
-            throw new BadRequestError('Owner don`t that variant');
+            throw new BadRequestError('This variant does not belong to the current owner.');
     }
 
     async createMyProductVariant(
@@ -89,8 +89,8 @@ export class productVariantApplicationService extends BaseService {
         const activeProduct = await this.queryBus.execute(
             new EnsureActiveProductGetByIdQuery({ productId: productId }),
         );
-        if (!activeProduct.product) throw new BadRequestError('Product not found');
-        if (!activeProduct.active) throw new BadRequestError('Product is not active');
+        if (!activeProduct.product) throw new BadRequestError('Product not found.');
+        if (!activeProduct.active) throw new BadRequestError('Product is not active.');
         const varaints = await this.vairiantRepo.FindByProductId(productId);
         if (!varaints) return null;
         const response = varaints.map((value) =>

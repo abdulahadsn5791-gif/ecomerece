@@ -5,7 +5,7 @@ export type ProductVaraintMessagesType = { message: string };
 export const productVaraintMessages = {
     varaintCreated(variantId: Id, productId: Id, actorId: Id): ProductVaraintMessagesType {
         return {
-            message: `Varaint with id ${variantId} has been created for product ${productId} by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Variant ${variantId.value} was created for product ${productId.value} by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     priceUpdated(
@@ -15,32 +15,32 @@ export const productVaraintMessages = {
         variantId: Id,
     ): ProductVaraintMessagesType {
         return {
-            message: `Varaint with id ${variantId.value} has updated its price ${price.value} and discounted price ${discountedPrice.value} by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `The price (${price.value}) and discounted price (${discountedPrice.value}) for variant ${variantId.value} were updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     metaUpdated(variantId: Id, actorId: Id): ProductVaraintMessagesType {
         return {
-            message: `Varaint with id ${variantId.value} has updated its meta  by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `The metadata for variant ${variantId.value} was updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     variantDisabled(variantId: Id, actorId: Id): ProductVaraintMessagesType {
         return {
-            message: `Variant with id ${variantId.value} has been disabled by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Variant ${variantId.value} was disabled by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     variantActivated(variantId: Id, actorId: Id): ProductVaraintMessagesType {
         return {
-            message: `Variant with id ${variantId.value} has been activated by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Variant ${variantId.value} was activated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     variantDeleted(variantId: Id, actorId: Id): ProductVaraintMessagesType {
         return {
-            message: `Variant with id ${variantId.value} has been deleted by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Variant ${variantId.value} was deleted by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     variantRecovered(variantId: Id, actorId: Id): ProductVaraintMessagesType {
         return {
-            message: `Variant with id ${variantId.value} has been recovered by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Variant ${variantId.value} was recovered by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
 };

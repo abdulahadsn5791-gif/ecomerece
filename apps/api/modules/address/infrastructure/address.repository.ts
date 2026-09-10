@@ -22,7 +22,7 @@ export class AddressRepository
 
     async FindByIdOrThrow(id: Id): Promise<AddressAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError('Address not found with this id');
+        if (!doc) throw new BadRequestError('Address not found.');
         return AddressMapper.persistenceToAggregate(doc);
     }
 

@@ -23,7 +23,7 @@ export class ReviewRepository
 
     async FindByIdOrThrow(id: Id): Promise<ReviewAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError('Review not found with this id');
+        if (!doc) throw new BadRequestError('Review not found.');
         return reviewMapper.persistenceToAggregate(doc);
     }
 
@@ -61,7 +61,7 @@ export class ReviewRepository
             authorId: authorId.value,
             'deleted.deleted': false,
         });
-        if (!doc) throw new BadRequestError('User does not own this review');
+        if (!doc) throw new BadRequestError('You do not own this review.');
         return reviewMapper.persistenceToAggregate(doc);
     }
 

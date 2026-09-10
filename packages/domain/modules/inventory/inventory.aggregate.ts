@@ -107,9 +107,9 @@ export class InventoryAggregate extends AggregateRoot {
     }
     deleteInventory(reason: Reason, actorId: Id) {
         if (!this._available.isZero)
-            throw new BadRequestError('First clear the available stocks  to continue');
+            throw new BadRequestError('Clear the available stock before deleting this inventory.');
         if (!this._reserved.isZero)
-            throw new BadRequestError('First clear the reserve stocks to continue');
+            throw new BadRequestError('Clear the reserved stock before deleting this inventory.');
         this._delete = DeleteInfoVO.create(actorId, reason);
     }
 }

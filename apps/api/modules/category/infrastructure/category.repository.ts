@@ -34,13 +34,13 @@ export class CategoryRepository
 
     async FindByIdOrThrow(id: Id): Promise<CategoryAggregate> {
         const doc = await super.findById(id.value);
-        if (!doc) throw new BadRequestError('Category not found');
+        if (!doc) throw new BadRequestError('Category not found.');
         return CategoryMapper.persistenceToAggregate(doc);
     }
 
     async FindByTitleOrThrow(title: Title): Promise<CategoryAggregate> {
         const doc = await super.findOne({ title: title });
-        if (!doc) throw new BadRequestError('Category not found');
+        if (!doc) throw new BadRequestError('Category not found.');
         return CategoryMapper.persistenceToAggregate(doc);
     }
 
@@ -88,7 +88,7 @@ export class CategoryRepository
 
     async Delete(id: Id): Promise<void> {
         const doc = await super.findByIdAndDelete(id.value);
-        if (!doc) throw new BadRequestError('Inventory not found with this id');
+        if (!doc) throw new BadRequestError('Category not found.');
     }
 
     async Exists(id: Id): Promise<boolean> {

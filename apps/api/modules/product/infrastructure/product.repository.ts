@@ -41,7 +41,7 @@ export class ProductRepository
             _id: productId.value,
             vendorId: vendorId.value,
         });
-        if (!doc) throw new BadRequestError('User don`t own that product');
+        if (!doc) throw new BadRequestError('You do not own this product.');
         return ProductMapper.persistenceToAggregate(doc);
     }
 
@@ -59,7 +59,7 @@ export class ProductRepository
         const doc = await super.findById(id.value);
 
         if (!doc) {
-            throw new NotFoundError('Product not found with this id');
+            throw new NotFoundError('Product not found.');
         }
 
         return ProductMapper.persistenceToAggregate(doc);
@@ -74,7 +74,7 @@ export class ProductRepository
         });
 
         if (!doc) {
-            throw new NotFoundError('Product not found for this vendor');
+            throw new NotFoundError('Product not found for this vendor.');
         }
 
         return ProductMapper.persistenceToAggregate(doc);

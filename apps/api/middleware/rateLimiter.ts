@@ -60,7 +60,7 @@ export async function rateLimiter(c: Context, next: Next) {
     const allowed = await consumeToken(ip);
 
     if (!allowed) {
-        throw new TooManyRequestError('Too Many Requests');
+        throw new TooManyRequestError('Too many requests. Please wait a moment and try again.');
     }
 
     await next();

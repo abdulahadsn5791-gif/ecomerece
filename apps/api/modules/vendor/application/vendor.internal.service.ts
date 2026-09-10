@@ -16,9 +16,9 @@ export class VendorInternalService extends BaseService {
     async canCreateVendor(id: Id) {
         const user = await this.queryBus.execute(new EnsureActiveQuery({ userId: id }));
 
-        if (!user) throw new BadRequestError('User is not active');
+        if (!user) throw new BadRequestError('User is not active.');
         const vendor = await this.vendorRepo.FindByOwnerId(id);
-        if (vendor) throw new BadRequestError('User cannot create more than one vendor');
+        if (vendor) throw new BadRequestError('Each user can create only one vendor.');
     }
     async getVendorByUserId(id: Id): Promise<VendorReadModel | null> {
         const vendor = await this.vendorRepo.FindByOwnerId(id);
@@ -28,11 +28,12 @@ export class VendorInternalService extends BaseService {
 
     async ensureActiveVendor(userId: Id, vendorId: Id): Promise<VendorReadModel> {
         const user = await this.queryBus.execute(new EnsureActiveQuery({ userId: userId }));
-        if (!user) throw new BadRequestError('User is not active');
+        if (!user) throw new BadRequestError('User is not active.');
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
-        if (vendor.ownerId !== userId) throw new BadRequestError('Owner dont own that vendor');
-        if (vendor.delete.isDeleted) throw new BadRequestError('Vendor was removed');
-        if (!vendor.verification.isVerified) throw new BadRequestError('Vendor is not verified');
+        if (vendor.ownerId !== userId) throw new BadRequestError('You do not own this vendor.');
+        if (vendor.delete.isDeleted) throw new BadRequestError('This vendor has been removed.');
+        if (!vendor.verification.isVerified)
+            throw new BadRequestError('This vendor has not been verified yet.');
         return VendorMapper.aggregateToReadModel(vendor);
     }
 

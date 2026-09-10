@@ -9,7 +9,7 @@ export function sanitizeData<T extends AnyRecord>(
     data: T,
 ): Partial<T> {
     if (!data || typeof data !== 'object') {
-        throw new BadRequestError('Invalid data provided');
+        throw new BadRequestError('The provided data is invalid.');
     }
 
     const disallowedSet = new Set(disallowedFields);
@@ -29,7 +29,7 @@ export function sanitizeData<T extends AnyRecord>(
     );
 
     if (Object.keys(sanitized).length === 0) {
-        throw new BadRequestError('No valid fields to update');
+        throw new BadRequestError('No valid fields were provided for the update.');
     }
 
     return sanitized;

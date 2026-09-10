@@ -20,7 +20,7 @@ import { EnsureActiveUserGetByIdQuery } from '../../user/application/queries/ens
 import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { AddressMapper } from '../infrastructure/address.mapper';
 import type { AddressRepository } from '../infrastructure/address.repository';
-import { AddressMessages, type addressMessagesType } from '../presentation/address.messgae';
+import { AddressMessages, type addressMessagesType } from '../presentation/address.messages';
 import { updateMyAddressDtoType } from '../../../../../packages/shared/request-dtos/address/update-address.dto';
 
 
@@ -36,8 +36,8 @@ export class AddressApplicationService extends BaseService {
         const activeUser = await this.queryBus.execute(
             new EnsureActiveUserGetByIdQuery({ userId: actorId }),
         );
-        if (!activeUser.user) throw new BadRequestError('User is not found');
-        if (!activeUser.active) throw new BadRequestError('User is not active');
+        if (!activeUser.user) throw new BadRequestError('User not found.');
+        if (!activeUser.active) throw new BadRequestError('User is not active.');
     }
 
     async getMyAddresses(actor: UserPersistence): Promise<AddressResponseReadModel[] | null> {
@@ -100,7 +100,7 @@ export class AddressApplicationService extends BaseService {
         });
         const exsistingAddress = await this.addressRepo.FindByOwnerId(actorId);
         if (exsistingAddress && exsistingAddress?.length >= 4)
-            throw new BadRequestError('Maximum length reached');
+            throw new BadRequestError('A maximum of four addresses is allowed per user.');
         await this.canEditAddress(actorId);
         await this.addressRepo.Create(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);

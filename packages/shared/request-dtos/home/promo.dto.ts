@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { colorSchema, idSchema, titleSchema, urlSchema } from '../../dtos';
 
 export const createPromoDtoSchema = z.object({
-    id: idSchema.optional(),
     title: titleSchema,
     subtitle: titleSchema,
     image: urlSchema,

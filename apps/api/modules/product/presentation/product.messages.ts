@@ -8,88 +8,87 @@ export type productMessagesType = {
 export const productMessages = {
     productCreated(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} has been created by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was created by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     productUpdated(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} has been updated by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     productDeleted(productId: Id, actorId: Id, reason: Reason): productMessagesType {
         return {
-            message: `Product wiht id ${productId} has been deleted by ${actorId} due to reason : ${reason} on ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was deleted by ${actorId.value} on ${EffectiveDate.today().value}. Reason: ${reason.value}.`,
         };
     },
     productBlocked(productId: Id, actorId: Id, reason: Reason): productMessagesType {
         return {
-            message: `Product with id ${productId} has been blocked by ${actorId} due to reason : ${reason} on ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was blocked by ${actorId.value} on ${EffectiveDate.today().value}. Reason: ${reason.value}.`,
         };
     },
     productUnBlocked(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} has been un-blocked by ${actorId}  ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was unblocked by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
-
     productRecovered(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} has been recovered by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was recovered by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     productPublic(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} has been become public by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was made public by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     productPrivate(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} has been become private by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Product ${productId.value} was made private by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     metaUpdated(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} meta has been updated meta by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `The metadata for product ${productId.value} was updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     disclaimerEnabled(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} desclaimer has been enabled by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `The disclaimer for product ${productId.value} was enabled by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     disclaimerDisabled(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} desclaimer has been disabled by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `The disclaimer for product ${productId.value} was disabled by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     disclaimerUpdated(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} desclaimer has been updated by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `The disclaimer for product ${productId.value} was updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     imageUpdated(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} image has been updated by ${actorId} on ${EffectiveDate.today().value} `,
+            message: `The images for product ${productId.value} were updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     imageDefault(index: Quantity, productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} has set deafult image of no ${index.increase(1).value} by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `Image #${index.increase(1).value} was set as the default image for product ${productId.value} by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     ingredientsEnabled(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} ingrediants has been enabled by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `The ingredients list for product ${productId.value} was enabled by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     ingredientsDisabled(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} ingrediants has been disabled by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `The ingredients list for product ${productId.value} was disabled by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     ingredientsUpdated(productId: Id, actorId: Id): productMessagesType {
         return {
-            message: `Product with id ${productId} ingrediants has been updated by ${actorId} on ${EffectiveDate.today().value}`,
+            message: `The ingredients list for product ${productId.value} was updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
 };

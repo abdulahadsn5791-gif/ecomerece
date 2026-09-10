@@ -10,18 +10,18 @@ export const AddressMessages = {
     addressCreated(actorId: Id, addressId: Id, updatedData: AddressResponseReadModel) {
         return {
             updatedData,
-            message: `Address ${addressId.value} has been created by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Address ${addressId.value} was created by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     addressUpdated(actorId: Id, addressId: Id, updatedData: AddressResponseReadModel) {
         return {
             updatedData,
-            message: `Address ${addressId.value} has been updated by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Address ${addressId.value} was updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     addressDeleted(actorId: Id, addressId: Id): addressMessagesType {
         return {
-            message: `Address ${addressId.value} has been deleted by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Address ${addressId.value} was deleted by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     addressRecovered(
@@ -31,7 +31,7 @@ export const AddressMessages = {
     ): addressMessagesType {
         return {
             updatedData,
-            message: `Address ${addressId.value} has been recovered by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Address ${addressId.value} was recovered by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
     defaultAddress(
@@ -41,7 +41,7 @@ export const AddressMessages = {
     ): addressMessagesType {
         return {
             updatedData,
-            message: `Address ${addressId.value} has been setted as default by ${actorId.value} on ${EffectiveDate.today().value}`,
+            message: `Address ${addressId.value} was set as the default address by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
 };

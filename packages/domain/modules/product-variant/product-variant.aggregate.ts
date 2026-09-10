@@ -58,7 +58,7 @@ export class ProductVariantAggregate extends AggregateRoot {
 
     static create(data: createVarientProps): ProductVariantAggregate {
         if (data.price.value < data.discountedPrice.value)
-            throw new BadRequestError('Discount must be smaller than actual price');
+            throw new BadRequestError('The discount must be lower than the actual price.');
         return new ProductVariantAggregate(
             data.id,
             data.productId,
@@ -104,30 +104,30 @@ export class ProductVariantAggregate extends AggregateRoot {
     }
 
     activate(actorId: Id) {
-        if (this._active === true) throw new BadRequestError('Variant was already active');
+        if (this._active === true) throw new BadRequestError('This variant is already active.');
         this._active = true;
     }
     deActivate(actorId: Id) {
-        if (this._active === false) throw new BadRequestError('Variant was already deActive');
+        if (this._active === false) throw new BadRequestError('This variant is already inactive.');
         this._active = false;
     }
 
     updatePrice(price: Money, discountedPrice: Money, actorId: Id) {
         if (price < discountedPrice)
-            throw new BadRequestError('Discount must be smaller than actual price');
+            throw new BadRequestError('The discount must be lower than the actual price.');
         this._price = price;
         this._discountedPrice = discountedPrice;
     }
 
     deleteProduct(actorId: Id, reason: Reason) {
-        if (this._delete.deleted) throw new BadRequestError('Product Variant was already removed');
+        if (this._delete.deleted) throw new BadRequestError('This product variant has already been removed.');
         this._delete = DeleteInfoVO.create(actorId, reason);
         this._active = false;
     }
 
     recoverProduct(actorId: Id) {
         if (!this._delete.deleted)
-            throw new BadRequestError('Product Variant was already recovered');
+            throw new BadRequestError('This product variant has already been recovered.');
         this._delete = DeleteInfoVO.none();
     }
 }

@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { colorSchema, descriptionSchema, idSchema, titleSchema } from '../../dtos';
 
 export const createFeatureDtoSchema = z.object({
-    id: idSchema.optional(),
     title: titleSchema,
     detail: descriptionSchema,
     accent: colorSchema.default('#10B981'),

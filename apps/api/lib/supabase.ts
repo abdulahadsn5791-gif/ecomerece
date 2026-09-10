@@ -13,7 +13,7 @@ export async function getUserById(userId: string) {
     const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId);
 
     if (error || !data.user) {
-        throw new NotFoundError('User not found');
+        throw new NotFoundError('User not found.');
     }
 
     return data.user;

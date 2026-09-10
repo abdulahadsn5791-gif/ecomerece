@@ -78,7 +78,7 @@ export class ProductApplicationService extends BaseService {
         const verfied = await this.queryBus.execute(
             new VerifyCategoryAndGetQuery({ id: categoryId }),
         );
-        if (!verfied.isValid) throw new BadRequestError('Invalid category');
+        if (!verfied.isValid) throw new BadRequestError('The provided category is invalid.');
         const disclaimer = DisclaimerVO.create({
             isDisclaimer: data.disclaimer.isDisclaimer,
             items: data.disclaimer.disclaimers.map((val) => ({

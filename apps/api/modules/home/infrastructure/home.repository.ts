@@ -53,7 +53,7 @@ export class HomeRepository implements IHomeRepository {
         if (result.matchedCount === 0) {
             const exists = await HomeModel.exists({ _id: home.id.value }).session(this.session ?? null);
             if (!exists) {
-                throw new NotFoundError(`Home aggregate '${home.id.value}' not found`);
+                throw new NotFoundError(`The homepage layout '${home.id.value}' was not found.`);
             }
             throw new ConcurrencyError(
                 'Home aggregate was modified by another process. Please refresh and try again.',

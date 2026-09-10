@@ -36,7 +36,7 @@ export class ImagesVO {
     setDefault(index: Quantity) {
         const length = this._images.length;
         if (!(index.value < length - 1) && index.value !== length - 1)
-            throw new BadRequestError('Image does`t exists');
+            throw new BadRequestError('The selected image does not exist in this product.');
         for (let i = 0; i <= length - 1; i++) {
             this._images[i].setDefault(false);
         }

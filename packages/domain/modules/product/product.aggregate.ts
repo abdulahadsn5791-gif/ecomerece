@@ -19,6 +19,30 @@ import {
 import type { DisclaimerVO } from './value-objects/disclaimer.vo';
 import type { IngredientsVO } from './value-objects/ingredients.vo';
 import type { ImagesVO } from './value-objects/product-images.vo';
+import { ProductBlockedEvent } from './events/product-blocked.event';
+import { ProductCreatedEvent } from './events/product-created.event';
+import { ProductDefaultImageSetEvent } from './events/product-default-image-set.event';
+import { ProductDeletedEvent } from './events/product-deleted.event';
+import { ProductDisclaimerDisabledEvent } from './events/product-disclaimer-disabled.event';
+import { ProductDisclaimerEnabledEvent } from './events/product-disclaimer-enabled.event';
+import { ProductDisclaimerUpdatedEvent } from './events/product-disclaimer-updated.event';
+import { ProductDisclaimersAddedEvent } from './events/product-disclaimers-added.event';
+import { ProductDisclaimersRemovedEvent } from './events/product-disclaimers-removed.event';
+import { ProductImagesAddedEvent } from './events/product-images-added.event';
+import { ProductImagesRemovedEvent } from './events/product-images-removed.event';
+import { ProductIngredientsAddedEvent } from './events/product-ingredients-added.event';
+import { ProductIngredientsClearedEvent } from './events/product-ingredients-cleared.event';
+import { ProductIngredientsDisabledEvent } from './events/product-ingredients-disabled.event';
+import { ProductIngredientsEnabledEvent } from './events/product-ingredients-enabled.event';
+import { ProductIngredientsRemovedEvent } from './events/product-ingredients-removed.event';
+import { ProductInStockUpdatedEvent } from './events/product-in-stock-updated.event';
+import { ProductMadePrivateEvent } from './events/product-made-private.event';
+import { ProductMadePublicEvent } from './events/product-made-public.event';
+import { ProductMetaUpdatedEvent } from './events/product-meta-updated.event';
+import { ProductPricingSummaryUpdatedEvent } from './events/product-pricing-summary-updated.event';
+import { ProductRatingSummaryUpdatedEvent } from './events/product-rating-summary-updated.event';
+import { ProductRecoveredEvent } from './events/product-recovered.event';
+import { ProductUnblockedEvent } from './events/product-unblocked.event';
 
 type CreateVendorProps = {
     id: Id;
@@ -145,7 +169,7 @@ export class ProductAggregate extends AggregateRoot {
     }
 
     static create(data: CreateVendorProps): ProductAggregate {
-        return new ProductAggregate(
+        const product = new ProductAggregate(
             data.id,
             data.vendorId,
             data.categoryId,
@@ -168,6 +192,9 @@ export class ProductAggregate extends AggregateRoot {
             Quantity.none(),
             Quantity.zero(),
         );
+        product.raise(new ProductCreatedEvent({ productId: product._id, vendorId: product._vendorId, categoryId: product._categoryId }));
+
+        return product;
     }
 
     static rehydrate(
@@ -229,6 +256,16 @@ export class ProductAggregate extends AggregateRoot {
         this._maxPrice = maxPrice;
         this._minDiscountedPrice = minDiscountedPrice;
         this._maxDiscountedPrice = maxDiscountedPrice;
+        this.raise(
+            new ProductPricingSummaryUpdatedEvent({
+                productId: this._id,
+                vendorId: this._vendorId,
+                minPrice,
+                maxPrice,
+                minDiscountedPrice,
+                maxDiscountedPrice,
+            }),
+        );
     }
 
     updateRatingSummary(averageRating: number, totalReviews: number): void {
@@ -240,49 +277,65 @@ export class ProductAggregate extends AggregateRoot {
         }
         this._averageRating = Quantity.create(Math.round(averageRating * 10) / 10);
         this._totalReviews = Quantity.create(totalReviews);
+        this.raise(
+            new ProductRatingSummaryUpdatedEvent({
+                productId: this._id,
+                averageRating: this._averageRating,
+                totalReviews: this._totalReviews,
+            }),
+        );
     }
 
     recoverProduct(): void {
         if (!this._delete.deleted) throw new BadRequestError('This product has already been recovered.');
         this._delete = DeleteInfoVO.none();
+        this.raise(new ProductRecoveredEvent({ productId: this._id }));
     }
 
     deleteProduct(actor: Id, reason: Reason): void {
         if (this._delete.deleted) throw new BadRequestError('This product has already been removed.');
         this._delete = DeleteInfoVO.create(actor, reason);
+        this.raise(new ProductDeletedEvent({ productId: this._id, actorId: actor, deletionInfo: this._delete }));
     }
 
     blockProduct(actor: Id, reason: Reason): void {
         if (this._block.isBlocked) throw new BadRequestError('This product is already blocked.');
         this._block = this._block.block(actor, reason);
+        this.raise(new ProductBlockedEvent({ productId: this._id, actorId: actor, blockInfo: this._block }));
     }
 
     unBlockProduct(actor: Id): void {
         if (!this._block.isBlocked) throw new BadRequestError('This product is not blocked.');
         this._block = this._block.unblock();
+        this.raise(new ProductUnblockedEvent({ productId: this._id, actorId: actor }));
     }
 
     makeProductPublic(): void {
         if (this._appearance.isPublic) throw new BadRequestError('This product is already public.');
         this._appearance = this._appearance.makePublic();
+        this.raise(new ProductMadePublicEvent({ productId: this._id }));
     }
 
     makeProductPrivate(): void {
         if (this._appearance.isPrivate) throw new BadRequestError('This product is already private.');
         this._appearance = this._appearance.makePrivate();
+        this.raise(new ProductMadePrivateEvent({ productId: this._id }));
     }
 
     updateMeta(title: Title, description: Description, actorId: Id): void {
         this._title = title;
         this._description = description;
+        this.raise(new ProductMetaUpdatedEvent({ productId: this._id, actorId }));
     }
 
     enableDisclaimer(actorId: Id) {
         this._disclaimer = this._disclaimer.enable();
+        this.raise(new ProductDisclaimerEnabledEvent({ productId: this._id, actorId }));
     }
 
     disableDisclaimer(actorId: Id) {
         this._disclaimer = this._disclaimer.disable();
+        this.raise(new ProductDisclaimerDisabledEvent({ productId: this._id, actorId }));
     }
 
     addDisclaimers(data: desclaimerItem[], actorId: Id) {
@@ -291,10 +344,12 @@ export class ProductAggregate extends AggregateRoot {
             title: Title.create(value.title),
         }));
         this._disclaimer = this._disclaimer.addMany(items);
+        this.raise(new ProductDisclaimersAddedEvent({ productId: this._id, actorId, items }));
     }
 
     setInStock(inStock: boolean, actorId: Id) {
         this._inStock = inStock;
+        this.raise(new ProductInStockUpdatedEvent({ productId: this._id, actorId, inStock }));
     }
 
     removeDisclaimers(data: desclaimerItem[], actorId: Id) {
@@ -303,22 +358,27 @@ export class ProductAggregate extends AggregateRoot {
             title: Title.create(value.title),
         }));
         this._disclaimer = this._disclaimer.removeMany(items);
+        this.raise(new ProductDisclaimersRemovedEvent({ productId: this._id, actorId, items }));
     }
 
     updateDisclaimer(name: Name, title: Title, actorId: Id) {
         this._disclaimer = this._disclaimer.update(name.value, title.value);
+        this.raise(new ProductDisclaimerUpdatedEvent({ productId: this._id, actorId, name, title }));
     }
 
     addImages(images: ImageVO | ImageVO[], actorId: Id): void {
         this._images = this._images.add(images);
+        this.raise(new ProductImagesAddedEvent({ productId: this._id, actorId, images }));
     }
 
     removeImages(urls: UrlVO | UrlVO[], actorId: Id): void {
         this._images = this._images.remove(urls);
+        this.raise(new ProductImagesRemovedEvent({ productId: this._id, actorId, urls }));
     }
 
     setDefault(index: Quantity, actorId: Id) {
         this._images.setDefault(index);
+        this.raise(new ProductDefaultImageSetEvent({ productId: this._id, actorId, index }));
     }
 
     hasImage(url: UrlVO): boolean {
@@ -351,33 +411,43 @@ export class ProductAggregate extends AggregateRoot {
 
     enableIngredients(actorId: Id): void {
         this._ingredients = this._ingredients.enable();
+        this.raise(new ProductIngredientsEnabledEvent({ productId: this._id, actorId }));
     }
 
     disableIngredients(actorId: Id): void {
         this._ingredients = this._ingredients.disable();
+        this.raise(new ProductIngredientsDisabledEvent({ productId: this._id, actorId }));
     }
 
     addIngredients(items: string | string[], actorId: Id): void {
         const ingredientList = Array.isArray(items) ? items : [items];
+        const added: string[] = [];
 
         ingredientList.forEach((ingredient) => {
             if (ingredient && ingredient.trim()) {
                 this._ingredients.add(ingredient);
+                added.push(ingredient);
             }
         });
+        this.raise(new ProductIngredientsAddedEvent({ productId: this._id, actorId, items: added }));
     }
 
     removeIngredients(items: string | string[], actorId: Id): void {
         const ingredientList = Array.isArray(items) ? items : [items];
+        const removed: string[] = [];
+
         ingredientList.forEach((ingredient) => {
             if (ingredient && ingredient.trim()) {
                 this._ingredients.remove(ingredient);
+                removed.push(ingredient);
             }
         });
+        this.raise(new ProductIngredientsRemovedEvent({ productId: this._id, actorId, items: removed }));
     }
 
     clearIngredients(actorId: Id): void {
         this._ingredients = this._ingredients.clear();
+        this.raise(new ProductIngredientsClearedEvent({ productId: this._id, actorId }));
     }
 
     hasIngredient(item: string): boolean {

@@ -1,6 +1,13 @@
 import { BadRequestError } from "../../../../apps/api/errors/app-error";
 import { AggregateRoot } from "../../aggregate-root";
 import { DeleteInfoVO, EffectiveDate, Id, Quantity, Reason } from "../../value-objects";
+import { InventoryBoughtEvent } from "./events/inventory-bought.event";
+import { InventoryCompletedEvent } from "./events/inventory-completed.event";
+import { InventoryCreatedEvent } from "./events/inventory-created.event";
+import { InventoryDeletedEvent } from "./events/inventory-deleted.event";
+import { InventoryLowStockThresholdUpdatedEvent } from "./events/inventory-low-stock-threshold-updated.event";
+import { InventoryReservedEvent } from "./events/inventory-reserved.event";
+import { InventoryStockRemovedEvent } from "./events/inventory-stock-removed.event";
 
 
 type createInventoryProps = {
@@ -50,7 +57,7 @@ export class InventoryAggregate extends AggregateRoot {
     }
 
     static create(data: createInventoryProps): InventoryAggregate {
-        return new InventoryAggregate(
+        const inventory = new InventoryAggregate(
             data.id,
             data.variantId,
             data.available,
@@ -61,6 +68,9 @@ export class InventoryAggregate extends AggregateRoot {
             Quantity.none(),
             EffectiveDate.today(),
         );
+        inventory.raise(new InventoryCreatedEvent({ inventoryId: inventory._id, variantId: inventory._variantId }));
+
+        return inventory;
     }
 
     static rehydrate(
@@ -90,20 +100,25 @@ export class InventoryAggregate extends AggregateRoot {
     reserve(quantity: Quantity, actorId: Id) {
         this._reserved = this._reserved.increase(quantity.value);
         this._available = this._available.decrease(quantity.value);
+        this.raise(new InventoryReservedEvent({ inventoryId: this._id, variantId: this._variantId, quantity }));
     }
 
     complete(quantity: Quantity, actorId: Id) {
         this._reserved = this._reserved.decrease(quantity.value);
+        this.raise(new InventoryCompletedEvent({ inventoryId: this._id, variantId: this._variantId, quantity }));
     }
 
     buy(quantity: Quantity, actorId: Id) {
         this._available = this._available.increase(quantity.value);
+        this.raise(new InventoryBoughtEvent({ inventoryId: this._id, variantId: this._variantId, quantity }));
     }
     updateLowStockThreshold(quantity: Quantity, actorId: Id) {
         this._lowStockThreshold = quantity;
+        this.raise(new InventoryLowStockThresholdUpdatedEvent({ inventoryId: this._id, variantId: this._variantId, quantity }));
     }
     removeStock(quantity: Quantity, actorId: Id) {
         this._available = this._available.decrease(quantity.value);
+        this.raise(new InventoryStockRemovedEvent({ inventoryId: this._id, variantId: this._variantId, quantity }));
     }
     deleteInventory(reason: Reason, actorId: Id) {
         if (!this._available.isZero)
@@ -111,5 +126,6 @@ export class InventoryAggregate extends AggregateRoot {
         if (!this._reserved.isZero)
             throw new BadRequestError('Clear the reserved stock before deleting this inventory.');
         this._delete = DeleteInfoVO.create(actorId, reason);
+        this.raise(new InventoryDeletedEvent({ inventoryId: this._id, variantId: this._variantId, actorId, deletionInfo: this._delete }));
     }
 }

@@ -339,22 +339,22 @@ sequenceDiagram
 
 | Module | Aggregate | Events (type strings) | Raise | Publish |
 | :--- | :--- | :--- | :--- | :--- |
-| `user` | `UserAggregate` | `user.signed-in`, `user.logged-in`, `user.role-assigned`, `user.banned`, `user.ban-lifted`, `user.blocked`, `user.block-lifted`, `user.deleted`, `user.delete-lifted` | ✅ all 9 | ❌ app service does not publish yet |
-| `vendor` | `VendorAggregate` | `vendor.created`, `vendor.verified`, `vendor.rejected`, `vendor.deleted`, `vendor.recovered` | ✅ all 5 | ❌ not published yet |
+| `user` | `UserAggregate` | `user.signed-in`, `user.logged-in`, `user.role-assigned`, `user.banned`, `user.ban-lifted`, `user.ban-extended`, `user.ban-shortened`, `user.blocked`, `user.block-lifted`, `user.deleted`, `user.delete-lifted` = **11** | ✅ all 11 | ❌ app service does not publish yet |
+| `vendor` | `VendorAggregate` | `vendor.created`, `vendor.verified`, `vendor.rejected`, `vendor.deleted`, `vendor.recovered`, `vendor.image-updated`, `vendor.contact-updated`, `vendor.meta-updated` = **8** | ✅ all 8 | ❌ not published yet |
 | `order` | `OrderAggregate` | `order.created`, `order.confirmed`, `order.completed`, `order.cancelled`, `order.refunded`, `order.returnded` *(sic, code typo)* | ⚠️ only `order.created` | ❌ not published yet |
 | `home` | `HomeAggregate` | `home.category-*` (4), `home.feature-*` (4), `home.slide-*` (4), `home.promo-*` (3), `home.container-*` (4) = **19** | ✅ all 19 | ✅ `pullEvents()` + `publish()` in `home.app.service.ts` |
-| `product` | `ProductAggregate` | — | — | — |
-| `product-variant` | `ProductVariantAggregate` | — | — | — |
-| `inventory` | `InventoryAggregate` | — | — | — |
-| `category` | `CategoryAggregate` | — | — | — |
-| `address` | `AddressAggregate` | — | — | — |
-| `order-items` | `OrderItemsAggregate` | — | — | — |
-| `reviews` | `ReviewAggregate` | — | — | — |
+| `product` | `ProductAggregate` | `product.created`, `product.pricing-summary-updated`, `product.rating-summary-updated`, `product.recovered`, `product.deleted`, `product.blocked`, `product.unblocked`, `product.made-public`, `product.made-private`, `product.meta-updated`, `product.in-stock-updated`, `product.disclaimer-enabled`, `product.disclaimer-disabled`, `product.disclaimers-added`, `product.disclaimers-removed`, `product.disclaimer-updated`, `product.images-added`, `product.images-removed`, `product.default-image-set`, `product.ingredients-enabled`, `product.ingredients-disabled`, `product.ingredients-added`, `product.ingredients-removed`, `product.ingredients-cleared` = **24** | ✅ all 24 | ❌ not published yet |
+| `product-variant` | `ProductVariantAggregate` | `product-variant.created`, `product-variant.meta-updated`, `product-variant.activated`, `product-variant.deactivated`, `product-variant.price-updated`, `product-variant.deleted`, `product-variant.recovered` = **7** | ✅ all 7 | ❌ not published yet |
+| `inventory` | `InventoryAggregate` | `inventory.created`, `inventory.reserved`, `inventory.completed`, `inventory.bought`, `inventory.low-stock-threshold-updated`, `inventory.stock-removed`, `inventory.deleted` = **7** | ✅ all 7 | ❌ not published yet |
+| `category` | `CategoryAggregate` | `category.created`, `category.meta-updated`, `category.image-updated`, `category.deleted`, `category.recovered`, `category.blocked` = **6** | ✅ all 6 | ❌ not published yet |
+| `address` | `AddressAggregate` | `address.created`, `address.updated`, `address.deleted`, `address.recovered`, `address.set-as-default` = **5** | ✅ all 5 | ❌ not published yet |
+| `order-items` | `OrderItemsAggregate` | `order-item.created` = **1** | ✅ all 1 | ❌ not published yet |
+| `reviews` | `ReviewAggregate` | `review.created`, `review.updated`, `review.vendor-reply-added`, `review.liked`, `review.disliked`, `review.reported`, `review.deleted` = **7** | ✅ all 7 | ❌ not published yet |
 
-The home module event files live in `packages/domain/modules/home/events/` (barrel-exported via `home/events/index.ts`, re-exported from `packages/domain/modules/home/index.ts`). Home registers **no listeners** — it only creates and pushes events.
+Events are raised inside the aggregate command methods, and creation events are raised from the static `create()` factory before the aggregate is returned. The event files live in `packages/domain/modules/<module>/events/` (barrel-exported via `<module>/events/index.ts`, re-exported from `<module>/index.ts`). Home registers **no listeners** — it only creates and pushes events.
 
 > [!NOTE]
-> Current publish gap: modules `user`, `vendor` and `order` inject `eventBus` into their app services but **do not yet call `publish()`** — their aggregates raise events without them ever being pushed. Only `home.app.service.ts` implements the full Load → Command → Save → Publish loop. The `user` module does register one handler (`UserSignedInHandler` on `user.signed-in`).
+> Current publish gap: modules `user`, `vendor`, `order`, `product`, `product-variant`, `inventory`, `category`, `address`, `order-items` and `reviews` raise domain events but their app services **do not yet call `publish()`** — events accumulate in the aggregate and are drained only if the service calls `pullEvents()`. Only `home.app.service.ts` implements the full Load → Command → Save → Publish loop. The `user` module does register one handler (`UserSignedInHandler` on `user.signed-in`).
 
 ---
 

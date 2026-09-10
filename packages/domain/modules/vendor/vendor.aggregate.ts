@@ -8,6 +8,9 @@ import { VendorDeletedEvent } from './events/delete-vendor.event';
 import { VendorRecoverEvent } from './events/recover-vendor.event';
 import { VendorVerificationRejectedEvent } from './events/reject-vendor.event';
 import { VendorVerifiedEvent } from './events/verify-vendor.event';
+import { VendorImageUpdatedEvent } from './events/vendor-image-updated.event';
+import { VendorContactUpdatedEvent } from './events/vendor-contact-updated.event';
+import { VendorMetaUpdatedEvent } from './events/vendor-meta-updated.event';
 import type { ContactInfoVO } from './value-objects/contact-info.vo';
 
 import type { ImageInfoVO } from './value-objects/image-info.vo';
@@ -163,18 +166,21 @@ export class VendorAggregate extends AggregateRoot {
     updateImage(logo: UrlVO, banner: UrlVO) {
         this._image = this._image.changeBanner(banner);
         this._image = this.image.changeLogo(logo);
+        this.raise(new VendorImageUpdatedEvent({ vendorId: this._id, ownerId: this._ownerId }));
     }
 
     updateContact(phone: PhoneNumber, email: EmailVO, address: AddressVO) {
         this._contact = this._contact.changePhone(phone);
         this._contact = this._contact.changeEmail(email);
         this._contact = this._contact.changeAddress(address);
+        this.raise(new VendorContactUpdatedEvent({ vendorId: this._id, ownerId: this._ownerId }));
     }
 
     updatedMeta(title: Title, slug: Slug, description: Description): void {
         this._title = Title.create(title.value);
         this._slug = Slug.create(slug.value);
         this._description = Description.create(description.value);
+        this.raise(new VendorMetaUpdatedEvent({ vendorId: this._id, ownerId: this._ownerId }));
     }
 
     deleteVendor(actor: Id, reason: Reason): void {

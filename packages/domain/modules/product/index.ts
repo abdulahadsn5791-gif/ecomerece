@@ -1,4 +1,5 @@
 // Barrel file for product
+export * from './events';
 export * from './product.aggregate';
 export * from './ports/i-product-repository';
 export * from './read-models/product.read-model';

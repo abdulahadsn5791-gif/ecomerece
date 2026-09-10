@@ -13,6 +13,13 @@ import {
     Title,
     UrlVO,
 } from '../../value-objects';
+import { ReviewCreatedEvent } from './events/review-created.event';
+import { ReviewDeletedEvent } from './events/review-deleted.event';
+import { ReviewDislikedEvent } from './events/review-disliked.event';
+import { ReviewLikedEvent } from './events/review-liked.event';
+import { ReviewReportedEvent } from './events/review-reported.event';
+import { ReviewUpdatedEvent } from './events/review-updated.event';
+import { ReviewVendorReplyAddedEvent } from './events/review-vendor-reply-added.event';
 
 type CreateReviewProps = {
     id: Id;
@@ -83,6 +90,10 @@ export class ReviewAggregate extends AggregateRoot {
         );
 
 
+        review.raise(
+            new ReviewCreatedEvent({ reviewId: review._id, productId: review._productId, authorId: review._authorId, rating: review._rating }),
+        );
+
         return review;
     }
 
@@ -135,6 +146,7 @@ export class ReviewAggregate extends AggregateRoot {
         this._images = images;
         this._rating = rating;
         this.touch();
+        this.raise(new ReviewUpdatedEvent({ reviewId: this._id, authorId: this._authorId }));
     }
 
     public addVendorReply(reply: Description): void {
@@ -144,18 +156,21 @@ export class ReviewAggregate extends AggregateRoot {
         }
         this._vendorReply = reply;
         this.touch();
+        this.raise(new ReviewVendorReplyAddedEvent({ reviewId: this._id, productId: this._productId, reply }));
     }
 
     public like(): void {
         this.ensureNotDeleted();
         this._likes = this._likes.increase(1);
         this.touch();
+        this.raise(new ReviewLikedEvent({ reviewId: this._id }));
     }
 
     public dislike(): void {
         this.ensureNotDeleted();
         this._dislikes = this._dislikes.increase(1);
         this.touch();
+        this.raise(new ReviewDislikedEvent({ reviewId: this._id }));
     }
 
     public report(reason: Reason): void {
@@ -163,6 +178,7 @@ export class ReviewAggregate extends AggregateRoot {
         this._reportReasons.push(reason);
         this._reportCount = this._reportCount.increase(1);
         this.touch();
+        this.raise(new ReviewReportedEvent({ reviewId: this._id, reason }));
     }
 
 
@@ -172,6 +188,7 @@ export class ReviewAggregate extends AggregateRoot {
         }
         this._delete = deleteInfo;
         this.touch();
+        this.raise(new ReviewDeletedEvent({ reviewId: this._id, deletionInfo: this._delete }));
     }
 
     public get version(): Quantity {

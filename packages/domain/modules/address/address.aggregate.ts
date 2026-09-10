@@ -1,6 +1,11 @@
 import { BadRequestError } from "../../../../apps/api/errors/app-error";
 import { AggregateRoot } from "../../aggregate-root";
 import { AddressVO, CityVO, CountryVO, DeleteInfoVO, EffectiveDate, FullAddressVO, Id, PostalCodeVO, Quantity, Reason, StateVO, StreetAddressVO } from "../../value-objects";
+import { AddressCreatedEvent } from "./events/address-created.event";
+import { AddressDeletedEvent } from "./events/address-deleted.event";
+import { AddressRecoveredEvent } from "./events/address-recovered.event";
+import { AddressSetAsDefaultEvent } from "./events/address-set-as-default.event";
+import { AddressUpdatedEvent } from "./events/address-updated.event";
 
 
 
@@ -65,7 +70,7 @@ export class AddressAggregate extends AggregateRoot {
     }
 
     static create(data: createAddressProps): AddressAggregate {
-        return new AddressAggregate(
+        const address = new AddressAggregate(
             data._id,
             data._ownerId,
             null,
@@ -80,6 +85,9 @@ export class AddressAggregate extends AggregateRoot {
             Quantity.none(),
             EffectiveDate.today(),
         );
+        address.raise(new AddressCreatedEvent({ addressId: address._id, ownerId: address._ownerId }));
+
+        return address;
     }
 
     static rehydrate(
@@ -105,17 +113,21 @@ export class AddressAggregate extends AggregateRoot {
     updateAddress(data: AddressVO, actorId: Id) {
         if (actorId.value !== this.ownerId.value) throw new BadRequestError('You can only update your own address.')
         this._address = data;
+        this.raise(new AddressUpdatedEvent({ addressId: this._id, ownerId: this._ownerId, actorId }));
     }
     deleteAddress(reason: Reason, actorId: Id) {
         if (this._delete.isDeleted) throw new BadRequestError('This address has already been removed.');
         this._delete = DeleteInfoVO.create(actorId, reason);
+        this.raise(new AddressDeletedEvent({ addressId: this._id, ownerId: this._ownerId, actorId, deletionInfo: this._delete }));
     }
     recoverAddress(actorId: Id) {
         if (!this._delete.isDeleted) throw new BadRequestError('This address has already been recovered.');
         this._delete = DeleteInfoVO.none();
+        this.raise(new AddressRecoveredEvent({ addressId: this._id, ownerId: this._ownerId, actorId }));
     }
     setAsDefault() {
         this._defaultDate = EffectiveDate.today();
+        this.raise(new AddressSetAsDefaultEvent({ addressId: this._id, ownerId: this._ownerId }));
     }
 
     toString(): string {

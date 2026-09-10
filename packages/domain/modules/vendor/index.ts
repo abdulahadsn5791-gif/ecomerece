@@ -11,3 +11,6 @@ export * from './events/delete-vendor.event';
 export * from './events/recover-vendor.event';
 export * from './events/reject-vendor.event';
 export * from './events/verify-vendor.event';
+export * from './events/vendor-contact-updated.event';
+export * from './events/vendor-image-updated.event';
+export * from './events/vendor-meta-updated.event';

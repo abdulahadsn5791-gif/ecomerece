@@ -1,6 +1,7 @@
 
 import { AggregateRoot } from "../../aggregate-root";
 import { DeleteInfoVO, EffectiveDate, ExpirationDate, Id, Money, Quantity } from "../../value-objects";
+import { OrderItemCreatedEvent } from "./events/order-item-created.event";
 import { StatusVo } from "./value-objects/status.vo";
 
 export type cretaeOrderProps = {
@@ -48,7 +49,7 @@ export class OrderItemsAggregate extends AggregateRoot {
 
     static create(props: cretaeOrderProps): OrderItemsAggregate {
         const totalPrice = Money.create(props.quantity.value * props.price.value);
-        return new OrderItemsAggregate(
+        const orderItem = new OrderItemsAggregate(
             props.id,
             props.orderId,
             props.vendorId,
@@ -61,7 +62,10 @@ export class OrderItemsAggregate extends AggregateRoot {
             DeleteInfoVO.none(),
             Quantity.create(1),
             EffectiveDate.today()
-        )
+        );
+        orderItem.raise(new OrderItemCreatedEvent({ orderItemId: orderItem._id, orderId: orderItem._orderId, variantId: orderItem._variantId, vendorId: orderItem._vendorId }));
+
+        return orderItem;
     }
 
     static rehydrate(

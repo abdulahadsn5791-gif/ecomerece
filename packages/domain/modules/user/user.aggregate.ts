@@ -11,6 +11,8 @@ import { UserDeletedEvent } from './events/user-deleted.event';
 import { UserLoggedInEvent } from './events/user-logged-in.event';
 import { UserRoleAssignedEvent } from './events/user-role-assigned.event';
 import { UserSignedInEvent } from './events/user-signed-in.event';
+import { UserBanExtendedEvent } from './events/user-ban-extended.event';
+import { UserBanShortenedEvent } from './events/user-ban-shortened.event';
 
 
 import type { NameInfoVO } from './value-objects/name-info.vo';
@@ -174,6 +176,7 @@ export class UserAggregate extends AggregateRoot {
             throw new BadRequestError('You cannot extend your own ban period.');
         if (this._role.isAdmin) throw new BadRequestError('An administrator ban period cannot be extended.');
         this._ban = this._ban.extend(days);
+        this.raise(new UserBanExtendedEvent({ userId: this._id, banInfo: this._ban }));
     }
 
     shortenBan(actor: Id, days: number): void {
@@ -181,6 +184,7 @@ export class UserAggregate extends AggregateRoot {
             throw new BadRequestError('The user must be banned before the ban period can be shortened.');
         if (this._id.value === actor.value) throw new BadRequestError('You cannot shorten your own ban period.');
         this._ban = this._ban.shorten(days);
+        this.raise(new UserBanShortenedEvent({ userId: this._id, banInfo: this._ban }));
     }
 
     unBanUser(actor: Id): void {

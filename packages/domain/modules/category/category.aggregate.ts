@@ -1,6 +1,12 @@
 
 import { AggregateRoot } from "../../aggregate-root";
 import { BlockInfoVO, DeleteInfoVO, EffectiveDate, Id, Quantity, Reason, Title, UrlVO } from "../../value-objects";
+import { CategoryBlockedEvent } from "./events/category-blocked.event";
+import { CategoryCreatedEvent } from "./events/category-created.event";
+import { CategoryDeletedEvent } from "./events/category-deleted.event";
+import { CategoryImageUpdatedEvent } from "./events/category-image-updated.event";
+import { CategoryMetaUpdatedEvent } from "./events/category-meta-updated.event";
+import { CategoryRecoveredEvent } from "./events/category-recovered.event";
 
 export type createCategoryProps = {
     id: Id,
@@ -48,8 +54,10 @@ export class CategoryAggregate extends AggregateRoot {
     }
 
     static create(data: createCategoryProps): CategoryAggregate {
-        return new CategoryAggregate(data.id, data.title, data.createdBy, DeleteInfoVO.none(), data.image, BlockInfoVO.none(), Quantity.create(0), EffectiveDate.today());
+        const category = new CategoryAggregate(data.id, data.title, data.createdBy, DeleteInfoVO.none(), data.image, BlockInfoVO.none(), Quantity.create(0), EffectiveDate.today());
+        category.raise(new CategoryCreatedEvent({ categoryId: category._id, createdBy: category._createdBy }));
 
+        return category;
     }
     static rehydrate(_id: Id, title: Title, _createdBy: Id, _delete: DeleteInfoVO, _image: UrlVO, _block: BlockInfoVO, _version: Quantity, _createdAt: EffectiveDate,): CategoryAggregate {
         return new CategoryAggregate(_id, title, _createdBy, _delete, _image, _block, _version, _createdAt)
@@ -57,19 +65,24 @@ export class CategoryAggregate extends AggregateRoot {
 
     updateMeta(title: Title, actorId: Id) {
         this._title = title;
+        this.raise(new CategoryMetaUpdatedEvent({ categoryId: this._id, actorId }));
     }
     updateImage(image: UrlVO) {
         this._image = image;
+        this.raise(new CategoryImageUpdatedEvent({ categoryId: this._id, image }));
     }
 
     deleteCategory(reason: Reason, actorId: Id) {
         this._delete = DeleteInfoVO.create(actorId, reason);
+        this.raise(new CategoryDeletedEvent({ categoryId: this._id, actorId, deletionInfo: this._delete }));
     }
     recoverCategory(actorId: Id) {
         this._delete = DeleteInfoVO.none();
+        this.raise(new CategoryRecoveredEvent({ categoryId: this._id, actorId }));
     }
     blockCategory(reason: Reason, actorId: Id) {
         this._block = BlockInfoVO.create(actorId, reason);
+        this.raise(new CategoryBlockedEvent({ categoryId: this._id, actorId, blockInfo: this._block }));
     }
 
 }

@@ -12,6 +12,11 @@ An  multi-vendor e-commerce platform engineered around **Domain-Driven Design (D
 2. [Tech Stack](#-tech-stack)
 3. [Repository Layout](#-repository-layout)
 4. [Architecture Overview](#-architecture-overview)
+   - [Infrastructure Topology (Deployment View)](#infrastructure-topology-deployment-view)
+   - [API Internal Component Structure](#api-internal-component-structure)
+   - [Anatomy of a Single Module (product example)](#anatomy-of-a-single-module-product-example)
+   - [Request Lifecycle (full round-trip)](#request-lifecycle-full-round-trip)
+   - [Unit-of-Work Transaction Flow](#unit-of-work-transaction-flow)
 5. [Domain Model: Aggregates & Events](#-domain-model-aggregates--events)
 6. [Cross-Module Communication (CQRS Buses)](#-cross-module-communication-cqrs-buses)
 7. [The 4 Layers — The Iron Law of Dependencies](#-the-4-layers--the-iron-law-of-dependencies)
@@ -128,6 +133,257 @@ flowchart TB
 ```
 
 **The pattern at a glance:** the client calls the API → the API's **Presentation** layer extracts plain IDs → the **Application** layer orchestrates *Load → Command → Save → Events* → the **Domain** aggregate enforces invariants and raises events → a **Port** (repository interface) is implemented by the **Infrastructure** layer that persists to MongoDB inside a Unit-of-Work transaction.
+
+The rest of this section drills into the infrastructure with four detail views: the **[runtime topology](#infrastructure-topology-deployment-view)**, the **[internal component structure](#api-internal-component-structure)**, the **[anatomy of a single module](#anatomy-of-a-single-module-product-example)**, and the **[unit-of-work transaction flow](#unit-of-work-transaction-flow)**.
+
+---
+
+### Infrastructure Topology (Deployment View)
+
+```mermaid
+flowchart TB
+    subgraph Clients["Clients"]
+        Web["apps/web — Next.js 16 (Storefront · Account · Admin)"]
+        Mobile["apps/mobile — React Native / Expo (placeholder)"]
+        SDK["packages/frontend — Headless SDK (React Query + adapters)"]
+    end
+
+    subgraph ApiApp["apps/api — Hono v4 + Bun runtime (port 8000)"]
+        Entry["index.ts bootstrap — logger · secureHeaders · cors · requestGuards · dbMiddleware · rateLimiter"]
+        Routers["routes/index.ts — 10 mounted routers"]
+        Modules["11 module packages — 4-layer DDD scaffolds"]
+        Core["core infrastructure — buses · UnitOfWork · MongoRepository · BaseController"]
+        Adapters["lib/ — mongo · redis · supabase · clerk · jwt"]
+        Entry --> Routers
+        Routers --> Modules
+        Modules --> Core
+        Core --> Adapters
+    end
+
+    subgraph SharedContracts["Monorepo Packages"]
+        Domain["packages/domain — pure TS (aggregates · VOs · events · ports)"]
+        Shared["packages/shared — Zod schemas · DTOs · API envelopes"]
+        Domain -.->|"implemented by"| Modules
+        Shared -.->|"validates"| Routers
+    end
+
+    subgraph DataServices["Data & Identity Services"]
+        Mongo[("MongoDB — replica set (transactions)")]
+        Redis[("Redis — rate limiting")]
+        Supabase["Supabase Auth — Admin SDK (JWT verify)"]
+        Clerk["Clerk / Google OAuth — web storefront login"]
+    end
+
+    Web --> SDK
+    Mobile -.-> SDK
+    Web -->|"HTTP / JSON envelopes"| ApiApp
+    Mobile -.->|"HTTP / JSON envelopes"| ApiApp
+    SDK -->|"HTTP / JSON envelopes"| ApiApp
+    Adapters --> Mongo
+    Adapters --> Redis
+    Adapters --> Supabase
+    Adapters --> Clerk
+```
+
+---
+
+### API Internal Component Structure
+
+Depicts how a single `apps/api` process is wired from bootstrap to persistence:
+
+```mermaid
+flowchart TB
+    subgraph Bootstrap["apps/api/index.ts — edge bootstrap"]
+        Hono["Hono app"]
+        Pipeline["Global middleware pipeline (applied in order)"]
+        Err["registerErrorHandler — centralized error mapping"]
+    end
+
+    subgraph Middleware["middleware/ — pipeline order"]
+        M1["logger (hono)"]
+        M2["secureHeaders — CSP · X-Frame-Options: DENY · nosniff"]
+        M3["cors — localhost:3000, credentials"]
+        M4["requestguards — url(200) · query(100) · param(20) · body(1KB) · jsonDepth(5) · jsonNodes(50)"]
+        M5["dbMiddleware — shared Mongo connection"]
+        M6["rateLimiter — Redis sliding token bucket (10 burst / 1 per sec)"]
+        M7["Auth guards — auth · admin · initAuth · seller (per-route)"]
+    end
+
+    subgraph Routers["routes/index.ts — 10 mounted routers"]
+        R1["/users · /product · /product-variant"]
+        R2["/product-inventory · /order · /order-items"]
+        R3["/category · /address · /vendor · /home"]
+    end
+
+    subgraph ModuleLayers["Every module = 4 layers"]
+        P["presentation — messages · controller (BaseController) · routes · module.ts"]
+        A["application — query/command DTOs + handlers · internel.service · app.service"]
+        D["domain (packages/domain) — aggregate · VOs · events · ports"]
+        I["infrastructure — Mongoose model · mapper · repository"]
+    end
+
+    subgraph CoreInfra["core/ — shared infrastructure"]
+        Bus["Buses — InMemoryCommandBus · InMemoryQueryBus · InMemoryEventBus"]
+        Uow["UnitOfWork — AsyncLocalStorage session propagation + transient retry"]
+        Repo["BaseRepository · MongoRepository (session-aware CRUD)"]
+        Ctrl["BaseController — typed responses / error binding"]
+    end
+
+    subgraph ExternalAdapters["lib/ — swappable adapters"]
+        L1["mongo · redis"]
+        L2["supabase · clerkClient"]
+        L3["jwt · getBearerToken · sanitizeObj · toSlug"]
+    end
+
+    Hono --> Pipeline
+    Pipeline --> Routers
+    Routers --> P
+    P --> A
+    A --> D
+    I -.->|"implements domain ports"| D
+    A --> Uow
+    I --> Repo
+    P --> Ctrl
+    A --> Bus
+    Bus --> CoreInfra
+    Repo --> L1
+    Hono --> Err
+```
+
+---
+
+### Anatomy of a Single Module (product example)
+
+Every bounded context mirrors this exact skeleton (referenced paths are real); the same shape exists for `user`, `vendor`, `inventory`, `category`, `address`, `home`, `order`, `order-items`, `product-variant`, and `reviews`:
+
+```mermaid
+flowchart TB
+    subgraph Http["HTTP boundary"]
+        Routes["presentation/product.routes.ts — PATCH /product/my/price"]
+        Controller["presentation/product.controller.ts — extends BaseController"]
+    end
+
+    subgraph AppLayer["application/"]
+        AppSvc["product.app.service.ts — Load → Command → Save → Events"]
+        Internel["product.internel.service.ts — intra-module API"]
+        Cmd["commands/update-price.command.ts + command-handlers/update-price.command-handler.ts"]
+        Queries["queries/verify-product-and-get.query.ts + query-handlers/"]
+    end
+
+    subgraph DomainLayer["domain — packages/domain/modules/product/"]
+        Agg["product.aggregate.ts — ProductAggregate → updatePrice() raises ProductVariantPriceUpdatedEvent"]
+        Evts["events/ — 24 event classes"]
+        Port["ports/i-product-repository.ts"]
+        Read["read-models/product.read-model.ts"]
+    end
+
+    subgraph InfraLayer["infrastructure/"]
+        Model["product.model.ts — Mongoose schema"]
+        Mapper["product.mapper.ts — doc ↔ aggregate (4 methods)"]
+        Repo["product.repository.ts — implements IProductRepository"]
+    end
+
+    subgraph Wiring["product.module.ts — DI composition"]
+        Wire["new ProductRepository() → new InternelService(repo) → new AppService(queryBus, repo) → new Controller(...)"]
+        Reg["registers handlers on queryBus / commandBus"]
+    end
+
+    Routes --> Controller
+    Controller --> AppSvc
+    AppSvc --> Agg
+    AppSvc --> Internel
+    Internel --> Cmd
+    Internel --> Queries
+    Agg --> Evts
+    Repo -.->|implements| Port
+    Mapper --> Agg
+    Repo --> Mapper
+    Repo --> Model
+    Wire --> Repo
+    Wire --> AppSvc
+    Wire --> Reg
+    Agg -.->|read model| Read
+```
+
+---
+
+### Request Lifecycle (full round-trip)
+
+What happens to an authenticated `PATCH /product/my/price` call, end to end:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client (browser / SDK)
+    participant P as Middleware pipeline
+    participant RT as Router (routes/index.ts)
+    participant CT as Controller (presentation)
+    participant AS as App Service (application)
+    participant AGG as ProductAggregate (domain)
+    participant U as UnitOfWork (AsyncLocalStorage)
+    participant R as ProductRepository (infrastructure)
+    participant M as MongoDB (replica set)
+    participant B as EventBus
+
+    C->>P: PATCH /product/my/price (Bearer JWT)
+    P->>P: requestGuards — bounds URL/query/params/body/JSON
+    P->>P: rateLimiter — Redis token bucket
+    P->>P: auth — verify JWT (Supabase) + live state check
+    P->>RT: forward with verified user context
+    RT->>CT: route to product controller
+    CT->>CT: parse & validate DTO (Zod)
+    CT->>AS: appService.updatePrice(...)
+
+    activate U
+    AS->>U: uow.transaction(async () => {...})
+    U->>U: start MongoDB session + AsyncLocalStorage context
+    AS->>R: repository.FindByIdOrThrow(variantId)  (session-aware)
+    R->>M: findOne on session
+    R-->>AS: variant aggregate (rehydrated)
+    AS->>AGG: variant.updatePrice(price, discounted, actor)
+    AGG->>AGG: enforce price invariants + raise ProductVariantPriceUpdatedEvent
+    AS->>R: repository.Update(id, payload)  (session-aware)
+    R->>M: findByIdAndUpdate on same session
+    AS->>U: uow.transaction resolves → commitTransaction (atomic)
+    deactivate U
+
+    AS->>B: variant.pullEvents() → eventBus.publish(events)
+    B-->>CT: (handlers run — none registered for this type yet)
+    CT-->>C: 200 { data, message, success: true } envelope
+```
+
+---
+
+### Unit-of-Work Transaction Flow
+
+Why a multi-write operation (e.g. multi-vendor checkout) is still atomic: every repository inherits the session propagated through `AsyncLocalStorage`, so reads, writes and commits share one MongoDB transaction.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant S as App Service
+    participant U as UnitOfWork
+    participant TX as AsyncLocalStorage (transactionContext)
+    participant R1 as OrderItemsRepository
+    participant R2 as OrderRepository
+    participant MO as MongoDB (transaction)
+
+    S->>U: uow.transaction(callback, retries=3)
+    alt No active session yet (new transaction)
+        U->>MO: mongoose.startSession()
+        U->>MO: session.startTransaction()
+        U->>TX: transactionContext.run({ session }, callback)
+        TX->>R1: getCurrentSession() -> session
+        R1->>MO: inserts on session
+        TX->>R2: getCurrentSession() -> same session
+        R2->>MO: update on session
+        TX-->>U: callback resolves
+        U->>MO: commitTransaction
+    else Already inside a transaction (nested call)
+        U-->>S: run callback directly (reuse outer session)
+    end
+    Note over U, MO: TransientTransactionError → exponential backoff retry (100ms → 5s cap)
+```
 
 ---
 

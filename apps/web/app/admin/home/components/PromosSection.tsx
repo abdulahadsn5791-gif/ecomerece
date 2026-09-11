@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useThemeStore } from '@ecomerece/frontend';
-import { Layers, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Layers, Plus, Pencil, Trash2, Maximize2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+import { ImageInput } from './ImageInput';
+import { ImageLightbox } from './ImageLightbox';
 import {
   useAddPromo,
   useUpdatePromo,
@@ -30,6 +32,7 @@ export const PromosSection = ({ promos, darkMode }: PromosSectionProps) => {
     accent: '#4A7FB5',
     link: '',
   });
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   const addPromo = useAddPromo();
   const updatePromo = useUpdatePromo();
@@ -131,8 +134,12 @@ export const PromosSection = ({ promos, darkMode }: PromosSectionProps) => {
                   : 'bg-neutral-50 border-neutral-200'
               }`}
             >
-              <div
-                className="w-14 h-14 rounded-xl overflow-hidden shrink-0"
+              <button
+                type="button"
+                onClick={() => setPreviewSrc(promo.image)}
+                title="Expand image preview"
+                aria-label={`Preview image for ${promo.title}`}
+                className="w-14 h-14 rounded-xl overflow-hidden shrink-0 group relative"
                 style={{ backgroundColor: promo.accent }}
               >
                 {promo.image && (
@@ -142,7 +149,10 @@ export const PromosSection = ({ promos, darkMode }: PromosSectionProps) => {
                     className="w-full h-full object-cover"
                   />
                 )}
-              </div>
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-opacity group-hover:bg-black/30 group-hover:opacity-100">
+                  <Maximize2 className="w-4 h-4 text-white" />
+                </span>
+              </button>
               <div className="flex-1 min-w-0">
                 <p
                   className={`font-semibold truncate ${darkMode ? 'text-white' : 'text-neutral-900'}`}
@@ -199,11 +209,10 @@ export const PromosSection = ({ promos, darkMode }: PromosSectionProps) => {
                 onChange={(e) => setFormData((p) => ({ ...p, subtitle: e.target.value }))}
                 className={inputCls}
               />
-              <input
-                placeholder="Image URL"
+              <ImageInput
                 value={formData.image}
-                onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
-                className={inputCls}
+                onChange={(image) => setFormData((p) => ({ ...p, image }))}
+                darkMode={darkMode}
               />
               <input
                 placeholder="Link URL"
@@ -239,6 +248,12 @@ export const PromosSection = ({ promos, darkMode }: PromosSectionProps) => {
         isLoading={removePromo.isPending}
         error={removePromo.error}
         onConfirm={handleDelete}
+      />
+
+      <ImageLightbox
+        src={previewSrc}
+        alt="Promo image preview"
+        onClose={() => setPreviewSrc(null)}
       />
     </div>
   );

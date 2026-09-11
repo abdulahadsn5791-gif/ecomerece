@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useThemeStore } from '@ecomerece/frontend';
-import { Tag, Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { Tag, Plus, Pencil, Trash2, GripVertical, Maximize2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+import { ImageInput } from './ImageInput';
+import { ImageLightbox } from './ImageLightbox';
 import {
   useAddCategory,
   useUpdateCategory,
@@ -24,6 +26,7 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
   const [modalMode, setModalMode] = useState<'create' | 'edit' | 'delete' | null>(null);
   const [selected, setSelected] = useState<HomeCategoryResponse | null>(null);
   const [formData, setFormData] = useState({ name: '', image: '', accent: '#4A7FB5' });
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   const addCategory = useAddCategory();
   const updateCategory = useUpdateCategory();
@@ -122,8 +125,12 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
               <GripVertical
                 className={`w-4 h-4 shrink-0 cursor-grab ${darkMode ? 'text-neutral-600' : 'text-neutral-300'}`}
               />
-              <div
-                className="w-12 h-12 rounded-xl overflow-hidden shrink-0"
+              <button
+                type="button"
+                onClick={() => setPreviewSrc(cat.image)}
+                title="Expand image preview"
+                aria-label={`Preview image for ${cat.name}`}
+                className="w-12 h-12 rounded-xl overflow-hidden shrink-0 group relative"
                 style={{ backgroundColor: cat.accent }}
               >
                 {cat.image && (
@@ -133,7 +140,10 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
                     className="w-full h-full object-cover"
                   />
                 )}
-              </div>
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-opacity group-hover:bg-black/30 group-hover:opacity-100">
+                  <Maximize2 className="w-4 h-4 text-white" />
+                </span>
+              </button>
               <p
                 className={`flex-1 font-semibold truncate ${darkMode ? 'text-white' : 'text-neutral-900'}`}
               >
@@ -177,11 +187,10 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
                 onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                 className={inputCls}
               />
-              <input
-                placeholder="Image URL"
+              <ImageInput
                 value={formData.image}
-                onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
-                className={inputCls}
+                onChange={(image) => setFormData((p) => ({ ...p, image }))}
+                darkMode={darkMode}
               />
               <div className="flex items-center gap-3">
                 <input
@@ -211,6 +220,12 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
         isLoading={removeCategory.isPending}
         error={removeCategory.error}
         onConfirm={handleDelete}
+      />
+
+      <ImageLightbox
+        src={previewSrc}
+        alt="Category image preview"
+        onClose={() => setPreviewSrc(null)}
       />
     </div>
   );

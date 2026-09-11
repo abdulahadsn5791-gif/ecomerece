@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useThemeStore } from '@ecomerece/frontend';
-import { ImageIcon, Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { ImageIcon, Plus, Pencil, Trash2, GripVertical, Maximize2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+import { ImageInput } from './ImageInput';
+import { ImageLightbox } from './ImageLightbox';
 import { useAddSlide, useUpdateSlide, useRemoveSlide } from '@ecomerece/frontend';
 import type {
   HomeSlideResponse,
@@ -28,6 +30,7 @@ export const SlidesSection = ({ slides, darkMode }: SlidesSectionProps) => {
     image: '',
     accent: '#4A7FB5',
   });
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
   const addSlide = useAddSlide();
   const updateSlide = useUpdateSlide();
@@ -139,8 +142,12 @@ export const SlidesSection = ({ slides, darkMode }: SlidesSectionProps) => {
                 <GripVertical
                   className={`w-4 h-4 shrink-0 cursor-grab ${darkMode ? 'text-neutral-600' : 'text-neutral-300'}`}
                 />
-                <div
-                  className="w-16 h-10 rounded-lg overflow-hidden shrink-0"
+                <button
+                  type="button"
+                  onClick={() => setPreviewSrc(slide.image)}
+                  title="Expand image preview"
+                  aria-label={`Preview image for ${slide.title}`}
+                  className="w-16 h-10 rounded-lg overflow-hidden shrink-0 group relative"
                   style={{ backgroundColor: slide.accent }}
                 >
                   {slide.image && (
@@ -150,7 +157,10 @@ export const SlidesSection = ({ slides, darkMode }: SlidesSectionProps) => {
                       className="w-full h-full object-cover"
                     />
                   )}
-                </div>
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-opacity group-hover:bg-black/30 group-hover:opacity-100">
+                    <Maximize2 className="w-4 h-4 text-white" />
+                  </span>
+                </button>
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block mb-1 ${darkMode ? 'bg-neutral-700 text-neutral-300' : 'bg-neutral-200 text-neutral-600'}`}
@@ -230,11 +240,10 @@ export const SlidesSection = ({ slides, darkMode }: SlidesSectionProps) => {
                 onChange={(e) => setFormData((p) => ({ ...p, cta: e.target.value }))}
                 className={inputCls}
               />
-              <input
-                placeholder="Image URL"
+              <ImageInput
                 value={formData.image}
-                onChange={(e) => setFormData((p) => ({ ...p, image: e.target.value }))}
-                className={inputCls}
+                onChange={(image) => setFormData((p) => ({ ...p, image }))}
+                darkMode={darkMode}
               />
               <div className="flex items-center gap-3">
                 <input
@@ -264,6 +273,12 @@ export const SlidesSection = ({ slides, darkMode }: SlidesSectionProps) => {
         isLoading={removeSlide.isPending}
         error={removeSlide.error}
         onConfirm={handleDelete}
+      />
+
+      <ImageLightbox
+        src={previewSrc}
+        alt="Slide image preview"
+        onClose={() => setPreviewSrc(null)}
       />
     </div>
   );

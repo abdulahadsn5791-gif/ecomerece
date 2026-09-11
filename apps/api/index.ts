@@ -38,7 +38,7 @@ app.use(
         maxUrlLength: 200,
         maxQueryLength: 100,
         maxParamLength: 20,
-        maxBodyBytes: 1_000,
+        maxBodyBytes: 1000,
         maxJsonDepth: 5,
         maxJsonNodes: 50,
     }),

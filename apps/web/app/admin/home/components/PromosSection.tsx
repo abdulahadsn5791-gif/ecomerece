@@ -191,28 +191,39 @@ export const PromosSection = ({ promos, darkMode }: PromosSectionProps) => {
           title={modalMode === 'create' ? 'Add New Promo' : 'Edit Promo'}
           message="Configure the promo details below."
           variant="warning"
+          wide
           confirmText={modalMode === 'create' ? 'Add Promo' : 'Save Changes'}
           isLoading={addPromo.isPending || updatePromo.isPending}
           error={addPromo.error || updatePromo.error}
           onConfirm={modalMode === 'create' ? handleCreate : handleUpdate}
           renderFields={() => (
             <div className="space-y-3">
-              <input
-                placeholder="Title"
-                value={formData.title}
-                onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
-                className={inputCls}
-              />
+              <div className="grid grid-cols-[1fr_auto] gap-3 items-center">
+                <input
+                  placeholder="Title"
+                  value={formData.title}
+                  onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
+                  className={inputCls}
+                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={formData.accent}
+                    onChange={(e) => setFormData((p) => ({ ...p, accent: e.target.value }))}
+                    className="w-10 h-10 rounded-xl border-0 cursor-pointer"
+                  />
+                  <span
+                    className={`text-sm whitespace-nowrap ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
+                  >
+                    Accent
+                  </span>
+                </div>
+              </div>
               <input
                 placeholder="Subtitle"
                 value={formData.subtitle}
                 onChange={(e) => setFormData((p) => ({ ...p, subtitle: e.target.value }))}
                 className={inputCls}
-              />
-              <ImageInput
-                value={formData.image}
-                onChange={(image) => setFormData((p) => ({ ...p, image }))}
-                darkMode={darkMode}
               />
               <input
                 placeholder="Link URL"
@@ -220,19 +231,11 @@ export const PromosSection = ({ promos, darkMode }: PromosSectionProps) => {
                 onChange={(e) => setFormData((p) => ({ ...p, link: e.target.value }))}
                 className={inputCls}
               />
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={formData.accent}
-                  onChange={(e) => setFormData((p) => ({ ...p, accent: e.target.value }))}
-                  className="w-10 h-10 rounded-xl border-0 cursor-pointer"
-                />
-                <span
-                  className={`text-sm ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
-                >
-                  Accent color
-                </span>
-              </div>
+              <ImageInput
+                value={formData.image}
+                onChange={(image) => setFormData((p) => ({ ...p, image }))}
+                darkMode={darkMode}
+              />
             </div>
           )}
         />

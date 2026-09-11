@@ -81,6 +81,8 @@ export interface GenericConfirmModalProps<T> {
     error?: string | unknown | null;
     defaultPayload?: Partial<T>;
     onConfirm: (payload: T) => void;
+    /** Use a wider modal (max-w-2xl) for forms with multiple fields. */
+    wide?: boolean;
 
     renderFields?: (
         payload: Partial<T>,
@@ -103,6 +105,7 @@ export function GenericConfirmModal<T = Record<string, unknown>>({
     defaultPayload = {},
     onConfirm,
     renderFields,
+    wide = false,
 }: GenericConfirmModalProps<T>) {
     const [localPayload, setLocalPayload] = useState<Partial<T>>(defaultPayload);
     const prevIsOpenRef = useRef(false);
@@ -177,7 +180,7 @@ export function GenericConfirmModal<T = Record<string, unknown>>({
 
                     {/* Modal Card */}
                     <motion.div
-                        className={`relative z-10 w-full max-w-md p-6 rounded-3xl shadow-2xl border transition-colors ${darkMode
+                        className={`relative z-10 w-full ${wide ? 'max-w-2xl' : 'max-w-md'} p-6 rounded-3xl shadow-2xl border transition-colors ${darkMode
                                 ? 'bg-neutral-900 border-neutral-800 text-white'
                                 : 'bg-white border-neutral-100 text-neutral-900'
                             }`}

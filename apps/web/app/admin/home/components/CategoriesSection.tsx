@@ -175,36 +175,39 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
           title={modalMode === 'create' ? 'Add New Category' : 'Edit Category'}
           message="Configure the category details below."
           variant="confirm"
+          wide
           confirmText={modalMode === 'create' ? 'Add Category' : 'Save Changes'}
           isLoading={addCategory.isPending || updateCategory.isPending}
           error={addCategory.error || updateCategory.error}
           onConfirm={modalMode === 'create' ? handleCreate : handleUpdate}
           renderFields={() => (
             <div className="space-y-3">
-              <input
-                placeholder="Category name"
-                value={formData.name}
-                onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                className={inputCls}
-              />
+              <div className="grid grid-cols-[1fr_auto] gap-3 items-center">
+                <input
+                  placeholder="Category name"
+                  value={formData.name}
+                  onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+                  className={inputCls}
+                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={formData.accent}
+                    onChange={(e) => setFormData((p) => ({ ...p, accent: e.target.value }))}
+                    className="w-10 h-10 rounded-xl border-0 cursor-pointer"
+                  />
+                  <span
+                    className={`text-sm whitespace-nowrap ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
+                  >
+                    Accent
+                  </span>
+                </div>
+              </div>
               <ImageInput
                 value={formData.image}
                 onChange={(image) => setFormData((p) => ({ ...p, image }))}
                 darkMode={darkMode}
               />
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={formData.accent}
-                  onChange={(e) => setFormData((p) => ({ ...p, accent: e.target.value }))}
-                  className="w-10 h-10 rounded-xl border-0 cursor-pointer"
-                />
-                <span
-                  className={`text-sm ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
-                >
-                  Accent color
-                </span>
-              </div>
             </div>
           )}
         />

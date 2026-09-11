@@ -204,36 +204,41 @@ export const SlidesSection = ({ slides, darkMode }: SlidesSectionProps) => {
           title={modalMode === 'create' ? 'Add New Slide' : 'Edit Slide'}
           message="Configure the slide details below."
           variant="info"
+          wide
           confirmText={modalMode === 'create' ? 'Add Slide' : 'Save Changes'}
           isLoading={addSlide.isPending || updateSlide.isPending}
           error={addSlide.error || updateSlide.error}
           onConfirm={modalMode === 'create' ? handleCreate : handleUpdate}
           renderFields={() => (
             <div className="space-y-3">
-              <input
-                placeholder="Tag (e.g. New Season)"
-                value={formData.tag}
-                onChange={(e) => setFormData((p) => ({ ...p, tag: e.target.value }))}
-                className={inputCls}
-              />
-              <input
-                placeholder="Title"
-                value={formData.title}
-                onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
-                className={inputCls}
-              />
-              <input
-                placeholder="Subhead"
-                value={formData.subhead}
-                onChange={(e) => setFormData((p) => ({ ...p, subhead: e.target.value }))}
-                className={inputCls}
-              />
-              <input
-                placeholder="Subtitle"
-                value={formData.subtitle}
-                onChange={(e) => setFormData((p) => ({ ...p, subtitle: e.target.value }))}
-                className={inputCls}
-              />
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  placeholder="Tag (e.g. New Season)"
+                  value={formData.tag}
+                  onChange={(e) => setFormData((p) => ({ ...p, tag: e.target.value }))}
+                  className={inputCls}
+                />
+                <input
+                  placeholder="Title"
+                  value={formData.title}
+                  onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
+                  className={inputCls}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  placeholder="Subhead"
+                  value={formData.subhead}
+                  onChange={(e) => setFormData((p) => ({ ...p, subhead: e.target.value }))}
+                  className={inputCls}
+                />
+                <input
+                  placeholder="Subtitle"
+                  value={formData.subtitle}
+                  onChange={(e) => setFormData((p) => ({ ...p, subtitle: e.target.value }))}
+                  className={inputCls}
+                />
+              </div>
               <input
                 placeholder="CTA text"
                 value={formData.cta}

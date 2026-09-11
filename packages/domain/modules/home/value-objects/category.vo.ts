@@ -1,11 +1,13 @@
 import { Id, Title, UrlVO } from '../../../value-objects';
 import { ColorVO } from '../../../value-objects/color.vo';
+import { ImageKey } from '../../image-storage/value-objects/image-key.vo';
 
 export type CategoryVOProps = {
     id?: Id;
     name: Title;
     image: UrlVO;
     accent: ColorVO;
+    imageKey?: ImageKey;
 };
 
 export class CategoryVO {
@@ -14,6 +16,7 @@ export class CategoryVO {
         private readonly _name: Title,
         private readonly _image: UrlVO,
         private readonly _accent: ColorVO,
+        private readonly _imageKey?: ImageKey,
     ) {}
 
     get id(): Id {
@@ -28,6 +31,9 @@ export class CategoryVO {
     get accent(): ColorVO {
         return this._accent;
     }
+    get imageKey(): ImageKey | undefined {
+        return this._imageKey;
+    }
 
     static create(props: CategoryVOProps): CategoryVO {
         return new CategoryVO(
@@ -35,6 +41,7 @@ export class CategoryVO {
             props.name,
             props.image,
             props.accent,
+            props.imageKey,
         );
     }
 
@@ -43,7 +50,8 @@ export class CategoryVO {
         name: Title,
         image: UrlVO,
         accent: ColorVO,
+        imageKey?: ImageKey,
     ): CategoryVO {
-        return new CategoryVO(id, name, image, accent);
+        return new CategoryVO(id, name, image, accent, imageKey);
     }
 }

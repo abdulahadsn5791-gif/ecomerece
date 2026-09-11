@@ -1,5 +1,6 @@
 import { Id, Quantity, Title, UrlVO } from '../../../value-objects';
 import { ColorVO } from '../../../value-objects/color.vo';
+import { ImageKey } from '../../image-storage/value-objects/image-key.vo';
 
 export type SlideVOProps = {
     id?: Id;
@@ -11,6 +12,7 @@ export type SlideVOProps = {
     image: UrlVO;
     accent: ColorVO;
     displayOrder?: Quantity;
+    imageKey?: ImageKey;
 };
 
 export class SlideVO {
@@ -24,6 +26,7 @@ export class SlideVO {
         private readonly _image: UrlVO,
         private readonly _accent: ColorVO,
         private _displayOrder: Quantity,
+        private readonly _imageKey?: ImageKey,
     ) {}
 
     get id(): Id {
@@ -53,6 +56,9 @@ export class SlideVO {
     get displayOrder(): Quantity {
         return this._displayOrder;
     }
+    get imageKey(): ImageKey | undefined {
+        return this._imageKey;
+    }
 
     updateDisplayOrder(order: Quantity): void {
         this._displayOrder = order;
@@ -69,6 +75,7 @@ export class SlideVO {
             props.image,
             props.accent,
             props.displayOrder ?? Quantity.create(0),
+            props.imageKey,
         );
     }
 
@@ -82,8 +89,9 @@ export class SlideVO {
         image: UrlVO,
         accent: ColorVO,
         displayOrder: Quantity,
+        imageKey?: ImageKey,
     ): SlideVO {
-        return new SlideVO(id, tag, title, subhead, subtitle, cta, image, accent, displayOrder);
+        return new SlideVO(id, tag, title, subhead, subtitle, cta, image, accent, displayOrder, imageKey);
     }
 }
 

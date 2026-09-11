@@ -1,4 +1,5 @@
 export * from './address';
+export * from './image-storage';
 export * from './inventory';
 export * from './order';
 export * from './order-items';

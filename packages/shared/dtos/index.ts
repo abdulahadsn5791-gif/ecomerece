@@ -16,3 +16,4 @@ export * from './clerk-id-schema'
 export * from './rating-schema'
 export * from './color-schema';
 export * from './icon-schema';
+export * from './image-input-schema';

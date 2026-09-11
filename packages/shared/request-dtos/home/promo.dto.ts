@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { colorSchema, idSchema, titleSchema, urlSchema } from '../../dtos';
+import { colorSchema, idSchema, imageInputSchema, titleSchema, urlSchema } from '../../dtos';
 
 export const createPromoDtoSchema = z.object({
     title: titleSchema,
     subtitle: titleSchema,
-    image: urlSchema,
+    image: imageInputSchema,
     accent: colorSchema.default('#FB923C'),
     link: urlSchema.default('https://example.com/client/home'),
 });
@@ -15,7 +15,7 @@ export const updatePromoDtoSchema = z.object({
     id: idSchema,
     title: titleSchema.optional(),
     subtitle: titleSchema.optional(),
-    image: urlSchema.optional(),
+    image: imageInputSchema.optional(),
     accent: colorSchema.optional(),
     link: urlSchema.optional(),
 });

@@ -1,5 +1,6 @@
 import { Id, Title, UrlVO } from '../../../value-objects';
 import { ColorVO } from '../../../value-objects/color.vo';
+import { ImageKey } from '../../image-storage/value-objects/image-key.vo';
 
 export type PromoVOProps = {
     id?: Id;
@@ -8,6 +9,7 @@ export type PromoVOProps = {
     image: UrlVO;
     accent: ColorVO;
     link?: UrlVO;
+    imageKey?: ImageKey;
 };
 
 export class PromoVO {
@@ -18,6 +20,7 @@ export class PromoVO {
         private readonly _image: UrlVO,
         private readonly _accent: ColorVO,
         private readonly _link: UrlVO,
+        private readonly _imageKey?: ImageKey,
     ) {}
 
     get id(): Id {
@@ -38,6 +41,9 @@ export class PromoVO {
     get link(): UrlVO {
         return this._link;
     }
+    get imageKey(): ImageKey | undefined {
+        return this._imageKey;
+    }
 
     static create(props: PromoVOProps): PromoVO {
         return new PromoVO(
@@ -47,6 +53,7 @@ export class PromoVO {
             props.image,
             props.accent,
             props.link ?? UrlVO.create('https://example.com/client/home'),
+            props.imageKey,
         );
     }
 
@@ -57,8 +64,8 @@ export class PromoVO {
         image: UrlVO,
         accent: ColorVO,
         link: UrlVO,
+        imageKey?: ImageKey,
     ): PromoVO {
-        return new PromoVO(id, title, subtitle, image, accent, link);
+        return new PromoVO(id, title, subtitle, image, accent, link, imageKey);
     }
 }
-

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { colorSchema, idSchema, positiveNumberSchema, titleSchema, urlSchema } from '../../dtos';
+import { colorSchema, idSchema, imageInputSchema, positiveNumberSchema, titleSchema } from '../../dtos';
 
 export const createSlideDtoSchema = z.object({
     tag: titleSchema,
@@ -7,7 +7,7 @@ export const createSlideDtoSchema = z.object({
     subhead: titleSchema.default(''),
     subtitle: titleSchema.default(''),
     cta: titleSchema,
-    image: urlSchema,
+    image: imageInputSchema,
     accent: colorSchema.default('#3B82F6'),
     displayOrder: positiveNumberSchema.optional(),
 });
@@ -21,7 +21,7 @@ export const updateSlideDtoSchema = z.object({
     subhead: titleSchema.optional(),
     subtitle: titleSchema.optional(),
     cta: titleSchema.optional(),
-    image: urlSchema.optional(),
+    image: imageInputSchema.optional(),
     accent: colorSchema.optional(),
 });
 

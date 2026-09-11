@@ -22,9 +22,39 @@ export type ProductMutationResult = {
     updatedData?: ProductResponseReadModel;
 };
 
+export type PaginatedProductsResult = {
+    data: ProductResponseReadModel[];
+    meta: {
+        nextCursor: string | null;
+        prevCursor: string | null;
+        hasMore: boolean;
+    };
+};
+
 export class ProductService {
     getProductById(id: string): Promise<ProductResponseReadModel> {
         return http.get<ProductResponseReadModel>(`/product/${id}`);
+    }
+
+    getPaginatedProducts(params: {
+        categoryId?: string;
+        vendorId?: string;
+        appearance?: 'public' | 'private';
+        search?: string;
+        cursor?: string;
+        limit?: number;
+        direction?: 'next' | 'prev';
+    }): Promise<PaginatedProductsResult> {
+        const searchParams = new URLSearchParams();
+        if (params.categoryId) searchParams.set('categoryId', params.categoryId);
+        if (params.vendorId) searchParams.set('vendorId', params.vendorId);
+        if (params.appearance) searchParams.set('appearance', params.appearance);
+        if (params.search) searchParams.set('search', params.search);
+        if (params.cursor) searchParams.set('cursor', params.cursor);
+        if (params.limit) searchParams.set('limit', String(params.limit));
+        if (params.direction) searchParams.set('direction', params.direction);
+        const qs = searchParams.toString();
+        return http.get<PaginatedProductsResult>(`/product/${qs ? `?${qs}` : ''}`);
     }
 
     createMyProduct(data: CreateMyProductDto): Promise<ProductMutationResult> {

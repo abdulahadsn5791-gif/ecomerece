@@ -11,6 +11,7 @@ const homeCategorySchema = new Schema(
         name: { type: String, required: true },
         image: { type: String, required: true },
         accent: { type: String, required: true },
+        imageKey: { type: String },
     },
     { _id: false },
 );
@@ -36,6 +37,7 @@ const homeSlideSchema = new Schema(
         image: { type: String, required: true },
         accent: { type: String, required: true },
         displayOrder: { type: Number, default: 0 },
+        imageKey: { type: String },
     },
     { _id: false },
 );
@@ -48,6 +50,7 @@ const homePromoSchema = new Schema(
         image: { type: String, required: true },
         accent: { type: String, required: true },
         link: { type: String, default: "https://example.com/client/home" },
+        imageKey: { type: String },
     },
     { _id: false },
 );

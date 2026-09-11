@@ -44,6 +44,21 @@ export function useGetProductById(id: string) {
     });
 }
 
+export function useGetPaginatedProducts(params: {
+    categoryId?: string;
+    vendorId?: string;
+    appearance?: 'public' | 'private';
+    search?: string;
+    cursor?: string;
+    limit?: number;
+    direction?: 'next' | 'prev';
+}) {
+    return useQuery({
+        queryKey: [...PRODUCT_QUERY_KEY, 'paginated', params],
+        queryFn: () => productService.getPaginatedProducts(params),
+    });
+}
+
 // ── Shared cache-update helper ───────────────────────────────────────────────
 
 function applyProductMutationResult(queryClient: QueryClient, result: ProductMutationResult) {

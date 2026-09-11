@@ -1,4 +1,4 @@
-import { CategoryVO, FeatureVO, HomeAggregate, ProductContainerVO, PromoVO, SlideVO, type HomeReadModel } from '@ecomerece/domain';
+import { CategoryVO, FeatureVO, HomeAggregate, ImageKey, ProductContainerVO, PromoVO, SlideVO, type HomeReadModel } from '@ecomerece/domain';
 import { ColorVO, Description, EffectiveDate, Id, Quantity, Title, UrlVO } from '@ecomerece/domain/value-objects';
 import { BaseQueryVO } from '@ecomerece/domain/value-objects/query.vo';
 import type { HomeResponseReadModel } from '@ecomerece/shared';
@@ -12,6 +12,7 @@ export const HomeMapper = {
                 Title.create(c.name),
                 UrlVO.create(c.image),
                 ColorVO.create(c.accent),
+                c.imageKey ? ImageKey.rehydrate(c.imageKey) : undefined,
             ),
         );
         const features = (doc.features ?? []).map((f) =>
@@ -33,6 +34,7 @@ export const HomeMapper = {
                 UrlVO.create(s.image),
                 ColorVO.create(s.accent),
                 Quantity.create(s.displayOrder ?? 0),
+                s.imageKey ? ImageKey.rehydrate(s.imageKey) : undefined,
             ),
         );
         const promos = (doc.promos ?? []).map((p) =>
@@ -43,6 +45,7 @@ export const HomeMapper = {
                 UrlVO.create(p.image),
                 ColorVO.create(p.accent),
                 UrlVO.create(p.link ?? '/client/home'),
+                p.imageKey ? ImageKey.rehydrate(p.imageKey) : undefined,
             ),
         );
         const containers = (doc.productContainers ?? []).map((pc) =>
@@ -80,6 +83,7 @@ export const HomeMapper = {
                 name: c.name.value,
                 image: c.image.value,
                 accent: c.accent.value,
+                ...(c.imageKey ? { imageKey: c.imageKey.value } : {}),
             })),
             features: home.features.map((f) => ({
                 id: f.id.value,
@@ -97,6 +101,7 @@ export const HomeMapper = {
                 image: s.image.value,
                 accent: s.accent.value,
                 displayOrder: s.displayOrder.value,
+                ...(s.imageKey ? { imageKey: s.imageKey.value } : {}),
             })),
             promos: home.promos.map((p) => ({
                 id: p.id.value,
@@ -105,6 +110,7 @@ export const HomeMapper = {
                 image: p.image.value,
                 accent: p.accent.value,
                 link: p.link.value,
+                ...(p.imageKey ? { imageKey: p.imageKey.value } : {}),
             })),
             productContainers: home.productContainers.map((pc) => ({
                 id: pc.id.value,

@@ -1,7 +1,7 @@
-// components/Categories.tsx
 "use client";
 
 import { useThemeStore } from "@ecomerece/frontend";
+import type { HomeCategoryResponse } from "@ecomerece/shared";
 import {
     ArrowRight,
     Laptop,
@@ -19,91 +19,25 @@ import {
     type LucideIcon,
 } from "lucide-react";
 
-type Category = {
-    name: string;
-    icon: LucideIcon;
-    image: string;
-    /** Signature hue for this department — drives the icon badge and hover ring */
-    accent: string;
+const iconMap: Record<string, LucideIcon> = {
+    Laptop,
+    Monitor,
+    Keyboard,
+    Mouse,
+    Headphones,
+    Camera,
+    Gamepad2,
+    Armchair,
+    Router,
+    MemoryStick,
+    HardDrive,
+    Plug,
 };
 
-const categories: Category[] = [
-    {
-        name: "Laptops",
-        icon: Laptop,
-        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80",
-        accent: "#4A7FB5",
-    },
-    {
-        name: "Monitors",
-        icon: Monitor,
-        image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&q=80",
-        accent: "#7FA88C",
-    },
-    {
-        name: "Keyboards",
-        icon: Keyboard,
-        image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80",
-        accent: "#D4A24C",
-    },
-    {
-        name: "Mouse",
-        icon: Mouse,
-        image: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=400&q=80",
-        accent: "#D8607C",
-    },
-    {
-        name: "Headsets & Mics",
-        icon: Headphones,
-        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80",
-        accent: "#9C6FB0",
-    },
-    {
-        name: "Webcams & Cameras",
-        icon: Camera,
-        image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80",
-        accent: "#3E9C9C",
-    },
-    {
-        name: "Gaming Consoles",
-        icon: Gamepad2,
-        image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&q=80",
-        accent: "#9C6FB0",
-    },
-    {
-        name: "Gaming Furniture",
-        icon: Armchair,
-        image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400&q=80",
-        accent: "#D8607C",
-    },
-    {
-        name: "Networking",
-        icon: Router,
-        image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&q=80",
-        accent: "#4A7FB5",
-    },
-    {
-        name: "Memory / RAM",
-        icon: MemoryStick,
-        image: "https://images.unsplash.com/photo-1591405351990-4726e331f141?w=400&q=80",
-        accent: "#D4A24C",
-    },
-    {
-        name: "Storage",
-        icon: HardDrive,
-        image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400&q=80",
-        accent: "#7FA88C",
-    },
-    {
-        name: "Power Supply",
-        icon: Plug,
-        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80",
-        accent: "#3E9C9C",
-    },
-];
-
-export default function Categories() {
+export default function Categories({ categories }: { categories: HomeCategoryResponse[] }) {
     const { darkMode } = useThemeStore();
+
+    if (!categories.length) return null;
 
     return (
         <section
@@ -133,13 +67,13 @@ export default function Categories() {
                     </a>
                 </div>
 
-                {/* Horizontal scroll strip of circular category tiles, snap-scrolled on touch devices */}
+                {/* Horizontal scroll strip of circular category tiles */}
                 <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {categories.map((cat) => {
-                        const IconComponent = cat.icon;
+                        const IconComponent = iconMap[cat.name] || Laptop;
                         return (
                             <a
-                                key={cat.name}
+                                key={cat.id}
                                 href="#"
                                 style={{ "--accent": cat.accent } as React.CSSProperties}
                                 className="group flex flex-col items-center gap-3 shrink-0 w-24 sm:w-28 snap-start focus-visible:outline-none"

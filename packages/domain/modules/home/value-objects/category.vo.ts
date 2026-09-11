@@ -1,4 +1,4 @@
-import { Id, Title, UrlVO } from '../../../value-objects';
+import { IconVO, Id, Title, UrlVO } from '../../../value-objects';
 import { ColorVO } from '../../../value-objects/color.vo';
 import { ImageKey } from '../../image-storage/value-objects/image-key.vo';
 
@@ -7,6 +7,7 @@ export type CategoryVOProps = {
     name: Title;
     image: UrlVO;
     accent: ColorVO;
+    icon?: IconVO;
     imageKey?: ImageKey;
 };
 
@@ -16,6 +17,7 @@ export class CategoryVO {
         private readonly _name: Title,
         private readonly _image: UrlVO,
         private readonly _accent: ColorVO,
+        private readonly _icon?: IconVO,
         private readonly _imageKey?: ImageKey,
     ) {}
 
@@ -31,6 +33,9 @@ export class CategoryVO {
     get accent(): ColorVO {
         return this._accent;
     }
+    get icon(): IconVO | undefined {
+        return this._icon;
+    }
     get imageKey(): ImageKey | undefined {
         return this._imageKey;
     }
@@ -41,6 +46,7 @@ export class CategoryVO {
             props.name,
             props.image,
             props.accent,
+            props.icon,
             props.imageKey,
         );
     }
@@ -50,8 +56,9 @@ export class CategoryVO {
         name: Title,
         image: UrlVO,
         accent: ColorVO,
+        icon?: IconVO,
         imageKey?: ImageKey,
     ): CategoryVO {
-        return new CategoryVO(id, name, image, accent, imageKey);
+        return new CategoryVO(id, name, image, accent, icon, imageKey);
     }
 }

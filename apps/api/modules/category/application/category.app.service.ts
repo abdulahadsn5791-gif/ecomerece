@@ -4,11 +4,18 @@ import {
     type deleteCategoryType,
     type getPaginatedDtoType,
 } from '@ecomerece/shared';
+import type { FilterQuery } from 'mongoose';
 import { BaseService } from '../../../core/services/base.services';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { CategoryMapper } from '../infrastructure/category.mapper';
 import type { CategoryRepository } from '../infrastructure/category.repository';
+import type { CategoryPersistence } from '../infrastructure/category.models';
 import { type CategoryMessagesType, CategoryMessags } from '../presentation/category.messages';
+
+const CATEGORY_COLLATION = { locale: 'en', strength: 2 };
+
+const escapeRegex = (value: string): string =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export class CategoryAppService extends BaseService {
     constructor(private readonly categoryRepo: CategoryRepository) {
@@ -60,13 +67,19 @@ export class CategoryAppService extends BaseService {
             hasMore: boolean;
         };
     }> {
-        let cursor;
-        let limit;
-        let direction;
-        if (data.cursor) cursor = Id.create(data.cursor);
-        if (data.limit) limit = Quantity.create(data.limit);
-        if (data.direction) direction = data.direction;
-        const categories = await this.categoryRepo.FindPaginated({ cursor, limit, direction });
-        return categories;
+        const filter: FilterQuery<CategoryPersistence> = {
+            'deleted.deleted': false,
+            'block.blocked': false,
+        };
+        if (data.search) {
+            filter.title = { $regex: `^${escapeRegex(data.search)}` };
+        }
+        return this.categoryRepo.FindPaginated({
+            filter,
+            cursor: data.cursor ? Id.create(data.cursor) : undefined,
+            limit: data.limit ? Quantity.create(data.limit) : undefined,
+            direction: data.direction,
+            collation: CATEGORY_COLLATION,
+        });
     }
 }

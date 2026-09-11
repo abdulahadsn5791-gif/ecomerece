@@ -3,6 +3,8 @@ import { useThemeStore } from '@ecomerece/frontend';
 import { Sparkles, Plus, Pencil, Trash2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+import { DynamicIcon } from '@/lib/icons';
+import { IconPicker } from './IconPicker';
 import {
   useAddFeature,
   useUpdateFeature,
@@ -27,6 +29,7 @@ export const FeaturesSection = ({ features, darkMode }: FeaturesSectionProps) =>
     title: '',
     detail: '',
     accent: '#4A7FB5',
+    icon: 'Sparkles',
   });
 
   const addFeature = useAddFeature();
@@ -34,13 +37,13 @@ export const FeaturesSection = ({ features, darkMode }: FeaturesSectionProps) =>
   const removeFeature = useRemoveFeature();
 
   const openCreate = () => {
-    setFormData({ title: '', detail: '', accent: '#4A7FB5' });
+    setFormData({ title: '', detail: '', accent: '#4A7FB5', icon: 'Sparkles' });
     setModalMode('create');
   };
 
   const openEdit = (feat: HomeFeatureResponse) => {
     setSelected(feat);
-    setFormData({ title: feat.title, detail: feat.detail, accent: feat.accent });
+    setFormData({ title: feat.title, detail: feat.detail, accent: feat.accent, icon: feat.icon });
     setModalMode('edit');
   };
 
@@ -127,10 +130,7 @@ export const FeaturesSection = ({ features, darkMode }: FeaturesSectionProps) =>
                 className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                 style={{ backgroundColor: feat.accent + '20' }}
               >
-                <Sparkles
-                  className="w-5 h-5"
-                  style={{ color: feat.accent }}
-                />
+                <DynamicIcon name={feat.icon} className="w-5 h-5" style={{ color: feat.accent }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p
@@ -176,6 +176,11 @@ export const FeaturesSection = ({ features, darkMode }: FeaturesSectionProps) =>
           onConfirm={modalMode === 'create' ? handleCreate : handleUpdate}
           renderFields={() => (
             <div className="space-y-3">
+              <IconPicker
+                value={formData.icon}
+                onChange={(icon) => setFormData((p) => ({ ...p, icon }))}
+                darkMode={darkMode}
+              />
               <input
                 placeholder="Feature title"
                 value={formData.title}

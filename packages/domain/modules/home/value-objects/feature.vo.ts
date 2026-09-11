@@ -1,4 +1,4 @@
-import { Description, Id, Title } from '../../../value-objects';
+import { Description, IconVO, Id, Title } from '../../../value-objects';
 import { ColorVO } from '../../../value-objects/color.vo';
 
 export type FeatureVOProps = {
@@ -6,6 +6,7 @@ export type FeatureVOProps = {
     title: Title;
     detail: Description;
     accent: ColorVO;
+    icon?: IconVO;
 };
 
 export class FeatureVO {
@@ -14,6 +15,7 @@ export class FeatureVO {
         private readonly _title: Title,
         private readonly _detail: Description,
         private readonly _accent: ColorVO,
+        private readonly _icon?: IconVO,
     ) {}
 
     get id(): Id {
@@ -28,6 +30,9 @@ export class FeatureVO {
     get accent(): ColorVO {
         return this._accent;
     }
+    get icon(): IconVO | undefined {
+        return this._icon;
+    }
 
     static create(props: FeatureVOProps): FeatureVO {
         return new FeatureVO(
@@ -35,6 +40,7 @@ export class FeatureVO {
             props.title,
             props.detail,
             props.accent,
+            props.icon,
         );
     }
 
@@ -43,7 +49,8 @@ export class FeatureVO {
         title: Title,
         detail: Description,
         accent: ColorVO,
+        icon?: IconVO,
     ): FeatureVO {
-        return new FeatureVO(id, title, detail, accent);
+        return new FeatureVO(id, title, detail, accent, icon);
     }
 }

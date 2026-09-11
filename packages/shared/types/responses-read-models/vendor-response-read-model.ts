@@ -1,3 +1,9 @@
+export type VendorListItemReadModel = {
+    id: string;
+    title: string;
+    slug: string;
+};
+
 export type VendorResponseReadModel = {
     id: string;
     ownerId: string;

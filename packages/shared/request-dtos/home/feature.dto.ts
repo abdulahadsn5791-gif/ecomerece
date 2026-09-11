@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import { colorSchema, descriptionSchema, idSchema, titleSchema } from '../../dtos';
+import { colorSchema, descriptionSchema, iconSchema, idSchema, titleSchema } from '../../dtos';
 
 export const createFeatureDtoSchema = z.object({
     title: titleSchema,
     detail: descriptionSchema,
     accent: colorSchema.default('#10B981'),
+    icon: iconSchema.default('Sparkles'),
 });
 
 export type CreateFeatureDtoType = z.infer<typeof createFeatureDtoSchema>;
@@ -14,6 +15,7 @@ export const updateFeatureDtoSchema = z.object({
     title: titleSchema.optional(),
     detail: descriptionSchema.optional(),
     accent: colorSchema.optional(),
+    icon: iconSchema.optional(),
 });
 
 export type UpdateFeatureDtoType = z.infer<typeof updateFeatureDtoSchema>;

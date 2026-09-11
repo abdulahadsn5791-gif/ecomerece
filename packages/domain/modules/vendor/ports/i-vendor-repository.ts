@@ -1,5 +1,6 @@
 
-import { Id, } from "../../../value-objects";
+import { Id } from "../../../value-objects";
+import type { Quantity } from "../../../value-objects";
 import type { VendorAggregate } from '../vendor.aggregate';
 
 export interface IVendorRepository {
@@ -13,4 +14,11 @@ export interface IVendorRepository {
     Save(user: VendorAggregate): Promise<void>;
     Delete(id: Id): Promise<void>;
     Exists(id: Id): Promise<boolean>;
+    FindPaginated(params: { cursor?: Id; limit?: Quantity; direction?: 'next' | 'prev'; }): Promise<{
+        data: any, meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        }
+    }>
 }

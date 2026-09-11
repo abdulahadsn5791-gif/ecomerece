@@ -11,6 +11,7 @@ const homeCategorySchema = new Schema(
         name: { type: String, required: true },
         image: { type: String, required: true },
         accent: { type: String, required: true },
+        icon: { type: String, default: 'Box' },
         imageKey: { type: String },
     },
     { _id: false },
@@ -22,6 +23,7 @@ const homeFeatureSchema = new Schema(
         title: { type: String, required: true },
         detail: { type: String, required: true },
         accent: { type: String, required: true },
+        icon: { type: String, default: 'Sparkles' },
     },
     { _id: false },
 );

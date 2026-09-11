@@ -81,6 +81,7 @@ export const ProductMapper = {
             _id: product.id.value,
             vendorId: product.vendorId.value,
             categoryId: product.categoryId.value,
+            vendorTitle: product.vendorTitle.value,
             title: product.title.value,
             inStock: product.inStock,
             description: product.description.value,

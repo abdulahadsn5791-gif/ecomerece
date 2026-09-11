@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
-import { useThemeStore } from '@ecomerece/frontend';
-import { Box, Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
-import MutationButton from '@/components/Mutationbutton';
-import { GenericConfirmModal } from '@/components/GenericConfirmModal';
 import {
   useAddProductContainer,
-  useUpdateProductContainer,
+  useGetPaginatedCategories,
+  useGetPaginatedVendors,
   useRemoveProductContainer,
+  useUpdateProductContainer,
 } from '@ecomerece/frontend';
 import type {
-  HomeContainerResponse,
   CreateProductContainerDtoType,
-  UpdateProductContainerDtoType,
   DeleteProductContainerDtoType,
+  HomeContainerResponse,
+  UpdateProductContainerDtoType,
 } from '@ecomerece/shared';
+import { Box, GripVertical, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+import MutationButton from '@/components/Mutationbutton';
+import { SearchableSelect } from './SearchableSelect';
 
 interface ContainersSectionProps {
   containers: HomeContainerResponse[];
@@ -26,15 +28,24 @@ export const ContainersSection = ({ containers, darkMode }: ContainersSectionPro
   const [formData, setFormData] = useState({
     heading: '',
     subTitle: '',
+    search: '',
+    categoryId: '',
+    vendorId: '',
     limit: 8,
   });
 
   const addContainer = useAddProductContainer();
   const updateContainer = useUpdateProductContainer();
   const removeContainer = useRemoveProductContainer();
+  const [categorySearch, setCategorySearch] = useState('');
+  const [vendorSearch, setVendorSearch] = useState('');
+  const categoriesQuery = useGetPaginatedCategories({ limit: 50, search: categorySearch });
+  const vendorsQuery = useGetPaginatedVendors({ limit: 50, search: vendorSearch });
 
   const openCreate = () => {
-    setFormData({ heading: '', subTitle: '', limit: 8 });
+    setFormData({ heading: '', subTitle: '', search: '', categoryId: '', vendorId: '', limit: 8 });
+    setCategorySearch('');
+    setVendorSearch('');
     setModalMode('create');
   };
 
@@ -43,6 +54,9 @@ export const ContainersSection = ({ containers, darkMode }: ContainersSectionPro
     setFormData({
       heading: container.heading,
       subTitle: container.subTitle,
+      search: (container.query?.filter?.search as string | undefined) ?? '',
+      categoryId: (container.query?.filter?.categoryId as string | undefined) ?? '',
+      vendorId: (container.query?.filter?.vendorId as string | undefined) ?? '',
       limit: container.query?.limit ?? 8,
     });
     setModalMode('edit');
@@ -53,15 +67,40 @@ export const ContainersSection = ({ containers, darkMode }: ContainersSectionPro
     setModalMode('delete');
   };
 
+  const buildQuery = (limit: number) => {
+    const filter: Record<string, unknown> = { ...(selected?.query?.filter ?? {}) };
+    filter.appearance = 'public';
+    if (formData.search.trim()) {
+      filter.search = formData.search.trim();
+    } else {
+      delete filter.search;
+    }
+    if (formData.categoryId) {
+      filter.categoryId = formData.categoryId;
+    } else {
+      delete filter.categoryId;
+    }
+    if (formData.vendorId) {
+      filter.vendorId = formData.vendorId;
+    } else {
+      delete filter.vendorId;
+    }
+    return { filter, limit };
+  };
+
+  const categoryName = (id: string) =>
+    categoriesQuery.data?.data.find((c) => c.id === id)?.title ?? id;
+  const vendorName = (id: string) => vendorsQuery.data?.data.find((v) => v.id === id)?.title ?? id;
+
   const handleCreate = () => {
     addContainer.mutate(
       {
         heading: formData.heading,
         subTitle: formData.subTitle,
-        query: { limit: formData.limit },
-        displayOrder: containers.length,
+        query: buildQuery(formData.limit),
+        displayOrder: containers.length + 1,
       } as CreateProductContainerDtoType,
-      { onSuccess: () => setModalMode(null) }
+      { onSuccess: () => setModalMode(null) },
     );
   };
 
@@ -72,18 +111,17 @@ export const ContainersSection = ({ containers, darkMode }: ContainersSectionPro
         id: selected.id,
         heading: formData.heading,
         subTitle: formData.subTitle,
-        query: { limit: formData.limit },
+        query: buildQuery(formData.limit),
       } as UpdateProductContainerDtoType,
-      { onSuccess: () => setModalMode(null) }
+      { onSuccess: () => setModalMode(null) },
     );
   };
 
   const handleDelete = () => {
     if (!selected) return;
-    removeContainer.mutate(
-      { id: selected.id } as DeleteProductContainerDtoType,
-      { onSuccess: () => setModalMode(null) }
-    );
+    removeContainer.mutate({ id: selected.id } as DeleteProductContainerDtoType, {
+      onSuccess: () => setModalMode(null),
+    });
   };
 
   const inputCls = `w-full p-3 text-sm rounded-2xl border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 ${
@@ -102,14 +140,10 @@ export const ContainersSection = ({ containers, darkMode }: ContainersSectionPro
             <Box className="w-5 h-5 text-rose-500" />
           </div>
           <div>
-            <h3
-              className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-neutral-900'}`}
-            >
+            <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-neutral-900'}`}>
               Product Containers
             </h3>
-            <p
-              className={`text-xs ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
-            >
+            <p className={`text-xs ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
               {containers.length} container{containers.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -158,6 +192,18 @@ export const ContainersSection = ({ containers, darkMode }: ContainersSectionPro
                     className={`text-xs truncate ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
                   >
                     {container.subTitle} &middot; Limit: {container.query?.limit ?? 'N/A'}
+                    {typeof container.query?.filter?.search === 'string' &&
+                      container.query.filter.search && (
+                        <> &middot; Search: &ldquo;{container.query.filter.search}&rdquo;</>
+                      )}
+                    {typeof container.query?.filter?.categoryId === 'string' &&
+                      container.query.filter.categoryId && (
+                        <> &middot; Category: {categoryName(container.query.filter.categoryId)}</>
+                      )}
+                    {typeof container.query?.filter?.vendorId === 'string' &&
+                      container.query.filter.vendorId && (
+                        <> &middot; Vendor: {vendorName(container.query.filter.vendorId)}</>
+                      )}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
@@ -183,49 +229,83 @@ export const ContainersSection = ({ containers, darkMode }: ContainersSectionPro
         <GenericConfirmModal
           isOpen={true}
           onClose={() => setModalMode(null)}
-          title={
-            modalMode === 'create'
-              ? 'Add New Container'
-              : 'Edit Container'
-          }
+          title={modalMode === 'create' ? 'Add New Container' : 'Edit Container'}
           message="Configure the product container below."
           variant="info"
-          confirmText={
-            modalMode === 'create' ? 'Add Container' : 'Save Changes'
-          }
+          wide
+          confirmText={modalMode === 'create' ? 'Add Container' : 'Save Changes'}
           isLoading={addContainer.isPending || updateContainer.isPending}
           error={addContainer.error || updateContainer.error}
           onConfirm={modalMode === 'create' ? handleCreate : handleUpdate}
           renderFields={() => (
             <div className="space-y-3">
-              <input
-                placeholder="Heading"
-                value={formData.heading}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, heading: e.target.value }))
-                }
-                className={inputCls}
-              />
-              <input
-                placeholder="Subtitle"
-                value={formData.subTitle}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, subTitle: e.target.value }))
-                }
-                className={inputCls}
-              />
-              <input
-                type="number"
-                placeholder="Product limit"
-                value={formData.limit}
-                onChange={(e) =>
-                  setFormData((p) => ({
-                    ...p,
-                    limit: parseInt(e.target.value) || 8,
-                  }))
-                }
-                className={inputCls}
-              />
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  placeholder="Heading"
+                  value={formData.heading}
+                  onChange={(e) => setFormData((p) => ({ ...p, heading: e.target.value }))}
+                  className={inputCls}
+                />
+                <input
+                  placeholder="Subtitle"
+                  value={formData.subTitle}
+                  onChange={(e) => setFormData((p) => ({ ...p, subTitle: e.target.value }))}
+                  className={inputCls}
+                />
+              </div>
+              <div className="grid grid-cols-[1fr_140px] gap-3">
+                <div className="relative">
+                  <Search
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${darkMode ? 'text-neutral-500' : 'text-neutral-400'}`}
+                  />
+                  <input
+                    placeholder="Search query (e.g. wireless headphones)"
+                    value={formData.search}
+                    onChange={(e) => setFormData((p) => ({ ...p, search: e.target.value }))}
+                    className={`${inputCls} pl-10`}
+                  />
+                </div>
+                <input
+                  type="number"
+                  placeholder="Product limit"
+                  value={formData.limit}
+                  onChange={(e) =>
+                    setFormData((p) => ({
+                      ...p,
+                      limit: parseInt(e.target.value) || 8,
+                    }))
+                  }
+                  className={inputCls}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <SearchableSelect
+                  value={formData.categoryId}
+                  onChange={(v) => setFormData((p) => ({ ...p, categoryId: v }))}
+                  onSearch={setCategorySearch}
+                  options={(categoriesQuery.data?.data ?? []).map((c) => ({
+                    id: c.id,
+                    label: c.title,
+                  }))}
+                  selectPlaceholder="All categories"
+                  searchPlaceholder="Type to search categories…"
+                  darkMode={darkMode}
+                  inputCls={inputCls}
+                />
+                <SearchableSelect
+                  value={formData.vendorId}
+                  onChange={(v) => setFormData((p) => ({ ...p, vendorId: v }))}
+                  onSearch={setVendorSearch}
+                  options={(vendorsQuery.data?.data ?? []).map((v) => ({
+                    id: v.id,
+                    label: v.title,
+                  }))}
+                  selectPlaceholder="All vendors"
+                  searchPlaceholder="Type to search vendors…"
+                  darkMode={darkMode}
+                  inputCls={inputCls}
+                />
+              </div>
             </div>
           )}
         />

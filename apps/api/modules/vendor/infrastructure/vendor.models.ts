@@ -61,7 +61,6 @@ export const VendorSchema = new Schema(
         title: {
             type: String,
             required: true,
-            unique: true,
         },
 
         slug: {
@@ -113,6 +112,8 @@ export const VendorSchema = new Schema(
         versionKey: false,
     },
 );
+
+VendorSchema.index({ title: 1 }, { collation: { locale: 'en', strength: 2 } });
 
 export type VendorPersistence = InferSchemaType<typeof VendorSchema>;
 export type VendorPersistenceWithId = VendorPersistence & {

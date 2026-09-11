@@ -10,6 +10,18 @@ import type {
 import { getCurrentSession } from '../database/transaction-context';
 import { BaseRepository } from './base.repository';
 
+export type CollationOptions = {
+    locale: string;
+    caseLevel?: boolean;
+    caseFirst?: string;
+    strength?: number;
+    numericOrdering?: boolean;
+    alternate?: string;
+    maxVariable?: string;
+    backwards?: boolean;
+    normalization?: boolean;
+};
+
 export class MongoRepository<T> extends BaseRepository<T> {
     constructor(protected readonly model: Model<T>) {
         super();
@@ -133,6 +145,7 @@ export class MongoRepository<T> extends BaseRepository<T> {
         cursor?: string;
         limit?: number;
         direction?: 'next' | 'prev';
+        collation?: CollationOptions;
     }) {
         const limit = Math.max(1, Math.min(params.limit ?? 20, 100));
 
@@ -141,8 +154,9 @@ export class MongoRepository<T> extends BaseRepository<T> {
             ...this.buildCursorFilter(params.cursor, params.direction),
         };
 
-        const docs = await this.model
-            .find(filter)
+        let query = this.model.find(filter);
+        if (params.collation) query = query.collation(params.collation);
+        const docs = await query
             .sort({ _id: -1 })
             .limit(limit + 1)
             .session(this.session ?? null)

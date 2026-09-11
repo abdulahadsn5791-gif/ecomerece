@@ -5,9 +5,9 @@ import type {
     Quantity,
     Title,
 } from '@ecomerece/domain';
-import { FilterQuery } from 'mongoose';
-import { CursorMeta } from '../../../core/repository/base.repository';
-import { MongoRepository } from '../../../core/repository/mongo.repository';
+import type { FilterQuery } from 'mongoose';
+import type { categoryReadModels } from '@ecomerece/domain';
+import { MongoRepository, type CollationOptions } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
 import { CategoryMapper } from './category.mapper';
 import { CategoryModel, type CategoryPersistence } from './category.models';
@@ -45,25 +45,28 @@ export class CategoryRepository
     }
 
     async FindPaginated(params: {
+        filter?: FilterQuery<CategoryPersistence>;
         cursor?: Id;
         limit?: Quantity;
         direction?: 'next' | 'prev';
+        collation?: CollationOptions;
     }): Promise<{
-        data: any;
+        data: categoryReadModels[];
         meta: {
             nextCursor: string | null;
             prevCursor: string | null;
             hasMore: boolean;
         };
     }> {
-        const info = {
+        const result = await this.paginateByCursor({
+            filter: params.filter,
             cursor: params.cursor?.value,
             limit: params.limit?.value,
             direction: params.direction,
-        };
-        const result = await this.paginateByCursor(info);
+            collation: params.collation,
+        });
         return {
-            data: result,
+            data: result.data.map((doc) => CategoryMapper.persistenceToReadModel(doc as never)),
             meta: result.meta,
         };
     }

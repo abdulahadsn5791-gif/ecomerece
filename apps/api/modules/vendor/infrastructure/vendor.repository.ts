@@ -1,15 +1,15 @@
 import type { IVendorRepository, VendorAggregate } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
-import { MongoRepository } from '../../../core/repository/mongo.repository';
+import type { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
+import { MongoRepository, type CollationOptions } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError, NotFoundError } from '../../../errors/app-error';
 import { VendorMapper } from './vendor.mapper';
 
-import { VendorModel, type VendorPersistence } from './vendor.models';
+import { VendorModel, type VendorPersistence, type VendorPersistenceWithId } from './vendor.models';
 
 export class VendorRepository
     extends MongoRepository<VendorPersistence>
-    implements IVendorRepository
-{
+    implements IVendorRepository {
     constructor() {
         super(VendorModel);
     }
@@ -93,5 +93,35 @@ export class VendorRepository
         return !!(await super.exists({
             _id: id.value,
         }));
+    }
+
+    async FindPaginated(params: {
+        filter?: Record<string, unknown>;
+        cursor?: Id;
+        limit?: Quantity;
+        direction?: 'next' | 'prev';
+        collation?: CollationOptions;
+    }): Promise<{
+        data: VendorAggregate[];
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
+    }> {
+        const result = await this.paginateByCursor({
+            filter: params.filter,
+            cursor: params.cursor?.value,
+            limit: params.limit?.value,
+            direction: params.direction,
+            collation: params.collation,
+        });
+
+        return {
+            data: result.data.map((doc: VendorPersistenceWithId) =>
+                VendorMapper.persistenceToAggregate(doc),
+            ),
+            meta: result.meta,
+        };
     }
 }

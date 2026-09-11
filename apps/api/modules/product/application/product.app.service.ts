@@ -86,10 +86,12 @@ export class ProductApplicationService extends BaseService {
                 title: Title.create(val.title),
             })),
         });
+        const vendorTitle = Title.create(vendor.title);
         const product = ProductAggregate.create({
             id: id,
             categoryId: categoryId,
             vendorId: vendorId,
+            vendorTitle: vendorTitle,
             images: images,
             title: title,
             description: description,
@@ -380,24 +382,21 @@ export class ProductApplicationService extends BaseService {
             'deleted.deleted': false,
             'block.blocked': false,
         };
-
         if (query.categoryId) filter.categoryId = query.categoryId;
         if (query.vendorId) filter.vendorId = query.vendorId;
         if (query.appearance) filter.appearance = query.appearance;
         if (query.search) {
             filter.title = { $regex: query.search, $options: 'i' } as any;
         }
-
         const cursor = query.cursor ? Id.create(query.cursor) : undefined;
         const limit = query.limit ? Quantity.create(query.limit) : undefined;
-
+       
         const result = await this.productRepo.FindPaginated({
             filter,
             cursor,
             limit,
             direction: query.direction,
         });
-
         return {
             data: result.data.map((aggregate) => (ProductMapper.aggregateToResponseReadModel(aggregate))),
             meta: result.meta,

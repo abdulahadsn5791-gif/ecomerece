@@ -54,7 +54,7 @@ export class ProductService {
         if (params.limit) searchParams.set('limit', String(params.limit));
         if (params.direction) searchParams.set('direction', params.direction);
         const qs = searchParams.toString();
-        return http.get<PaginatedProductsResult>(`/product/${qs ? `?${qs}` : ''}`);
+        return http.get<PaginatedProductsResult>(`/product${qs ? `?${qs}` : ''}`);
     }
 
     createMyProduct(data: CreateMyProductDto): Promise<ProductMutationResult> {

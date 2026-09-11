@@ -8,5 +8,5 @@ const { categoryController } = createCategoryModule();
 
 CategoryRoutes.post('/create', authMiddleware, adminMiddleware, categoryController.createCategory);
 CategoryRoutes.delete('/', authMiddleware, adminMiddleware, categoryController.deleteCategory);
-CategoryRoutes.get('/:id', categoryController.getCategory);
 CategoryRoutes.get('/', categoryController.getPaginated);
+CategoryRoutes.get('/:id', categoryController.getCategory);

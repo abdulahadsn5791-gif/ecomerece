@@ -22,7 +22,7 @@ export default function HeroBanner({ slides, promos }: { slides: HomeSlideRespon
         if (prefersReducedMotion || paused) return;
         const timer = setInterval(() => {
             setCurrentIndex((i) => (i + 1) % slides.length);
-        }, 6000);
+        }, 2000);
         return () => clearInterval(timer);
     }, [paused, slides.length]);
 

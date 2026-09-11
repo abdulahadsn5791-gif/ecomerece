@@ -1,5 +1,5 @@
 import { CategoryVO, FeatureVO, HomeAggregate, ImageKey, ProductContainerVO, PromoVO, SlideVO, type HomeReadModel } from '@ecomerece/domain';
-import { ColorVO, Description, EffectiveDate, Id, Quantity, Title, UrlVO } from '@ecomerece/domain/value-objects';
+import { ColorVO, Description, EffectiveDate, IconVO, Id, Quantity, Title, UrlVO } from '@ecomerece/domain/value-objects';
 import { BaseQueryVO } from '@ecomerece/domain/value-objects/query.vo';
 import type { HomeResponseReadModel } from '@ecomerece/shared';
 import type { HomePersistence } from './home.models';
@@ -12,6 +12,7 @@ export const HomeMapper = {
                 Title.create(c.name),
                 UrlVO.create(c.image),
                 ColorVO.create(c.accent),
+                c.icon ? IconVO.rehydrate(c.icon) : undefined,
                 c.imageKey ? ImageKey.rehydrate(c.imageKey) : undefined,
             ),
         );
@@ -21,6 +22,7 @@ export const HomeMapper = {
                 Title.create(f.title),
                 Description.create(f.detail),
                 ColorVO.create(f.accent),
+                f.icon ? IconVO.rehydrate(f.icon) : undefined,
             ),
         );
         const slides = (doc.slides ?? []).map((s) =>
@@ -83,6 +85,7 @@ export const HomeMapper = {
                 name: c.name.value,
                 image: c.image.value,
                 accent: c.accent.value,
+                icon: c.icon?.name ?? 'Box',
                 ...(c.imageKey ? { imageKey: c.imageKey.value } : {}),
             })),
             features: home.features.map((f) => ({
@@ -90,6 +93,7 @@ export const HomeMapper = {
                 title: f.title.value,
                 detail: f.detail.value,
                 accent: f.accent.value,
+                icon: f.icon?.name ?? 'Sparkles',
             })),
             slides: home.slides.map((s) => ({
                 id: s.id.value,
@@ -137,12 +141,14 @@ export const HomeMapper = {
                 name: c.name.value,
                 image: c.image.value,
                 accent: c.accent.value,
+                icon: c.icon?.name ?? 'Box',
             })),
             features: home.features.map((f) => ({
                 id: f.id.value,
                 title: f.title.value,
                 detail: f.detail.value,
                 accent: f.accent.value,
+                icon: f.icon?.name ?? 'Sparkles',
             })),
             slides: home.slides.map((s) => ({
                 id: s.id.value,

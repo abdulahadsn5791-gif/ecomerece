@@ -2,16 +2,17 @@
 import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { vendorService, type VendorMutationResult } from './vendor.service';
 import {
-
     CreateVendorDtoSchema,
     DeleteMyVendorDtoSchema,
     DeleteVendorDtoSchema,
+    getPaginatedVendorsQuerySchema,
     RecoverVendorDtoSchema,
     RejectVendorDtoSchema,
     VerifyVendorDtoSchema,
     type CreateVendorDto,
     type DeleteMyVendorDto,
     type DeleteVendorDto,
+    type GetPaginatedVendorsQueryDto,
     type RecoverVendorDto,
     type RejectVendorDto,
     type VendorResponseReadModel,
@@ -27,6 +28,13 @@ export function useGetVendorById(vendorId: string) {
         queryKey: [...VENDOR_QUERY_KEY, vendorId],
         queryFn: () => vendorService.getVendorById(vendorId),
         enabled: Boolean(vendorId),
+    });
+}
+
+export function useGetPaginatedVendors(params: GetPaginatedVendorsQueryDto) {
+    return useQuery({
+        queryKey: [...VENDOR_QUERY_KEY, 'paginated', params],
+        queryFn: () => vendorService.getPaginatedVendors(getPaginatedVendorsQuerySchema.parse(params)),
     });
 }
 

@@ -33,6 +33,7 @@ export class CategoryService {
         if (params.cursor) searchParams.append('cursor', params.cursor);
         if (params.limit) searchParams.append('limit', String(params.limit));
         if (params.direction) searchParams.append('direction', params.direction);
+        if (params.search) searchParams.append('search', params.search);
 
         const query = searchParams.toString();
         const url = query ? `/category?${query}` : '/category';

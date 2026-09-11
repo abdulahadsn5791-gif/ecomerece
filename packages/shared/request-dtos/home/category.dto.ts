@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import { colorSchema, idSchema, imageInputSchema, titleSchema } from '../../dtos';
+import { colorSchema, iconSchema, idSchema, imageInputSchema, titleSchema } from '../../dtos';
 
 export const createHomeCategoryDtoSchema = z.object({
     name: titleSchema,
     image: imageInputSchema,
     accent: colorSchema.default('#3B82F6'),
+    icon: iconSchema.default('Box'),
 });
 
 export type CreateHomeCategoryDtoType = z.infer<typeof createHomeCategoryDtoSchema>;
@@ -14,6 +15,7 @@ export const updateHomeCategoryDtoSchema = z.object({
     name: titleSchema.optional(),
     image: imageInputSchema.optional(),
     accent: colorSchema.optional(),
+    icon: iconSchema.optional(),
 });
 
 export type UpdateHomeCategoryDtoType = z.infer<typeof updateHomeCategoryDtoSchema>;

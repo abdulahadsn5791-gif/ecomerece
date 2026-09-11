@@ -17,5 +17,6 @@ vendorRoutes.patch(
     adminMiddleware,
     vendorController.rejectVendorVerification,
 );
+vendorRoutes.get('/', vendorController.getPaginatedVendors);
 vendorRoutes.get('/:id', vendorController.getVendorById);
 export default vendorRoutes;

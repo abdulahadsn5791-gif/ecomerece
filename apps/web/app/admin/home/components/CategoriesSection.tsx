@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore, useGetPaginatedCategories } from '@ecomerece/frontend';
 import { Tag, Plus, Pencil, Trash2, GripVertical, Maximize2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
 import { ImageInput } from './ImageInput';
 import { ImageLightbox } from './ImageLightbox';
+import { SearchableSelect } from './SearchableSelect';
+import { IconPicker } from './IconPicker';
+import { DynamicIcon } from '@/lib/icons';
 import {
   useAddCategory,
   useUpdateCategory,
@@ -25,21 +28,28 @@ interface CategoriesSectionProps {
 export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionProps) => {
   const [modalMode, setModalMode] = useState<'create' | 'edit' | 'delete' | null>(null);
   const [selected, setSelected] = useState<HomeCategoryResponse | null>(null);
-  const [formData, setFormData] = useState({ name: '', image: '', accent: '#4A7FB5' });
+  const [formData, setFormData] = useState({ name: '', image: '', accent: '#4A7FB5', icon: 'Box' });
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const [categorySearch, setCategorySearch] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const categoriesQuery = useGetPaginatedCategories({ limit: 50, search: categorySearch });
 
   const addCategory = useAddCategory();
   const updateCategory = useUpdateCategory();
   const removeCategory = useRemoveCategory();
 
   const openCreate = () => {
-    setFormData({ name: '', image: '', accent: '#4A7FB5' });
+    setFormData({ name: '', image: '', accent: '#4A7FB5', icon: 'Box' });
+    setCategorySearch('');
+    setSelectedCategoryId('');
     setModalMode('create');
   };
 
   const openEdit = (cat: HomeCategoryResponse) => {
     setSelected(cat);
-    setFormData({ name: cat.name, image: cat.image, accent: cat.accent });
+    setFormData({ name: cat.name, image: cat.image, accent: cat.accent, icon: cat.icon });
+    setCategorySearch('');
+    setSelectedCategoryId('');
     setModalMode('edit');
   };
 
@@ -68,6 +78,15 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
       { id: selected.id } as DeleteHomeCategoryDtoType,
       { onSuccess: () => setModalMode(null) }
     );
+  };
+
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategoryId(categoryId);
+    if (!categoryId) return;
+    const cat = categoriesQuery.data?.data.find((c) => c.id === categoryId);
+    if (cat) {
+      setFormData((p) => ({ ...p, name: cat.title, image: cat.image }));
+    }
   };
 
   const inputCls = `w-full p-3 text-sm rounded-2xl border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 ${
@@ -140,6 +159,9 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
                     className="w-full h-full object-cover"
                   />
                 )}
+                <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-black/50 ring-1 ring-white/20 flex items-center justify-center">
+                  <DynamicIcon name={cat.icon} className="w-3 h-3 text-white" />
+                </span>
                 <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-opacity group-hover:bg-black/30 group-hover:opacity-100">
                   <Maximize2 className="w-4 h-4 text-white" />
                 </span>
@@ -182,6 +204,25 @@ export const CategoriesSection = ({ categories, darkMode }: CategoriesSectionPro
           onConfirm={modalMode === 'create' ? handleCreate : handleUpdate}
           renderFields={() => (
             <div className="space-y-3">
+              <SearchableSelect
+                value={selectedCategoryId}
+                onChange={handleCategorySelect}
+                onSearch={setCategorySearch}
+                options={(categoriesQuery.data?.data ?? []).map((c) => ({
+                  id: c.id,
+                  label: c.title,
+                }))}
+                selectPlaceholder="Pick existing category (optional)"
+                searchPlaceholder="Search categories…"
+                darkMode={darkMode}
+                inputCls={inputCls}
+              />
+              <IconPicker
+                value={formData.icon}
+                onChange={(icon) => setFormData((p) => ({ ...p, icon }))}
+                darkMode={darkMode}
+                label="Icon"
+              />
               <div className="grid grid-cols-[1fr_auto] gap-3 items-center">
                 <input
                   placeholder="Category name"

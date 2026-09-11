@@ -4,8 +4,10 @@ import type {
     CreateVendorDto,
     DeleteMyVendorDto,
     DeleteVendorDto,
+    GetPaginatedVendorsQueryDto,
     RecoverVendorDto,
     RejectVendorDto,
+    VendorListItemReadModel,
     VendorResponseReadModel,
     VerifyVendorDto,
 } from '@ecomerece/shared';
@@ -43,6 +45,21 @@ export class VendorService {
 
     rejectVendorVerification(data: RejectVendorDto): Promise<VendorMutationResult> {
         return http.patch<VendorMutationResult>('/vendor/reject', data);
+    }
+
+    getPaginatedVendors(
+        params: GetPaginatedVendorsQueryDto,
+    ): Promise<{ data: VendorListItemReadModel[]; meta: { nextCursor: string | null; prevCursor: string | null; hasMore: boolean } }> {
+        const searchParams = new URLSearchParams();
+        if (params.cursor) searchParams.append('cursor', params.cursor);
+        if (params.limit) searchParams.append('limit', String(params.limit));
+        if (params.direction) searchParams.append('direction', params.direction);
+        if (params.search) searchParams.append('search', params.search);
+
+        const query = searchParams.toString();
+        const url = query ? `/vendor?${query}` : '/vendor';
+
+        return http.get(url);
     }
 }
 

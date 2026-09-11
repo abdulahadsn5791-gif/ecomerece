@@ -2,37 +2,8 @@
 
 import { useThemeStore } from "@ecomerece/frontend";
 import type { HomeCategoryResponse } from "@ecomerece/shared";
-import {
-    ArrowRight,
-    Laptop,
-    Monitor,
-    Keyboard,
-    Mouse,
-    Headphones,
-    Camera,
-    Gamepad2,
-    Armchair,
-    Router,
-    MemoryStick,
-    HardDrive,
-    Plug,
-    type LucideIcon,
-} from "lucide-react";
-
-const iconMap: Record<string, LucideIcon> = {
-    Laptop,
-    Monitor,
-    Keyboard,
-    Mouse,
-    Headphones,
-    Camera,
-    Gamepad2,
-    Armchair,
-    Router,
-    MemoryStick,
-    HardDrive,
-    Plug,
-};
+import { ArrowRight } from "lucide-react";
+import { DynamicIcon } from "@/lib/icons";
 
 export default function Categories({ categories }: { categories: HomeCategoryResponse[] }) {
     const { darkMode } = useThemeStore();
@@ -70,7 +41,6 @@ export default function Categories({ categories }: { categories: HomeCategoryRes
                 {/* Horizontal scroll strip of circular category tiles */}
                 <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {categories.map((cat) => {
-                        const IconComponent = iconMap[cat.name] || Laptop;
                         return (
                             <a
                                 key={cat.id}
@@ -90,7 +60,7 @@ export default function Categories({ categories }: { categories: HomeCategoryRes
                                     />
                                     <div className="absolute inset-0 bg-neutral-950/20 group-hover:bg-neutral-950/10 transition-colors duration-300" />
                                     <div className="absolute bottom-0 right-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-md ring-2 ring-white">
-                                        <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        <DynamicIcon name={cat.icon} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                     </div>
                                 </div>
                                 <span className="text-xs sm:text-sm font-medium text-center leading-tight">

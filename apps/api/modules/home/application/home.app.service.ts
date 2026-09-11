@@ -4,6 +4,7 @@ import {
     Description,
     FeatureVO,
     HomeAggregate,
+    IconVO,
     Id,
     IImageStoragePort,
     ImageKey,
@@ -140,6 +141,7 @@ export class HomeAppService extends BaseService {
                 name: Title.create(data.name),
                 image: image.url,
                 accent: ColorVO.create(data.accent),
+                icon: IconVO.create(data.icon),
                 imageKey: image.imageKey,
             }),
         );
@@ -164,6 +166,7 @@ export class HomeAppService extends BaseService {
                 name: data.name ? Title.create(data.name) : existing.name,
                 image: image.url,
                 accent: data.accent ? ColorVO.create(data.accent) : existing.accent,
+                icon: data.icon ? IconVO.create(data.icon) : existing.icon,
                 imageKey: image.imageKey,
             }),
         );
@@ -334,6 +337,7 @@ export class HomeAppService extends BaseService {
                 title: Title.create(data.title),
                 detail: Description.create(data.detail),
                 accent: ColorVO.create(data.accent),
+                icon: IconVO.create(data.icon),
             }),
         );
         await this.persist(home);
@@ -352,6 +356,7 @@ export class HomeAppService extends BaseService {
             title: data.title ? Title.create(data.title) : existing.title,
             detail: data.detail ? Description.create(data.detail) : existing.detail,
             accent: data.accent ? ColorVO.create(data.accent) : existing.accent,
+            icon: data.icon ? IconVO.create(data.icon) : existing.icon,
         });
         home.updateFeature(targetId, updated);
         await this.persist(home);
@@ -373,6 +378,7 @@ export class HomeAppService extends BaseService {
                 title: Title.create(f.title),
                 detail: Description.create(f.detail),
                 accent: ColorVO.create(f.accent),
+                icon: IconVO.create(f.icon),
             }),
         );
         home.setFeatures(features);

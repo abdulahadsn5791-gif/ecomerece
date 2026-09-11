@@ -2,16 +2,7 @@
 
 import { useThemeStore } from "@ecomerece/frontend";
 import type { HomeFeatureResponse } from "@ecomerece/shared";
-import { Headset, RefreshCw, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
-
-const iconMap: Record<string, LucideIcon> = {
-    "Free shipping": Truck,
-    "30-day returns": RefreshCw,
-    "Secure payment": ShieldCheck,
-    "24/7 support": Headset,
-};
-
-const defaultIcons: LucideIcon[] = [Truck, RefreshCw, ShieldCheck, Headset];
+import { DynamicIcon } from "@/lib/icons";
 
 export default function FeaturesStrip({ features }: { features: HomeFeatureResponse[] }) {
     const { darkMode } = useThemeStore();
@@ -27,7 +18,6 @@ export default function FeaturesStrip({ features }: { features: HomeFeatureRespo
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="grid grid-cols-2 lg:grid-cols-4">
                     {features.map((f, idx) => {
-                        const Icon = iconMap[f.title] || defaultIcons[idx % defaultIcons.length];
                         const mobileBorderR = idx % 2 === 0 ? "border-r" : "border-r-0";
                         const mobileBorderB = idx < 2 ? "border-b" : "border-b-0";
                         const lgBorderL = idx === 0 ? "lg:border-l-0" : "lg:border-l";
@@ -44,7 +34,7 @@ export default function FeaturesStrip({ features }: { features: HomeFeatureRespo
                                     <span className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[var(--accent)] transition-all duration-300 group-hover:w-3.5 group-hover:h-3.5" />
                                     <span className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[var(--accent)] transition-all duration-300 group-hover:w-3.5 group-hover:h-3.5" />
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <Icon className="w-[18px] h-[18px] sm:w-5 sm:h-5 text-[var(--accent)]" strokeWidth={1.75} />
+                                        <DynamicIcon name={f.icon} className="w-[18px] h-[18px] sm:w-5 sm:h-5 text-[var(--accent)]" strokeWidth={1.75} />
                                     </div>
                                 </div>
 

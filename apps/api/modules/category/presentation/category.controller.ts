@@ -6,12 +6,11 @@ import type { CategoryAppService } from '../application/category.app.service';
 export class CategoryController extends BaseController<CategoryAppService> {
     createCategory = async (c: Context) => {
         const actor = c.get('user');
-        console.log('1');
         const data = await this.body(c, createCategoryDto);
         return this.ok(c, await this.service.createCategory(data, actor));
     };
     getPaginated = async (c: Context) => {
-        const data = await this.body(c, getPaginatedDto);
+        const data = this.query(c, getPaginatedDto);
         return this.ok(c, await this.service.getPaginatedCategories(data));
     };
     deleteCategory = async (c: Context) => {

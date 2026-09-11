@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { optionalIdSchema } from '../../dtos';
 
-export const getPaginatedDto = z.object({
+export const getPaginatedVendorsQuerySchema = z.object({
     cursor: optionalIdSchema,
     limit: z
         .coerce
@@ -13,4 +13,4 @@ export const getPaginatedDto = z.object({
     search: z.string().trim().optional(),
 });
 
-export type getPaginatedDtoType = z.infer<typeof getPaginatedDto>;
+export type GetPaginatedVendorsQueryDto = z.infer<typeof getPaginatedVendorsQuerySchema>;

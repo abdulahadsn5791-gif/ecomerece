@@ -2,6 +2,7 @@ import {
     CreateVendorDtoSchema,
     DeleteMyVendorDtoSchema,
     DeleteVendorDtoSchema,
+    getPaginatedVendorsQuerySchema,
     RecoverVendorDtoSchema,
     RejectVendorDtoSchema,
     VendorParamDtoSchema,
@@ -15,6 +16,11 @@ export class VendorController extends BaseController<VendorAppService> {
     getVendorById = async (c: Context) => {
         const vendorId = this.param(c, 'id', VendorParamDtoSchema);
         return this.ok(c, await this.service.getVendorById(vendorId));
+    };
+
+    getPaginatedVendors = async (c: Context) => {
+        const query = this.query(c, getPaginatedVendorsQuerySchema);
+        return this.ok(c, await this.service.findPaginatedVendors(query));
     };
 
     createMyVendor = async (c: Context) => {

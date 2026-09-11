@@ -3,6 +3,7 @@ export type HomeCategoryResponse = {
     name: string;
     image: string;
     accent: string;
+    icon: string;
 };
 
 export type HomeFeatureResponse = {
@@ -10,6 +11,7 @@ export type HomeFeatureResponse = {
     title: string;
     detail: string;
     accent: string;
+    icon: string;
 };
 
 export type HomeSlideResponse = {

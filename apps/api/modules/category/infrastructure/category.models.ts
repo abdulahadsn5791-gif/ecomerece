@@ -32,7 +32,7 @@ export const CategorySchema = new Schema(
         },
         title: {
             type: String,
-            unique: true,
+
             required: true,
         },
 
@@ -64,6 +64,8 @@ export const CategorySchema = new Schema(
         versionKey: false,
     },
 );
+
+CategorySchema.index({ title: 1 }, { collation: { locale: 'en', strength: 2 } });
 
 export type CategoryPersistence = InferSchemaType<typeof CategorySchema>;
 export type CategoryDocument = HydratedDocument<CategoryPersistence>;

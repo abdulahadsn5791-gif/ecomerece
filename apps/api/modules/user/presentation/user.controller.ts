@@ -4,6 +4,8 @@ import {
     DeleteMeDTOSchema,
     DeleteUserDTOSchema,
     ExtendBanDTOSchema,
+    getAdminPaginatedUsersQuerySchema,
+    getPaginatedUsersQuerySchema,
     idSchema,
     ObjUserIdDTOSchema,
     UserRoleDtoSchema,
@@ -14,6 +16,16 @@ import { clerkUserIdSchema } from '../../../shared/validation/clerkSchema';
 import type { UserAppService } from '../application/user.app.service';
 
 export class UserController extends BaseController<UserAppService> {
+    getPaginatedUsers = async (c: Context) => {
+        const query = this.query(c, getPaginatedUsersQuerySchema);
+        return this.ok(c, await this.service.findPublicPaginatedUsers(query));
+    };
+
+    getAdminPaginatedUsers = async (c: Context) => {
+        const query = this.query(c, getAdminPaginatedUsersQuerySchema);
+        return this.ok(c, await this.service.findAdminPaginatedUsers(query));
+    };
+
     getUserById = async (c: Context) => {
         const clerkId = this.param(c, 'id', clerkUserIdSchema);
         return this.ok(c, await this.service.getUserById(clerkId));

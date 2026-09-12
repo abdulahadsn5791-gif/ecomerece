@@ -1,6 +1,8 @@
 import type { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
 import type { IAddressRepository } from '@ecomerece/domain/modules/address/ports/i-address-repository';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import type { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
+import type { FilterQuery } from 'mongoose';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
 import { AddressMapper } from './address.mapper';
@@ -68,5 +70,35 @@ export class AddressRepository
         return !!(await super.exists({
             _id: id.value,
         }));
+    }
+
+    async FindPaginated(params: {
+        filter?: FilterQuery<AddressPersistence>;
+        cursor?: Id;
+        limit?: Quantity;
+        direction?: 'next' | 'prev';
+    }): Promise<{
+        data: AddressAggregate[];
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
+    }> {
+        const result = await this.paginateByCursor({
+            filter: params.filter,
+            cursor: params.cursor?.value,
+            limit: params.limit?.value,
+            direction: params.direction,
+        });
+
+        const data = result.data.map((doc: AddressPersistence) =>
+            AddressMapper.persistenceToAggregate(doc),
+        );
+
+        return {
+            data,
+            meta: result.meta,
+        };
     }
 }

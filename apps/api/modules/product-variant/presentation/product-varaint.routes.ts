@@ -23,3 +23,9 @@ productVariantRoutes.patch(
     adminMiddleware,
     controller.recoverVariant,
 );
+productVariantRoutes.get(
+    '/admin/all',
+    authMiddleware,
+    adminMiddleware,
+    controller.getAdminPaginatedVariants,
+);

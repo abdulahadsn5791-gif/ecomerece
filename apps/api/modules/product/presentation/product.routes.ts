@@ -7,8 +7,8 @@ export const productRoutes = new Hono();
 
 const { productController } = createProductModule();
 
-
 productRoutes.get('/', productController.getPaginatedProducts);
+productRoutes.get('/admin/all', authMiddleware, adminMiddleware, productController.getAdminPaginatedProducts);
 productRoutes.get('/:id', productController.getProductById);
 productRoutes.post(`/my`, authMiddleware, productController.createMyProudct);
 productRoutes.delete(`/my/soft`, authMiddleware, productController.softDeleteMyProduct);

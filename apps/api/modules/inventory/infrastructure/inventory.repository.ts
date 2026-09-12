@@ -1,5 +1,6 @@
-import type { IIventoryRepository, InventoryAggregate } from '@ecomerece/domain';
+import type { IIventoryRepository, InventoryAggregate, Quantity } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import type { FilterQuery } from 'mongoose';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
 import { InventoryMapper } from './inventory.mapper';
@@ -101,5 +102,35 @@ export class InventoryReposityory
         const inventoryPersistence = InventoryMapper.aggregateToPersistence(inventory);
         const inventoryDoc = new InventoryModel(inventoryPersistence);
         await super.create(inventoryDoc);
+    }
+
+    async FindPaginated(params: {
+        filter?: FilterQuery<InventoryPersistence>;
+        cursor?: Id;
+        limit?: Quantity;
+        direction?: 'next' | 'prev';
+    }): Promise<{
+        data: InventoryAggregate[];
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
+    }> {
+        const result = await this.paginateByCursor({
+            filter: params.filter,
+            cursor: params.cursor?.value,
+            limit: params.limit?.value,
+            direction: params.direction,
+        });
+
+        const data = result.data.map((doc: InventoryPersistence) =>
+            InventoryMapper.persistenceToAggregate(doc),
+        );
+
+        return {
+            data,
+            meta: result.meta,
+        };
     }
 }

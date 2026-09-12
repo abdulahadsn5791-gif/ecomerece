@@ -8,6 +8,7 @@ export const AddressRoutes = new Hono();
 const { addressController } = createAddressModule();
 
 AddressRoutes.get('/my', authMiddleware, addressController.getMyAddresses);
+AddressRoutes.get('/admin/all', authMiddleware, adminMiddleware, addressController.getAdminPaginatedAddresses);
 AddressRoutes.post('/my', authMiddleware, addressController.createMyAddress);
 AddressRoutes.delete('/my/:id', authMiddleware, addressController.deleteMyAddress);
 AddressRoutes.patch(

@@ -1,5 +1,6 @@
 import {
     createMyProductVariantDto,
+    getAdminPaginatedVariantsQuerySchema,
     softDeleteMyVariantDto,
     toggleVariantApperaaracneDto,
     upadteMyVariantMetaDto,
@@ -44,5 +45,9 @@ export class ProductVariantController extends BaseController<productVariantAppli
         const id = this.param(c, 'id', idSchema);
         const actor = c.get('user');
         return this.ok(c, await this.service.recoverVariant(id, actor));
+    };
+    getAdminPaginatedVariants = async (c: Context) => {
+        const query = this.query(c, getAdminPaginatedVariantsQuerySchema);
+        return this.ok(c, await this.service.findAdminPaginatedVariants(query));
     };
 }

@@ -4,10 +4,12 @@ import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import type {
     buyMyInventoryStockDtoType,
     createMyInventoryDtoType,
+    GetAdminPaginatedInventoryQueryDto,
     InventoryResponseReadModel,
     removeMyInventoryStockDtoType,
     updateMylowStockThresholdDtoType,
 } from '@ecomerece/shared';
+import type { FilterQuery } from 'mongoose';
 import type { idType } from '../../../../../packages/shared/dtos/id-schema';
 import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import { BaseService } from '../../../core/services/base.services';
@@ -19,6 +21,7 @@ import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { EnsureActiveVendorGetByIdQuery } from '../../vendor/application/queries/ensure-active-vendor-get-by-id.query';
 import { InventoryMapper } from '../infrastructure/inventory.mapper';
 import type { InventoryReposityory } from '../infrastructure/inventory.repository';
+import type { InventoryPersistence } from '../infrastructure/inventory.model';
 import { InventoryMessages, type inventoryMessagesType } from '../presentation/inventory.messages';
 
 export class InventoryApplicationService extends BaseService {
@@ -144,5 +147,27 @@ export class InventoryApplicationService extends BaseService {
         const variantId = Id.create(id);
         const varinat = await this.inventoryRepo.FindByVariantIdOrThrow(variantId);
         return InventoryMapper.aggregateToResponseReadModel(varinat);
+    }
+
+    // Admin: all inventory — no baseline restrictions, optional filters
+    async findAdminPaginatedInventory(query: GetAdminPaginatedInventoryQueryDto) {
+        const filter: FilterQuery<InventoryPersistence> = {};
+        if (query.variantId) filter.variantId = Id.create(query.variantId).value;
+        if (query.inStock !== undefined) filter.inStock = query.inStock;
+        if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+        const result = await this.inventoryRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+        return {
+            data: result.data.map((inventory) =>
+                InventoryMapper.aggregateToReadModel(inventory),
+            ),
+            meta: result.meta,
+        };
     }
 }

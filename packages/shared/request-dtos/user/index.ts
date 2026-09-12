@@ -6,3 +6,4 @@ export * from './extend-ban.dto';
 export * from './recover-user.dto';
 export * from './sign-in.dto';
 export * from './user-id.dto';
+export * from './user-query.dto';

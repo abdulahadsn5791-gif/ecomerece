@@ -1,6 +1,8 @@
 import type { IUserRepository, UserAggregate } from '@ecomerece/domain';
 import type { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import type { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
+import type { FilterQuery } from 'mongoose';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { ConcurrencyError, NotFoundError } from '../../../errors/app-error';
 import { UserMapper } from './user.mapper';
@@ -71,5 +73,26 @@ export class UserRepository extends MongoRepository<UserPersistence> implements 
         return !!(await super.exists({
             _id: id.value,
         }));
+    }
+
+    async FindPaginated(params: {
+        filter?: FilterQuery<UserPersistence>;
+        cursor?: Id;
+        limit?: Quantity;
+        direction?: 'next' | 'prev';
+    }): Promise<{
+        data: UserAggregate[];
+        meta: { nextCursor: string | null; prevCursor: string | null; hasMore: boolean };
+    }> {
+        const result = await this.paginateByCursor({
+            filter: params.filter,
+            cursor: params.cursor?.value,
+            limit: params.limit?.value,
+            direction: params.direction,
+        });
+        return {
+            data: result.data.map((doc) => UserMapper.persistenceToAggregate(doc as UserPersistence)),
+            meta: result.meta,
+        };
     }
 }

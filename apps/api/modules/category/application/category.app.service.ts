@@ -3,6 +3,7 @@ import {
     type createCategoryDtoType,
     type deleteCategoryType,
     type getPaginatedDtoType,
+    type GetAdminPaginatedCategoriesDto,
 } from '@ecomerece/shared';
 import type { FilterQuery } from 'mongoose';
 import { BaseService } from '../../../core/services/base.services';
@@ -67,6 +68,7 @@ export class CategoryAppService extends BaseService {
             hasMore: boolean;
         };
     }> {
+        // Public: non-deleted, non-blocked categories
         const filter: FilterQuery<CategoryPersistence> = {
             'deleted.deleted': false,
             'block.blocked': false,
@@ -74,6 +76,30 @@ export class CategoryAppService extends BaseService {
         if (data.search) {
             filter.title = { $regex: `^${escapeRegex(data.search)}` };
         }
+        return this.categoryRepo.FindPaginated({
+            filter,
+            cursor: data.cursor ? Id.create(data.cursor) : undefined,
+            limit: data.limit ? Quantity.create(data.limit) : undefined,
+            direction: data.direction,
+            collation: CATEGORY_COLLATION,
+        });
+    }
+
+    async getAdminPaginatedCategories(data: GetAdminPaginatedCategoriesDto): Promise<{
+        data: any;
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
+    }> {
+        // Admin: all categories — no baseline restrictions
+        const filter: FilterQuery<CategoryPersistence> = {};
+        if (data.search) {
+            filter.title = { $regex: `^${escapeRegex(data.search)}` };
+        }
+        if (data.deleted !== undefined) filter['deleted.deleted'] = data.deleted;
+        if (data.blocked !== undefined) filter['block.blocked'] = data.blocked;
         return this.categoryRepo.FindPaginated({
             filter,
             cursor: data.cursor ? Id.create(data.cursor) : undefined,

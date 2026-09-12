@@ -1,5 +1,6 @@
 import { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
+import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import {
     AddressVO,
@@ -12,7 +13,9 @@ import {
 import type {
     AddressResponseReadModel,
     createMyAddressDtoType,
+    GetAdminPaginatedAddressesQueryDto,
 } from '../../../../../packages/shared';
+import type { FilterQuery } from 'mongoose';
 import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
@@ -20,6 +23,7 @@ import { EnsureActiveUserGetByIdQuery } from '../../user/application/queries/ens
 import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { AddressMapper } from '../infrastructure/address.mapper';
 import type { AddressRepository } from '../infrastructure/address.repository';
+import type { AddressPersistence } from '../infrastructure/address.models';
 import { AddressMessages, type addressMessagesType } from '../presentation/address.messages';
 import { updateMyAddressDtoType } from '../../../../../packages/shared/request-dtos/address/update-address.dto';
 
@@ -123,5 +127,24 @@ export class AddressApplicationService extends BaseService {
         await this.addressRepo.Save(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);
         return AddressMessages.addressUpdated(actorId, addressId, response);
+    }
+
+    // Admin: all addresses — no baseline restrictions, optional filters
+    async findAdminPaginatedAddresses(query: GetAdminPaginatedAddressesQueryDto) {
+        const filter: FilterQuery<AddressPersistence> = {};
+        if (query.ownerId) filter.ownerId = Id.create(query.ownerId).value;
+        if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+        const result = await this.addressRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+        return {
+            data: result.data.map((address) => AddressMapper.aggregateToReadModel(address)),
+            meta: result.meta,
+        };
     }
 }

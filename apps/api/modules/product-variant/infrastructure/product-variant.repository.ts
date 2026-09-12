@@ -1,5 +1,6 @@
-import type { IProductVariantRepository, ProductVariantAggregate } from '@ecomerece/domain';
+import type { IProductVariantRepository, ProductVariantAggregate, Quantity } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import type { FilterQuery } from 'mongoose';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
 import { productVariantMapper } from './product-variant.mapper';
@@ -85,5 +86,35 @@ export class ProductVariantRepository
         return !!(await super.exists({
             _id: id.value,
         }));
+    }
+
+    async FindPaginated(params: {
+        filter?: FilterQuery<ProductVariantPersistence>;
+        cursor?: Id;
+        limit?: Quantity;
+        direction?: 'next' | 'prev';
+    }): Promise<{
+        data: ProductVariantAggregate[];
+        meta: {
+            nextCursor: string | null;
+            prevCursor: string | null;
+            hasMore: boolean;
+        };
+    }> {
+        const result = await this.paginateByCursor({
+            filter: params.filter,
+            cursor: params.cursor?.value,
+            limit: params.limit?.value,
+            direction: params.direction,
+        });
+
+        const data = result.data.map((doc: ProductVariantPersistence) =>
+            productVariantMapper.persistenceToAggregate(doc),
+        );
+
+        return {
+            data,
+            meta: result.meta,
+        };
     }
 }

@@ -2,16 +2,19 @@ import { ProductVariantAggregate } from '@ecomerece/domain';
 
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Money } from '@ecomerece/domain/value-objects/money.vo';
+import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import type {
     createMyProductVariantDtoType,
+    GetAdminPaginatedVariantsQueryDto,
     ProductVariantResponseReadModel,
     softDeleteMyVariantDtoType,
     toggleVariantApperaaracneDtoType,
     upadteMyVariantMetaDtoType,
     updateMyVariatPriceDtoType,
 } from '@ecomerece/shared';
+import type { FilterQuery } from 'mongoose';
 import type { idType } from '../../../../../packages/shared/dtos/id-schema';
 import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import { BaseService } from '../../../core/services/base.services';
@@ -22,6 +25,7 @@ import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { EnsureActiveVendorGetByIdQuery } from '../../vendor/application/queries/ensure-active-vendor-get-by-id.query';
 import { productVariantMapper } from '../infrastructure/product-variant.mapper';
 import type { ProductVariantRepository } from '../infrastructure/product-variant.repository';
+import type { ProductVariantPersistence } from '../infrastructure/product-variant.model';
 import {
     type ProductVaraintMessagesType,
     productVaraintMessages,
@@ -208,6 +212,29 @@ export class productVariantApplicationService extends BaseService {
 
         await this.commandBus.execute(new UpdatePriceCommand(productId, price, actorId));
 
+    }
+
+    // Admin: all product variants — no baseline restrictions, optional filters
+    async findAdminPaginatedVariants(query: GetAdminPaginatedVariantsQueryDto) {
+        const filter: FilterQuery<ProductVariantPersistence> = {};
+        if (query.productId) filter.productId = Id.create(query.productId).value;
+        if (query.active !== undefined) filter.active = query.active;
+        if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
+        if (query.search) filter.title = { $regex: query.search, $options: 'i' } as any;
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+        const result = await this.vairiantRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+        return {
+            data: result.data.map((variant) =>
+                productVariantMapper.aggregateToReadModel(variant),
+            ),
+            meta: result.meta,
+        };
     }
 
 }

@@ -25,6 +25,7 @@ import type {
     toggleIngredientsDtoType,
     updateProductMetaDtoType,
     GetPaginatedProductsQueryDto,
+    GetAdminPaginatedProductsQueryDto,
 } from '@ecomerece/shared';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
@@ -44,7 +45,6 @@ export class ProductApplicationService extends BaseService {
     ) {
         super();
     }
-
 
     async getProductById(id: string): Promise<ProductResponseReadModel> {
         const productId = Id.create(id);
@@ -287,6 +287,7 @@ export class ProductApplicationService extends BaseService {
         await this.productRepo.Save(product);
         return productMessages.imageUpdated(productId, actorId);
     }
+
     async setMyProductDefaultImage(
         data: deafultImageDtoType,
         actor: UserPersistence,
@@ -376,21 +377,21 @@ export class ProductApplicationService extends BaseService {
         return productMessages.ingredientsUpdated(productId, actorId);
     }
 
-
-    async findPaginatedProducts(query: GetPaginatedProductsQueryDto) {
+    // Public: only non-deleted, non-blocked, public-appearance products
+    async findPublicPaginatedProducts(query: GetPaginatedProductsQueryDto) {
         const filter: FilterQuery<ProductPersistence> = {
             'deleted.deleted': false,
             'block.blocked': false,
+            appearance: 'public',
         };
         if (query.categoryId) filter.categoryId = query.categoryId;
         if (query.vendorId) filter.vendorId = query.vendorId;
-        if (query.appearance) filter.appearance = query.appearance;
         if (query.search) {
             filter.title = { $regex: query.search, $options: 'i' } as any;
         }
         const cursor = query.cursor ? Id.create(query.cursor) : undefined;
         const limit = query.limit ? Quantity.create(query.limit) : undefined;
-       
+
         const result = await this.productRepo.FindPaginated({
             filter,
             cursor,
@@ -398,10 +399,35 @@ export class ProductApplicationService extends BaseService {
             direction: query.direction,
         });
         return {
-            data: result.data.map((aggregate) => (ProductMapper.aggregateToResponseReadModel(aggregate))),
+            data: result.data.map((aggregate) => ProductMapper.aggregateToResponseReadModel(aggregate)),
             meta: result.meta,
         };
     }
 
+    // Admin: all products regardless of deleted / blocked / appearance state
+    async findAdminPaginatedProducts(query: GetAdminPaginatedProductsQueryDto) {
+        const filter: FilterQuery<ProductPersistence> = {};
+        if (query.categoryId) filter.categoryId = query.categoryId;
+        if (query.vendorId) filter.vendorId = query.vendorId;
+        if (query.appearance) filter.appearance = query.appearance;
+        if (query.search) {
+            filter.title = { $regex: query.search, $options: 'i' } as any;
+        }
+        if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
+        if (query.blocked !== undefined) filter['block.blocked'] = query.blocked;
 
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+
+        const result = await this.productRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+        return {
+            data: result.data.map((aggregate) => ProductMapper.aggregateToResponseReadModel(aggregate)),
+            meta: result.meta,
+        };
+    }
 }

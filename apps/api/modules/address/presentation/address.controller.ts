@@ -1,4 +1,4 @@
-import { createMyAddressDto } from '@ecomerece/shared';
+import { createMyAddressDto, getAdminPaginatedAddressesQuerySchema } from '@ecomerece/shared';
 import type { Context } from 'hono';
 import { idSchema } from '../../../../../packages/shared/dtos/id-schema';
 import { BaseController } from '../../../core/controller/base.controller';
@@ -34,5 +34,9 @@ export class AddressController extends BaseController<AddressApplicationService>
         const addressId = this.param(c, 'id', idSchema);
         const actor = c.get('user');
         return this.ok(c, await this.service.setMyAddressAsDefault(addressId, actor));
+    };
+    getAdminPaginatedAddresses = async (c: Context) => {
+        const query = this.query(c, getAdminPaginatedAddressesQuerySchema);
+        return this.ok(c, await this.service.findAdminPaginatedAddresses(query));
     };
 }

@@ -9,7 +9,8 @@ import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Money } from '@ecomerece/domain/value-objects/money.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { FullAddressVO } from '@ecomerece/domain/value-objects/street-address.vo';
-import type { createMyOrderDtoType } from '@ecomerece/shared';
+import type { createMyOrderDtoType, GetAdminPaginatedOrdersQueryDto, GetMyOrdersQueryDto } from '@ecomerece/shared';
+import type { FilterQuery } from 'mongoose';
 import type { InMemoryCommandBus } from '../../../core/infrastructure/buses/in-memory-command-bus';
 import type { InMemoryEventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
 import type { InMemoryQueryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
@@ -26,6 +27,7 @@ import type { UserPersistence } from '../../user/infrastructure/user.models';
 import { VerifyVendorAndGetQuery } from '../../vendor/application/queries/verify-vendor-and-get.query';
 import { OrderMapper } from '../infrastructure/order.mapper';
 import type { OrderRepository } from '../infrastructure/order.repository';
+import type { OrderPersistence } from '../infrastructure/order.model';
 import { OrderMessages } from '../presentation/order.messages';
 
 interface InventoryResult {
@@ -404,5 +406,44 @@ export class OrderApplicationService extends BaseService {
 
         const response = OrderMapper.aggregateToResponseReadModel(order);
         return OrderMessages.orderCreated(orderId, actorId, addressId, response);
+    }
+
+    // Public: the authenticated user's own non-deleted orders
+    async getMyOrders(query: GetMyOrdersQueryDto, buyerId: string) {
+        const filter: FilterQuery<OrderPersistence> = {
+            buyerId: Id.create(buyerId).value,
+            'deleted.deleted': false,
+        };
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+        const result = await this.orderRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+        return {
+            data: result.data.map((order) => OrderMapper.aggregateToReadModel(order)),
+            meta: result.meta,
+        };
+    }
+
+    // Admin: all orders — no baseline restrictions, optional buyerId / deleted filters
+    async findAdminPaginatedOrders(query: GetAdminPaginatedOrdersQueryDto) {
+        const filter: FilterQuery<OrderPersistence> = {};
+        if (query.buyerId) filter.buyerId = Id.create(query.buyerId).value;
+        if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+        const result = await this.orderRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+        return {
+            data: result.data.map((order) => OrderMapper.aggregateToReadModel(order)),
+            meta: result.meta,
+        };
     }
 }

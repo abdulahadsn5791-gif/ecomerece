@@ -22,6 +22,7 @@ import type {
     DeleteMyVendorDto,
     DeleteVendorDto,
     GetPaginatedVendorsQueryDto,
+    GetAdminPaginatedVendorsQueryDto,
     RecoverVendorDto,
     RejectVendorDto,
     VendorListItemReadModel,
@@ -100,12 +101,45 @@ export class VendorAppService extends BaseService {
     }
 
     async findPaginatedVendors(query: GetPaginatedVendorsQueryDto) {
+        // Public: non-deleted vendors only
         const filter: FilterQuery<VendorPersistence> = {
             'deleted.deleted': false,
         };
         if (query.search) {
             filter.title = { $regex: `^${escapeRegex(query.search)}` };
         }
+
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+
+        const result = await this.vendorRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+            collation: VENDOR_COLLATION,
+        });
+
+        const data: VendorListItemReadModel[] = result.data.map((aggregate) => ({
+            id: aggregate.id.value,
+            title: aggregate.title.value,
+            slug: aggregate.slug.value,
+        }));
+
+        return {
+            data,
+            meta: result.meta,
+        };
+    }
+
+    async findAdminPaginatedVendors(query: GetAdminPaginatedVendorsQueryDto) {
+        // Admin: all vendors — no baseline restrictions
+        const filter: FilterQuery<VendorPersistence> = {};
+        if (query.search) {
+            filter.title = { $regex: `^${escapeRegex(query.search)}` };
+        }
+        if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
+        if (query.verified !== undefined) filter['verification.verified'] = query.verified;
 
         const cursor = query.cursor ? Id.create(query.cursor) : undefined;
         const limit = query.limit ? Quantity.create(query.limit) : undefined;

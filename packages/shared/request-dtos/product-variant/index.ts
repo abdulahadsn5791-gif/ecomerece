@@ -3,3 +3,4 @@ export * from './delete-varient.dto';
 export * from './variant-appearance.dto';
 export * from './variant-meta.dto';
 export * from './variant-price.dto';
+export * from './variant-query.dto';

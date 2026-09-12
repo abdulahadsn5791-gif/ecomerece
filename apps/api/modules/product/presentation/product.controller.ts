@@ -4,6 +4,7 @@ import {
     CreateMyProductDtoSchema,
     deafultImageDto,
     disclaimerItemsDto,
+    getAdminPaginatedProductsQuerySchema,
     getPaginatedProductsQuerySchema,
     imagesDto,
     ingredientsDto,
@@ -21,13 +22,17 @@ import type { ProductApplicationService } from '../application/product.app.servi
 
 export class ProductController extends BaseController<ProductApplicationService> {
 
-
     getPaginatedProducts = async (c: Context) => {
         const query = this.query(c, getPaginatedProductsQuerySchema);
-        const result = await this.service.findPaginatedProducts(query);
+        const result = await this.service.findPublicPaginatedProducts(query);
         return this.ok(c, result);
     };
 
+    getAdminPaginatedProducts = async (c: Context) => {
+        const query = this.query(c, getAdminPaginatedProductsQuerySchema);
+        const result = await this.service.findAdminPaginatedProducts(query);
+        return this.ok(c, result);
+    };
 
     getProductById = async (c: Context) => {
         const id = this.param(c, 'id', idSchema);
@@ -69,6 +74,7 @@ export class ProductController extends BaseController<ProductApplicationService>
         const actor = c.get('user');
         return this.ok(c, await this.service.makeMyProductPublic(data, actor));
     };
+
     makeMyProductPrivate = async (c: Context) => {
         const data = await this.body(c, productAppereanceDto);
         const actor = c.get('user');
@@ -128,10 +134,10 @@ export class ProductController extends BaseController<ProductApplicationService>
         const actor = c.get('user');
         return this.ok(c, await this.service.addMyProductIngredients(data, actor));
     };
+
     removeMyProductIngredients = async (c: Context) => {
         const data = await this.body(c, ingredientsDto);
         const actor = c.get('user');
         return this.ok(c, await this.service.removeMyProductIngredients(data, actor));
     };
-  
 }

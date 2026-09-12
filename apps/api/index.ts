@@ -6,6 +6,7 @@ import { registerErrorHandler } from './errors/error-handler';
 import { dbMiddleware } from './middleware/db.middleware';
 import { rateLimiter } from './middleware/rateLimiter';
 import { requestGuards } from './middleware/requestguard.middleware';
+import { statsBufferService } from './modules/stats/application/StatsBufferService';
 import routes from './routes';
 
 app.use(logger());
@@ -54,6 +55,15 @@ app.options('*', (c) => {
 app.route('/', routes);
 
 registerErrorHandler(app);
+
+statsBufferService.startBackgroundFlushing(5000);
+for (const signal of ['SIGTERM', 'SIGINT'] as const) {
+    process.once(signal, () => {
+        void statsBufferService.shutdown();
+        process.exit(0);
+    });
+}
+
 export default {
     port: 8000,
     fetch: app.fetch,

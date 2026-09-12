@@ -8,6 +8,7 @@ export type cretaeOrderProps = {
     id: Id,
     orderId: Id,
     vendorId: Id,
+    productId: Id,
     variantId: Id,
     quantity: Quantity,
     waitingTime: ExpirationDate,
@@ -19,6 +20,7 @@ export class OrderItemsAggregate extends AggregateRoot {
         private readonly _id: Id,
         private readonly _orderId: Id,
         private readonly _vendorId: Id,
+        private readonly _productId: Id,
         private readonly _variantId: Id,
         private _quantity: Quantity,
         private _waitingTime: ExpirationDate,
@@ -35,6 +37,7 @@ export class OrderItemsAggregate extends AggregateRoot {
     get id() { return this._id }
     get orderId() { return this._orderId; }
     get vendorId() { return this._vendorId; }
+    get productId() { return this._productId; }
     get variantId() { return this._variantId }
     get quantity() { return this._quantity; }
     get waitingTime() { return this._waitingTime; }
@@ -53,6 +56,7 @@ export class OrderItemsAggregate extends AggregateRoot {
             props.id,
             props.orderId,
             props.vendorId,
+            props.productId,
             props.variantId,
             props.quantity,
             props.waitingTime,
@@ -63,7 +67,16 @@ export class OrderItemsAggregate extends AggregateRoot {
             Quantity.create(1),
             EffectiveDate.today()
         );
-        orderItem.raise(new OrderItemCreatedEvent({ orderItemId: orderItem._id, orderId: orderItem._orderId, variantId: orderItem._variantId, vendorId: orderItem._vendorId }));
+        orderItem.raise(new OrderItemCreatedEvent({
+            orderItemId: orderItem._id,
+            orderId: orderItem._orderId,
+            vendorId: orderItem._vendorId,
+            productId: orderItem._productId,
+            variantId: orderItem._variantId,
+            quantity: orderItem._quantity,
+            price: orderItem._price,
+            totalPrice: orderItem._totalPrice,
+        }));
 
         return orderItem;
     }
@@ -72,6 +85,7 @@ export class OrderItemsAggregate extends AggregateRoot {
         _id: Id,
         _orderId: Id,
         _vendorId: Id,
+        _productId: Id,
         _variantId: Id,
         _quantity: Quantity,
         _waitingTime: ExpirationDate,
@@ -85,6 +99,7 @@ export class OrderItemsAggregate extends AggregateRoot {
             _id,
             _orderId,
             _vendorId,
+            _productId,
             _variantId,
             _quantity,
             _waitingTime,

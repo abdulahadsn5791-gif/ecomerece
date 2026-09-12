@@ -10,6 +10,7 @@ export class CreateItemsCommand implements ICommand<{}> {
             id: Id;
             orderId: Id;
             vendorId: Id;
+            productId: Id;
             variantId: Id;
             quantity: Quantity;
             waitingTime: ExpirationDate;

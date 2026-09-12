@@ -1,6 +1,7 @@
 "use client"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGetHomeLayout } from '@ecomerece/frontend/home';
+import { trackView } from '@/lib/analytics';
 import HeroBanner from './client/home/components/HeroBanner';
 import FeaturesStrip from './client/home/components/FeaturesStrip';
 import Categories from './client/home/components/Categories';
@@ -12,6 +13,10 @@ import { Loader2 } from 'lucide-react';
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const { data: homeLayout, isLoading } = useGetHomeLayout();
+
+  useEffect(() => {
+    trackView('page', 'home');
+  }, []);
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);

@@ -50,6 +50,7 @@ interface VerifyReportResult {
     }>;
     validOrderItems: Array<{
         variantId: Id;
+        productId: Id;
         quantity: Quantity;
         price: number; // price is guaranteed here
     }>;
@@ -352,6 +353,7 @@ export class OrderApplicationService extends BaseService {
                 }
                 return {
                     variantId: entry.variantId,
+                    productId: entry.productId as Id,
                     quantity: entry.quantity,
                     price: entry.price! as number,
                     vendorId: Id.create(vendorIdValue), // now an Id object
@@ -395,6 +397,7 @@ export class OrderApplicationService extends BaseService {
             id: Id.create(),
             orderId: orderId,
             vendorId: element.vendorId,
+            productId: element.productId,
             variantId: element.variantId,
             quantity: element.quantity,
             waitingTime: waitingTime,

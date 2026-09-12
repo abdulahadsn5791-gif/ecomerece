@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useThemeStore } from "@ecomerece/frontend/theme";
+import { trackView } from "@/lib/analytics";
 import {
     ShoppingCart,
     Heart,
@@ -60,6 +61,10 @@ export default function ProductContentPage({
     relatedProducts = []
 }: ProductPageProps) {
     const { darkMode } = useThemeStore();
+
+    useEffect(() => {
+        trackView('product', product.id);
+    }, [product.id]);
 
     // Safely compute active variants and fallback to empty array if undefined
     const activeVariants = (variants || []).filter((v) => v?.active);

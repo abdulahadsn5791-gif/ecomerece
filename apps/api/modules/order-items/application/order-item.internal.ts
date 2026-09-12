@@ -20,6 +20,7 @@ export class OrderItemsInternalService extends BaseService {
             id: Id;
             orderId: Id;
             vendorId: Id;
+            productId: Id;
             variantId: Id;
             quantity: Quantity;
             waitingTime: ExpirationDate;
@@ -31,6 +32,7 @@ export class OrderItemsInternalService extends BaseService {
                 id: value.id,
                 orderId: value.orderId,
                 vendorId: value.vendorId,
+                productId: value.productId,
                 variantId: value.variantId,
                 quantity: value.quantity,
                 waitingTime: value.waitingTime,

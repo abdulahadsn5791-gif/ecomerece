@@ -4,6 +4,7 @@ export interface OrderItemReadModel {
     _id: string,
     orderId: string,
     vendorId: string,
+    productId: string,
     variantId: string,
     quantity: number,
     waitingTime: Date,

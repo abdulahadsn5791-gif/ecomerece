@@ -10,6 +10,7 @@ import { reviewRoutes } from '../modules/reviews/presentation/review.routes';
 import usersRoutes from '../modules/user/presentation/user.routes';
 import vendorRoutes from '../modules/vendor/presentation/vendor.routes';
 import homeRoutes from '../modules/home/presentation/home.routes';
+import { statsRouter } from '../modules/stats/presentation/StatsRoutes';
 
 const routes = new Hono();
 
@@ -24,5 +25,6 @@ routes.route('/address', AddressRoutes);
 routes.route('/users', usersRoutes);
 routes.route('/vendor', vendorRoutes);
 routes.route('/home', homeRoutes);
+routes.route('/stats', statsRouter);
 
 export default routes;

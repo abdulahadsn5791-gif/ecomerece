@@ -20,6 +20,7 @@ export interface OrderItemsPersistence {
     price: number;
     orderId: string;
     vendorId: string;
+    productId: string;
     variantId: string;
     version: number;
     deleted: {
@@ -64,6 +65,10 @@ const OrderItemsModelSchema = new mongoose.Schema<OrderItemsPersistence>(
             required: true,
         },
         vendorId: {
+            type: String,
+            required: true,
+        },
+        productId: {
             type: String,
             required: true,
         },

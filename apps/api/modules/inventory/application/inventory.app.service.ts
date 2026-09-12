@@ -1,4 +1,5 @@
 import { InventoryAggregate } from '@ecomerece/domain';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import type {
@@ -28,8 +29,16 @@ export class InventoryApplicationService extends BaseService {
     constructor(
         private readonly inventoryRepo: InventoryReposityory,
         private readonly queryBus: InMemoryQueryBus,
+        private readonly eventBus: IEventBus,
     ) {
         super();
+    }
+
+    private async publishEvents(inventory: InventoryAggregate): Promise<void> {
+        const events = inventory.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
     }
 
     async canActorEditInventory(variantId: Id, actorId: Id): Promise<void> {
@@ -77,6 +86,7 @@ export class InventoryApplicationService extends BaseService {
             available,
         });
         await this.inventoryRepo.Create(inventory);
+        await this.publishEvents(inventory);
         const inventoryReaponseReadModel = InventoryMapper.aggregateToResponseReadModel(inventory);
         return InventoryMessages.inventoryCreated(inventoryId, actorId, inventoryReaponseReadModel);
     }
@@ -93,6 +103,7 @@ export class InventoryApplicationService extends BaseService {
         await this.canActorEditInventory(inventory.variantId, actorId);
         inventory.buy(quantity, actorId);
         await this.inventoryRepo.Save(inventory);
+        await this.publishEvents(inventory);
         const inventoryReaponseReadModel = InventoryMapper.aggregateToResponseReadModel(inventory);
         return InventoryMessages.inventoryBought(
             inventoryId,
@@ -113,6 +124,7 @@ export class InventoryApplicationService extends BaseService {
         await this.canActorEditInventory(inventory.variantId, actorId);
         inventory.removeStock(quantity, actorId);
         await this.inventoryRepo.Save(inventory);
+        await this.publishEvents(inventory);
         const inventoryReaponseReadModel = InventoryMapper.aggregateToResponseReadModel(inventory);
         return InventoryMessages.inventoryRemoved(
             inventoryId,
@@ -134,6 +146,7 @@ export class InventoryApplicationService extends BaseService {
         await this.canActorEditInventory(inventory.variantId, actorId);
         inventory.updateLowStockThreshold(lowStockThreshold, actorId);
         await this.inventoryRepo.Save(inventory);
+        await this.publishEvents(inventory);
         const inventoryReaponseReadModel = InventoryMapper.aggregateToResponseReadModel(inventory);
         return InventoryMessages.lowStockThresholdUpdated(
             inventoryId,

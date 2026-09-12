@@ -34,6 +34,13 @@ export class UserAppService extends BaseService {
         super();
     }
 
+    private async publishEvents(user: UserAggregate): Promise<void> {
+        const events = user.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
+    }
+
     async initUser(userId: string) {
         const SupabaseUser = await getUserById(userId);
 
@@ -47,6 +54,7 @@ export class UserAppService extends BaseService {
         if (user) {
             user.loginUser();
             await this.userRepo.Save(user);
+            await this.publishEvents(user);
 
             return UserMessages.initialized(id);
         }
@@ -72,6 +80,7 @@ export class UserAppService extends BaseService {
         });
         User.signIn(User.id);
         await this.userRepo.Create(User);
+        await this.publishEvents(User);
         return UserMessages.initialized(id);
     }
 
@@ -89,6 +98,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.assignRole(role, actorId, reason);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.assignRole(id, role, actorId);
     }
@@ -105,6 +115,7 @@ export class UserAppService extends BaseService {
         const reason = Reason.create(data.reason);
         user.deleteUser(actorId, reason);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.delete(id, actorId);
     }
@@ -115,6 +126,7 @@ export class UserAppService extends BaseService {
         const reason = Reason.create(data.reason);
         user.deleteUser(actorId, reason);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.delete(actorId, actorId);
     }
@@ -124,6 +136,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(userId);
         user.recoverUser(actorId);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.recover(userId, actorId);
     }
@@ -134,6 +147,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.blockUser(actorId, reason);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.block(id, actorId);
     }
@@ -146,6 +160,7 @@ export class UserAppService extends BaseService {
         user.unBlockUser(actorId);
 
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.blockLift(id, actorId);
     }
@@ -156,6 +171,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.banUser(actorId, data.forDays, reason);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.ban(id, actorId, data.forDays);
     }
@@ -165,6 +181,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.unBanUser(actorId);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.banLift(id, actorId);
     }
@@ -174,6 +191,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.extendBan(actorId, data.forDays);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.extendBan(id, actorId, data.forDays);
     }
@@ -183,6 +201,7 @@ export class UserAppService extends BaseService {
         const user = await this.userRepo.FindByIdOrThrow(id);
         user.shortenBan(actorId, data.forDays);
         await this.userRepo.Save(user);
+        await this.publishEvents(user);
 
         return UserMessages.shortBan(id, actorId, data.forDays);
     }

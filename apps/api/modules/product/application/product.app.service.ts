@@ -1,4 +1,5 @@
 import { DisclaimerVO, ImagesVO, IngredientsVO, ProductAggregate } from '@ecomerece/domain';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import type { IQueryBus } from '@ecomerece/domain/query/query-bus.interface';
 import { AltVO } from '@ecomerece/domain/value-objects/alt.vo';
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
@@ -42,8 +43,16 @@ export class ProductApplicationService extends BaseService {
     constructor(
         private readonly queryBus: IQueryBus,
         private readonly productRepo: ProductRepository,
+        private readonly eventBus: IEventBus,
     ) {
         super();
+    }
+
+    private async publishEvents(product: ProductAggregate): Promise<void> {
+        const events = product.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
     }
 
     async getProductById(id: string): Promise<ProductResponseReadModel> {
@@ -99,6 +108,7 @@ export class ProductApplicationService extends BaseService {
             disclaimer: disclaimer,
         });
         await this.productRepo.Create(product);
+        await this.publishEvents(product);
         return productMessages.productCreated(id, vendorId);
     }
 
@@ -117,6 +127,7 @@ export class ProductApplicationService extends BaseService {
         const reason = Reason.create(data.reason);
         product.deleteProduct(actorId, reason);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.productDeleted(productId, actorId, reason);
     }
 
@@ -134,6 +145,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.recoverProduct();
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.productRecovered(productId, actorId);
     }
 
@@ -147,6 +159,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.FindByIdOrThrow(productId);
         product.blockProduct(actorId, reason);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.productBlocked(productId, actorId, reason);
     }
 
@@ -159,6 +172,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.FindByIdOrThrow(productId);
         product.unBlockProduct(actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.productUnBlocked(productId, actorId);
     }
 
@@ -176,6 +190,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.makeProductPublic();
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.productPublic(productId, actorId);
     }
 
@@ -193,6 +208,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.makeProductPrivate();
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.productPrivate(productId, actorId);
     }
 
@@ -212,6 +228,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.updateMeta(title, description, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.metaUpdated(productId, actorId);
     }
 
@@ -230,6 +247,7 @@ export class ProductApplicationService extends BaseService {
         if (data.enable) product.enableDisclaimer(actorId);
         else product.disableDisclaimer(actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         if (data.enable) return productMessages.disclaimerEnabled(productId, actorId);
         else return productMessages.disclaimerDisabled(productId, actorId);
     }
@@ -248,6 +266,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.addDisclaimers(data.items, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.disclaimerUpdated(productId, actorId);
     }
 
@@ -265,6 +284,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.removeDisclaimers(data.items, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.disclaimerUpdated(productId, actorId);
     }
 
@@ -285,6 +305,7 @@ export class ProductApplicationService extends BaseService {
         );
         product.addImages(images, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.imageUpdated(productId, actorId);
     }
 
@@ -303,6 +324,7 @@ export class ProductApplicationService extends BaseService {
         const index = Quantity.create(data.index);
         product.setDefault(index, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.imageDefault(index, productId, actorId);
     }
 
@@ -321,6 +343,7 @@ export class ProductApplicationService extends BaseService {
         const urls = data.images.map((value) => UrlVO.create(value.url));
         product.removeImages(urls, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.imageUpdated(productId, actorId);
     }
 
@@ -339,6 +362,7 @@ export class ProductApplicationService extends BaseService {
         if (data.enable) product.enableIngredients(actorId);
         else product.disableIngredients(actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         if (data.enable) return productMessages.ingredientsEnabled(productId, actorId);
         else return productMessages.ingredientsDisabled(productId, actorId);
     }
@@ -357,6 +381,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.addIngredients(data.items, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.ingredientsUpdated(productId, actorId);
     }
 
@@ -374,6 +399,7 @@ export class ProductApplicationService extends BaseService {
         const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
         product.removeIngredients(data.items, actorId);
         await this.productRepo.Save(product);
+        await this.publishEvents(product);
         return productMessages.ingredientsUpdated(productId, actorId);
     }
 

@@ -1,4 +1,5 @@
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
+import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
 import { AddressInternalService } from './application/address.app.internal.service';
 import { AddressApplicationService } from './application/address.app.service';
 import { EnsureActiveAddressGetByIdQuery } from './application/queries/ensure-active-address-get-by-it.query';
@@ -13,7 +14,11 @@ export function createAddressModule() {
         EnsureActiveAddressGetByIdQuery,
         new EnsureActiveAddressGetByIdQueryHandler(addressInternalService),
     );
-    const addressApplicationService = new AddressApplicationService(addressRepo, queryBus);
+    const addressApplicationService = new AddressApplicationService(
+        addressRepo,
+        queryBus,
+        eventBus,
+    );
     const addressController = new AddressController(addressApplicationService);
 
     return { addressController };

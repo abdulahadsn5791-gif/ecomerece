@@ -1,4 +1,5 @@
 import { AddressAggregate } from '@ecomerece/domain/modules/address/address.aggregate';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
@@ -32,8 +33,16 @@ export class AddressApplicationService extends BaseService {
     constructor(
         private readonly addressRepo: AddressRepository,
         private readonly queryBus: InMemoryQueryBus,
+        private readonly eventBus: IEventBus,
     ) {
         super();
+    }
+
+    private async publishEvents(address: AddressAggregate): Promise<void> {
+        const events = address.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
     }
 
     async canEditAddress(actorId: Id): Promise<void> {
@@ -58,6 +67,7 @@ export class AddressApplicationService extends BaseService {
         const address = await this.addressRepo.FindByIdOrThrow(addressId);
         address.recoverAddress(actorId);
         await this.addressRepo.Save(address);
+        await this.publishEvents(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);
         return AddressMessages.addressRecovered(actorId, addressId, response);
     }
@@ -68,6 +78,7 @@ export class AddressApplicationService extends BaseService {
         const address = await this.addressRepo.FindByIdOrThrow(addressId);
         address.setAsDefault();
         await this.addressRepo.Save(address);
+        await this.publishEvents(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);
         return AddressMessages.defaultAddress(actorId, addressId, response);
     }
@@ -79,6 +90,7 @@ export class AddressApplicationService extends BaseService {
         const reason = Reason.create('Address deletion not hold reason');
         address.deleteAddress(reason, actorId);
         await this.addressRepo.Save(address);
+        await this.publishEvents(address);
         return AddressMessages.addressDeleted(actorId, addressId);
     }
 
@@ -107,6 +119,7 @@ export class AddressApplicationService extends BaseService {
             throw new BadRequestError('A maximum of four addresses is allowed per user.');
         await this.canEditAddress(actorId);
         await this.addressRepo.Create(address);
+        await this.publishEvents(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);
         return AddressMessages.addressCreated(actorId, addressId, response);
     }
@@ -125,6 +138,7 @@ export class AddressApplicationService extends BaseService {
         await this.canEditAddress(actorId);
         address.updateAddress(updated, actorId);
         await this.addressRepo.Save(address);
+        await this.publishEvents(address);
         const response = AddressMapper.aggregateToResponseReadModel(address);
         return AddressMessages.addressUpdated(actorId, addressId, response);
     }

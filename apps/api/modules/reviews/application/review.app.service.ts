@@ -1,4 +1,5 @@
 
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import type { IQueryBus } from '@ecomerece/domain/query/query-bus.interface';
 import { DeleteInfoVO } from '@ecomerece/domain/value-objects/delete-info.vo';
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
@@ -29,8 +30,16 @@ export class ReviewApplicationService extends BaseService {
     constructor(
         private readonly queryBus: IQueryBus,
         private readonly reviewRepo: ReviewRepository,
+        private readonly eventBus: IEventBus,
     ) {
         super();
+    }
+
+    private async publishEvents(review: ReviewAggregate): Promise<void> {
+        const events = review.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
     }
 
     async getReviewById(id: string): Promise<ReviewResponseReadModel> {
@@ -122,6 +131,7 @@ export class ReviewApplicationService extends BaseService {
             isVerifiedPurchase: verified
         });
         await this.reviewRepo.Create(review);
+        await this.publishEvents(review);
         return reviewMessages.reviewCreated(reviewId, actorId, reviewMapper.aggregateToResponseReadModel(review))
     }
 

@@ -1,5 +1,6 @@
 import { commandBus } from '../../core/infrastructure/buses/in-memory-command-bus';
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
+import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
 import { ReserveInventoryHandler } from './application/command-handlers/reserve-inventory.handler';
 import { ReserveInventoryCommand } from './application/commands/reserve-inventory.command';
 import { InventoryApplicationService } from './application/inventory.app.service';
@@ -20,7 +21,11 @@ export function createInventoryModule() {
         ReserveInventoryCommand.name,
         new ReserveInventoryHandler(inventoryInternalServcie),
     );
-    const inventoryApplicationService = new InventoryApplicationService(inventoryRepo, queryBus);
+    const inventoryApplicationService = new InventoryApplicationService(
+        inventoryRepo,
+        queryBus,
+        eventBus,
+    );
     const inventoryController = new InventoryController(inventoryApplicationService);
 
     return { inventoryController };

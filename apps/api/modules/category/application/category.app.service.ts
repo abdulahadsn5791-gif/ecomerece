@@ -1,4 +1,5 @@
 import { CategoryAggregate, Id, Quantity, Reason, Title, UrlVO } from '@ecomerece/domain';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import {
     type createCategoryDtoType,
     type deleteCategoryType,
@@ -19,8 +20,18 @@ const escapeRegex = (value: string): string =>
     value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export class CategoryAppService extends BaseService {
-    constructor(private readonly categoryRepo: CategoryRepository) {
+    constructor(
+        private readonly categoryRepo: CategoryRepository,
+        private readonly eventBus: IEventBus,
+    ) {
         super();
+    }
+
+    private async publishEvents(category: CategoryAggregate): Promise<void> {
+        const events = category.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
     }
 
     async createCategory(
@@ -38,6 +49,7 @@ export class CategoryAppService extends BaseService {
             createdBy: actorId,
         });
         await this.categoryRepo.Create(category);
+        await this.publishEvents(category);
         return CategoryMessags.created(id, actorId);
     }
 
@@ -51,6 +63,7 @@ export class CategoryAppService extends BaseService {
         const category = await this.categoryRepo.FindByIdOrThrow(id);
         category.deleteCategory(reason, actorId);
         await this.categoryRepo.Save(category);
+        await this.publishEvents(category);
         return CategoryMessags.deleted(id, actorId);
     }
 

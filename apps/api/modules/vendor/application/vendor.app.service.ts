@@ -52,6 +52,13 @@ export class VendorAppService extends BaseService {
         super();
     }
 
+    private async publishEvents(vendor: VendorAggregate): Promise<void> {
+        const events = vendor.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
+    }
+
     async createMyVendor(
         data: CreateVendorDto,
         actor: UserPersistence,
@@ -90,6 +97,7 @@ export class VendorAppService extends BaseService {
         });
         newVendor.raiseCreated(id, actorId, tittle, slug);
         await this.vendorRepo.Create(newVendor);
+        await this.publishEvents(newVendor);
 
         return VendorMessages.createdVendor(id, actorId);
     }
@@ -170,6 +178,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByOwnerIdOrThrow(actorId);
         vendor.deleteVendor(actorId, reason);
         await this.vendorRepo.Save(vendor);
+        await this.publishEvents(vendor);
 
         return VendorMessages.deletedVendor(vendor.id, actorId);
     }
@@ -180,6 +189,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.deleteVendor(actorId, reason);
         await this.vendorRepo.Save(vendor);
+        await this.publishEvents(vendor);
 
         return VendorMessages.deletedVendor(vendor.id, actorId);
     }
@@ -190,6 +200,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.recoverVendor(actorId);
         await this.vendorRepo.Save(vendor);
+        await this.publishEvents(vendor);
 
         return VendorMessages.recoveredVendor(vendor.id, actorId);
     }
@@ -200,6 +211,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.verifyVendor(actorId);
         await this.vendorRepo.Save(vendor);
+        await this.publishEvents(vendor);
 
         return VendorMessages.verifiedVendor(vendor.id, actorId);
     }
@@ -211,6 +223,7 @@ export class VendorAppService extends BaseService {
         const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
         vendor.rejectVerification(actorId, reason);
         await this.vendorRepo.Save(vendor);
+        await this.publishEvents(vendor);
 
         return VendorMessages.rejectVendorVerification(vendor.id, actorId);
     }

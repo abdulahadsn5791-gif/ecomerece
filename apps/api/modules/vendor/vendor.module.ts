@@ -1,4 +1,4 @@
-import { InMemoryEventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
+import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { EnsureActiveVendorQuery } from './application/queries/ensure-active-vendor.query';
 import { EnsureActiveVendorGetByIdQuery } from './application/queries/ensure-active-vendor-get-by-id.query';
@@ -15,7 +15,6 @@ import { VendorController } from './presentation/vendor.controller';
 
 export function CreateVendorModule() {
     const repo = new VendorRepository();
-    const eventBus = new InMemoryEventBus();
     const internalService = new VendorInternalService(repo, queryBus);
 
     queryBus.register(

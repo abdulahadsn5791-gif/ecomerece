@@ -1,4 +1,5 @@
 import { ProductVariantAggregate } from '@ecomerece/domain';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { Money } from '@ecomerece/domain/value-objects/money.vo';
@@ -37,9 +38,17 @@ export class productVariantApplicationService extends BaseService {
     constructor(
         private readonly vairiantRepo: ProductVariantRepository,
         private readonly queryBus: InMemoryQueryBus,
-        private readonly commandBus: InMemoryCommandBus
+        private readonly commandBus: InMemoryCommandBus,
+        private readonly eventBus: IEventBus,
     ) {
         super();
+    }
+
+    private async publishEvents(variant: ProductVariantAggregate): Promise<void> {
+        const events = variant.pullEvents();
+        if (events.length > 0) {
+            await this.eventBus.publish(events);
+        }
     }
 
     async canActorEditProductVaraintOrThrow(productId: Id, actorId: Id): Promise<void> {
@@ -84,6 +93,7 @@ export class productVariantApplicationService extends BaseService {
             active: data.active,
         });
         await this.vairiantRepo.Create(varaint);
+        await this.publishEvents(varaint);
         await this.syncPricingSummary(productId.value, actor);
         return productVaraintMessages.varaintCreated(varaintId, productId, actorId);
     }
@@ -116,6 +126,7 @@ export class productVariantApplicationService extends BaseService {
         await this.canActorEditProductVaraintOrThrow(productId, actorId);
         variant.updatePrice(price, discountedPrice, actorId);
         await this.vairiantRepo.Save(variant);
+        await this.publishEvents(variant);
         await this.syncPricingSummary(variant.productId.value, actor);
         return productVaraintMessages.priceUpdated(price, discountedPrice, actorId, variantId);
     }
@@ -132,6 +143,7 @@ export class productVariantApplicationService extends BaseService {
         await this.canActorEditProductVaraintOrThrow(productId, actorId);
         variant.updateMeta(title, actorId);
         await this.vairiantRepo.Save(variant);
+        await this.publishEvents(variant);
         return productVaraintMessages.metaUpdated(variantId, actorId);
     }
 
@@ -146,12 +158,14 @@ export class productVariantApplicationService extends BaseService {
         await this.canActorEditProductVaraintOrThrow(productId, actorId);
         if (data.appearance) {
             variant.activate(actorId);
-            this.vairiantRepo.Save(variant);
+            await this.vairiantRepo.Save(variant);
+            await this.publishEvents(variant);
             await this.syncPricingSummary(variant.productId.value, actor);
             return productVaraintMessages.variantActivated(variantId, actorId);
         } else {
             variant.deActivate(actorId);
-            this.vairiantRepo.Save(variant);
+            await this.vairiantRepo.Save(variant);
+            await this.publishEvents(variant);
             await this.syncPricingSummary(variant.productId.value, actor);
             return productVaraintMessages.variantDisabled(variantId, actorId);
         }
@@ -169,6 +183,7 @@ export class productVariantApplicationService extends BaseService {
         await this.canActorEditProductVaraintOrThrow(productId, actorId);
         variant.deleteProduct(actorId, reason);
         await this.vairiantRepo.Save(variant);
+        await this.publishEvents(variant);
         await this.syncPricingSummary(variant.productId.value, actor);
         return productVaraintMessages.variantDeleted(variantId, actorId);
     }
@@ -179,6 +194,7 @@ export class productVariantApplicationService extends BaseService {
         const variant = await this.vairiantRepo.FindByIdOrThrow(variantId);
         variant.recoverProduct(actorId);
         await this.vairiantRepo.Save(variant);
+        await this.publishEvents(variant);
         await this.syncPricingSummary(variant.productId.value, actor);
         return productVaraintMessages.variantRecovered(variantId, actorId);
     }

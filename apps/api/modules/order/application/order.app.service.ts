@@ -403,6 +403,10 @@ export class OrderApplicationService extends BaseService {
         await this.commandBus.execute(new CreateItemsCommand(orderItems));
         order.createOrder();
         await this.orderRepo.Create(order);
+        const orderEvents = order.pullEvents();
+        if (orderEvents.length > 0) {
+            await this.eventBus.publish(orderEvents);
+        }
 
         const response = OrderMapper.aggregateToResponseReadModel(order);
         return OrderMessages.orderCreated(orderId, actorId, addressId, response);

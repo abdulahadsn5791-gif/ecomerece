@@ -1,5 +1,6 @@
 import { commandBus } from '../../core/infrastructure/buses/in-memory-command-bus';
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
+import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
 import { UpdatePriceHandler } from './application/command-handlers/update-price.command-handler';
 import { UpdatePriceCommand } from './application/commands/update-price.command';
 import { ProductApplicationService } from './application/product.app.service';
@@ -14,7 +15,7 @@ import { ProductController } from './presentation/product.controller';
 export function createProductModule() {
     const repo = new ProductRepository();
     const productInternalService = new ProductInternelService(repo);
-    const productApplicationService = new ProductApplicationService(queryBus, repo);
+    const productApplicationService = new ProductApplicationService(queryBus, repo, eventBus);
 
     queryBus.register(
         EnsureActiveProductGetByIdQuery,

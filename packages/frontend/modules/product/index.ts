@@ -1,2 +1,2 @@
-export * from './product.hook'
-export * from './product.service'
+export * from './product.hook';
+export * from './product.service';

@@ -2,21 +2,22 @@
 
 import { useThemeStore } from '@ecomerece/frontend/theme';
 import {
-  LayoutDashboard,
-  ImageIcon,
-  Tag,
-  Sparkles,
+  BarChart3,
   Box,
+  ImageIcon,
   Layers,
-  ShoppingBag,
-  Users,
-  Truck,
+  LayoutDashboard,
   LogOut,
   Settings,
+  ShoppingBag,
+  Sparkles,
+  Tag,
+  Truck,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import React from 'react';
+import type React from 'react';
 
 const ADMIN_ACCENT = '#7C3AED';
 const ADMIN_ACCENT_TEXT = '#6D28D9';
@@ -31,6 +32,7 @@ const primaryItems: AdminNavItem[] = [
   { label: 'Home Layout', icon: LayoutDashboard, href: '/admin/home' },
   { label: 'Products', icon: ShoppingBag, href: '/admin/products' },
   { label: 'Categories', icon: Tag, href: '/admin/categories' },
+  { label: 'Product Stats', icon: BarChart3, href: '/admin/product-stats' },
   { label: 'Users', icon: Users, href: '/admin/users' },
   { label: 'Vendors', icon: Truck, href: '/admin/vendors' },
 ];
@@ -53,7 +55,7 @@ export default function AdminSidebar() {
 
   const isOnHomePage = pathname === '/admin/home' || pathname.startsWith('/admin/home/');
   const isOnPrimaryPage = primaryItems.some(
-    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
   );
 
   const handleSignOut = async () => {
@@ -65,8 +67,7 @@ export default function AdminSidebar() {
       {/* Mobile horizontal scroll nav */}
       <nav className="lg:hidden flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-neutral-200 dark:border-neutral-800 mb-6">
         {primaryItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
 
           return (
@@ -105,9 +106,7 @@ export default function AdminSidebar() {
         >
           <div className="flex items-center gap-2 px-3 mb-3">
             <Settings className="w-4 h-4 text-violet-500" />
-            <h2
-              className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-neutral-900'}`}
-            >
+            <h2 className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-neutral-900'}`}>
               Admin Panel
             </h2>
           </div>
@@ -117,8 +116,7 @@ export default function AdminSidebar() {
             {primaryItems.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href !== '/admin/home' &&
-                  pathname.startsWith(`${item.href}/`));
+                (item.href !== '/admin/home' && pathname.startsWith(`${item.href}/`));
               const Icon = item.icon;
 
               return (

@@ -37,5 +37,6 @@ export type VendorReadModel = {
         verifiedAt: Date | null;
         rejectedReason: string | null;
     };
+    statsRefreshEnabled: boolean;
     isDeleted: boolean;
 };

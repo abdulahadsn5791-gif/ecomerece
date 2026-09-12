@@ -14,3 +14,4 @@ export * from './events/verify-vendor.event';
 export * from './events/vendor-contact-updated.event';
 export * from './events/vendor-image-updated.event';
 export * from './events/vendor-meta-updated.event';
+export * from './events/vendor-stats-refresh-toggled.event';

@@ -1,6 +1,6 @@
 import { commandBus } from '../../core/infrastructure/buses/in-memory-command-bus';
-import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
+import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { UpdatePriceHandler } from './application/command-handlers/update-price.command-handler';
 import { UpdatePriceCommand } from './application/commands/update-price.command';
 import { ProductApplicationService } from './application/product.app.service';
@@ -13,20 +13,20 @@ import { ProductRepository } from './infrastructure/product.repository';
 import { ProductController } from './presentation/product.controller';
 
 export function createProductModule() {
-    const repo = new ProductRepository();
-    const productInternalService = new ProductInternelService(repo);
-    const productApplicationService = new ProductApplicationService(queryBus, repo, eventBus);
+  const repo = new ProductRepository();
+  const productInternalService = new ProductInternelService(repo);
+  const productApplicationService = new ProductApplicationService(queryBus, repo, eventBus);
 
-    queryBus.register(
-        EnsureActiveProductGetByIdQuery,
-        new EnsureActiveProductGetByIdHandler(productInternalService),
-    );
-    queryBus.register(
-        VerifyProductAndGetQuery,
-        new VerifyProductAndGetHandler(productInternalService),
-    );
-    commandBus.register(UpdatePriceCommand.name, new UpdatePriceHandler(productInternalService))
-    const productController = new ProductController(productApplicationService);
+  queryBus.register(
+    EnsureActiveProductGetByIdQuery,
+    new EnsureActiveProductGetByIdHandler(productInternalService),
+  );
+  queryBus.register(
+    VerifyProductAndGetQuery,
+    new VerifyProductAndGetHandler(productInternalService),
+  );
+  commandBus.register(UpdatePriceCommand.name, new UpdatePriceHandler(productInternalService));
+  const productController = new ProductController(productApplicationService);
 
-    return { productController, productInternalService };
+  return { productController, productInternalService };
 }

@@ -14,19 +14,19 @@ import { VendorRepository } from './infrastructure/vendor.repository';
 import { VendorController } from './presentation/vendor.controller';
 
 export function CreateVendorModule() {
-    const repo = new VendorRepository();
-    const internalService = new VendorInternalService(repo, queryBus);
+  const repo = new VendorRepository();
+  const internalService = new VendorInternalService(repo, queryBus);
 
-    queryBus.register(
-        EnsureActiveVendorGetByIdQuery,
-        new EnsureActiveVendorGetByIdHandler(internalService),
-    );
-    queryBus.register(VerifyVendorAndGetQuery, new VerifyVendorAndGetHandler(internalService));
+  queryBus.register(
+    EnsureActiveVendorGetByIdQuery,
+    new EnsureActiveVendorGetByIdHandler(internalService),
+  );
+  queryBus.register(VerifyVendorAndGetQuery, new VerifyVendorAndGetHandler(internalService));
 
-    queryBus.register(EnsureActiveVendorQuery, new EnsureActiveVendorHandler(internalService));
-    queryBus.register(GetVendorByUserIdQuery, new GetVendorByUserIdHandler(internalService));
-    const appService = new VendorAppService(repo, eventBus, internalService);
-    const vendorController = new VendorController(appService);
+  queryBus.register(EnsureActiveVendorQuery, new EnsureActiveVendorHandler(internalService));
+  queryBus.register(GetVendorByUserIdQuery, new GetVendorByUserIdHandler(internalService));
+  const appService = new VendorAppService(repo, eventBus, internalService);
+  const vendorController = new VendorController(appService);
 
-    return { vendorController, appService, queries: {}, internalService };
+  return { vendorController, appService, queries: {}, internalService };
 }

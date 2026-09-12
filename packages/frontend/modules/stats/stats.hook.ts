@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import type { AggregationLevel, EntityType } from '@ecomerece/shared';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type StatsAggregationLevel, statsService } from './stats.service';
 
 export const STATS_QUERY_KEY = ['stats'];
@@ -29,5 +30,89 @@ export function useGetProductLifetimeStats(productId: string) {
     queryKey: [...STATS_QUERY_KEY, 'product', productId, 'lifetime'],
     queryFn: () => statsService.getLifetime('product', productId),
     enabled: Boolean(productId),
+  });
+}
+
+export function useGetPaginatedProductStats(params: {
+  entityType: EntityType;
+  aggregation?: AggregationLevel;
+  metric?: string;
+  sort?: 'desc' | 'asc';
+  cursor?: string;
+  limit?: number;
+}) {
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, 'paginated', params],
+    queryFn: () =>
+      statsService.getPaginatedStats(params.entityType, {
+        aggregation: params.aggregation,
+        metric: params.metric,
+        sort: params.sort,
+        cursor: params.cursor,
+        limit: params.limit,
+      }),
+    enabled: Boolean(params.entityType),
+  });
+}
+
+export function useGetProductStatsOverview(
+  productId: string,
+  options: { months?: number; days?: number; enabled?: boolean } = {},
+) {
+  const { months = 12, days = 30, enabled = true } = options;
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, 'product', productId, 'overview', months, days],
+    queryFn: () => statsService.getProductStatsOverview(productId, months, days),
+    enabled: Boolean(productId) && enabled,
+  });
+}
+
+export function useGetStatsAggregate(
+  entityType: EntityType,
+  params: { aggregation?: AggregationLevel; ids?: string[] } = {},
+) {
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, entityType, 'aggregate', params],
+    queryFn: () => statsService.getAggregate(entityType, params),
+    enabled: Boolean(entityType),
+  });
+}
+
+export function useGetStatsAggregateTimeSeries(
+  entityType: EntityType,
+  params: { aggregation?: 'daily' | 'weekly' | 'monthly'; from?: string; to?: string } = {},
+) {
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, entityType, 'aggregate-timeseries', params],
+    queryFn: () => statsService.getAggregateTimeSeries(entityType, params),
+    enabled: Boolean(entityType),
+  });
+}
+
+export function useGetStatsSyncSettings() {
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, 'sync-settings'],
+    queryFn: () => statsService.getSyncSettings(),
+  });
+}
+
+export function useUpdateStatsSyncSettings() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { intervalHours?: number; autoDenormalizeEnabled?: boolean }) =>
+      statsService.updateSyncSettings(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...STATS_QUERY_KEY, 'sync-settings'] });
+    },
+  });
+}
+
+export function useTriggerProductStatsDenormalization() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => statsService.triggerProductStatsDenormalization(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...STATS_QUERY_KEY, 'sync-settings'] });
+    },
   });
 }

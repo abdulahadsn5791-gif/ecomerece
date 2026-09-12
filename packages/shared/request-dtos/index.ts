@@ -8,3 +8,4 @@ export * from './vendor';
 export * from './category';
 export * from './home';
 export * from './review';
+export * from './stats';

@@ -6,50 +6,51 @@ import { registerErrorHandler } from './errors/error-handler';
 import { dbMiddleware } from './middleware/db.middleware';
 import { rateLimiter } from './middleware/rateLimiter';
 import { requestGuards } from './middleware/requestguard.middleware';
+import { productStatsSyncScheduler } from './modules/stats/application/ProductStatsSyncScheduler';
 import { statsBufferService } from './modules/stats/application/StatsBufferService';
 import routes from './routes';
 
 app.use(logger());
 //  middleware
 app.use(
-    '*',
-    secureHeaders({
-        contentSecurityPolicy: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"],
-        },
-        xFrameOptions: 'DENY',
-        xContentTypeOptions: 'nosniff',
-        referrerPolicy: 'no-referrer',
-    }),
+  '*',
+  secureHeaders({
+    contentSecurityPolicy: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+    },
+    xFrameOptions: 'DENY',
+    xContentTypeOptions: 'nosniff',
+    referrerPolicy: 'no-referrer',
+  }),
 );
 app.use(
-    '*',
-    cors({
-        origin: 'http://localhost:3000',
-        credentials: true,
-        allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowHeaders: ['Content-Type', 'Authorization'],
-    }),
+  '*',
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+  }),
 );
 
 app.use(
-    '*',
-    ...requestGuards({
-        maxUrlLength: 200,
-        maxQueryLength: 100,
-        maxParamLength: 20,
-        maxBodyBytes: 7_000_000,
-        maxJsonDepth: 5,
-        maxJsonNodes: 50,
-    }),
+  '*',
+  ...requestGuards({
+    maxUrlLength: 200,
+    maxQueryLength: 100,
+    maxParamLength: 20,
+    maxBodyBytes: 7_000_000,
+    maxJsonDepth: 5,
+    maxJsonNodes: 50,
+  }),
 );
 
 app.use('*', dbMiddleware);
 app.use('*', rateLimiter);
 
 app.options('*', (c) => {
-    return c.text('');
+  return c.text('');
 });
 
 app.route('/', routes);
@@ -57,15 +58,17 @@ app.route('/', routes);
 registerErrorHandler(app);
 
 statsBufferService.startBackgroundFlushing(5000);
+productStatsSyncScheduler.start(60_000);
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
-    process.once(signal, () => {
-        void statsBufferService.shutdown();
-        process.exit(0);
-    });
+  process.once(signal, () => {
+    void statsBufferService.shutdown();
+    productStatsSyncScheduler.stop();
+    process.exit(0);
+  });
 }
 
 export default {
-    port: 8000,
-    fetch: app.fetch,
-    reusePort: true,
+  port: 8000,
+  fetch: app.fetch,
+  reusePort: true,
 };

@@ -1,6 +1,62 @@
 import { getTimeWindows } from '@ecomerece/domain';
-import { type EntityType, emptyMetrics, type Metrics } from '@ecomerece/shared';
+import {
+  type AggregationLevel,
+  type EntityType,
+  emptyMetrics,
+  type Metrics,
+} from '@ecomerece/shared';
 import { statsRepository } from '../infrastructure/StatsRepository';
+
+function sumMetrics(docs: { metrics?: Metrics }[]): Metrics {
+  const total = { ...emptyMetrics() };
+  for (const doc of docs) {
+    for (const [metric, value] of Object.entries(doc.metrics ?? {})) {
+      total[metric as keyof Metrics] = (total[metric as keyof Metrics] ?? 0) + (value ?? 0);
+    }
+  }
+  return total;
+}
+
+function monthKey(date: Date): string {
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+}
+
+function backMonths(months: number, fromMonth: string): string[] {
+  const [yearStr, monthStr] = fromMonth.split('-');
+  let year = Number(yearStr);
+  let month = Number(monthStr);
+  const keys: string[] = [];
+  for (let i = 0; i < months; i++) {
+    keys.unshift(`${year}-${String(month).padStart(2, '0')}`);
+    month -= 1;
+    if (month === 0) {
+      month = 12;
+      year -= 1;
+    }
+  }
+  return keys;
+}
+
+function backDays(days: number, fromDate: string): string[] {
+  const [yearStr, monthStr, dayStr] = fromDate.split('-').map(Number);
+  const base = Date.UTC(yearStr, monthStr - 1, dayStr) - (days - 1) * 86_400_000;
+  const keys: string[] = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date(base + i * 86_400_000);
+    keys.push(d.toISOString().split('T')[0]);
+  }
+  return keys;
+}
+
+export interface ProductStatsOverview {
+  lifetime: Metrics;
+  today: Metrics;
+  thisWeek: Metrics;
+  thisMonth: Metrics;
+  thisYear: Metrics;
+  monthlySeries: { key: string; metrics: Metrics }[];
+  dailySeries: { key: string; metrics: Metrics }[];
+}
 
 export class StatsQueryService {
   async getLifetimeStats(entityType: EntityType, entityId: string): Promise<Metrics> {
@@ -39,6 +95,106 @@ export class StatsQueryService {
     limit = 10,
   ) {
     return statsRepository.getTopEntities(entityType, aggregation, metric, limit);
+  }
+
+  async getPaginatedByMetric(
+    entityType: EntityType,
+    aggregation: AggregationLevel,
+    metric: string,
+    sort: 'desc' | 'asc' = 'desc',
+    limit = 20,
+    cursor?: string,
+  ) {
+    return statsRepository.getPaginatedByMetric(
+      entityType,
+      aggregation,
+      metric,
+      sort,
+      limit,
+      cursor,
+    );
+  }
+
+  async getAggregateMetrics(entityType: EntityType, aggregation: AggregationLevel, ids?: string[]) {
+    return statsRepository.getAggregateMetrics(entityType, aggregation, ids);
+  }
+
+  async getAggregateTimeSeries(
+    entityType: EntityType,
+    aggregation: 'daily' | 'weekly' | 'monthly',
+    from: string,
+    to: string,
+  ) {
+    return statsRepository.getAggregateTimeSeries(entityType, aggregation, from, to);
+  }
+
+  async getProductOverview(
+    productId: string,
+    months = 12,
+    days = 30,
+  ): Promise<ProductStatsOverview> {
+    const now = new Date();
+    const { date, week, month } = getTimeWindows(now);
+    const year = date.slice(0, 4);
+
+    const [lifetime, today, thisWeek, thisMonth, yearDocs, monthlyDocs, dailyDocs] =
+      await Promise.all([
+        statsRepository.getEntityStats('product', productId, 'lifetime'),
+        statsRepository.getEntityStats('product', productId, 'daily', { 'dimensions.date': date }),
+        statsRepository.getEntityStats('product', productId, 'weekly', { 'dimensions.week': week }),
+        statsRepository.getEntityStats('product', productId, 'monthly', {
+          'dimensions.month': month,
+        }),
+        statsRepository.getDocsBetween(
+          'product',
+          productId,
+          'monthly',
+          'month',
+          `${year}-01`,
+          `${year}-12`,
+        ),
+        statsRepository.getDocsBetween(
+          'product',
+          productId,
+          'monthly',
+          'month',
+          backMonths(months, month)[0],
+          month,
+        ),
+        statsRepository.getDocsBetween(
+          'product',
+          productId,
+          'daily',
+          'date',
+          backDays(days, date)[0],
+          date,
+        ),
+      ]);
+
+    const monthMap = new Map<string, Metrics>(
+      monthlyDocs.map((d) => [d.dimensions?.month ?? '', (d.metrics as Metrics) ?? emptyMetrics()]),
+    );
+    const dayMap = new Map<string, Metrics>(
+      dailyDocs.map((d) => [d.dimensions?.date ?? '', (d.metrics as Metrics) ?? emptyMetrics()]),
+    );
+
+    return {
+      lifetime: (lifetime?.metrics as Metrics | undefined) ?? emptyMetrics(),
+      today: (today?.metrics as Metrics | undefined) ?? emptyMetrics(),
+      thisWeek: (thisWeek?.metrics as Metrics | undefined) ?? emptyMetrics(),
+      thisMonth: (thisMonth?.metrics as Metrics | undefined) ?? emptyMetrics(),
+      thisYear: sumMetrics(
+        yearDocs.map((d) => ({ metrics: (d.metrics as Metrics) ?? emptyMetrics() })),
+      ),
+      monthlySeries: backMonths(months, month).map((key) => ({
+        key,
+        metrics: { ...emptyMetrics(), ...(monthMap.get(key) ?? {}) },
+      })),
+      dailySeries: backDays(days, date).map((key) => ({
+        key,
+        metrics: { ...emptyMetrics(), ...(dayMap.get(key) ?? {}) },
+      })),
+    };
   }
 }
 

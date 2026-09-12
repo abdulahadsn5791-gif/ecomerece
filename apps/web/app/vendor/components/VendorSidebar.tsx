@@ -1,7 +1,7 @@
 'use client';
 
 import { useThemeStore } from '@ecomerece/frontend/theme';
-import { LayoutDashboard, LogOut, Store, Truck } from 'lucide-react';
+import { BarChart3, LayoutDashboard, LogOut, Store, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
@@ -17,6 +17,7 @@ interface VendorNavItem {
 
 const primaryItems: VendorNavItem[] = [
   { label: 'Overview', icon: LayoutDashboard, href: '/vendor/dashboard' },
+  { label: 'Performance', icon: BarChart3, href: '/vendor/products-stats' },
 ];
 
 export default function VendorSidebar() {

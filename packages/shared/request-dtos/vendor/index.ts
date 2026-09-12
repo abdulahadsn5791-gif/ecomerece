@@ -6,3 +6,4 @@ export * from './vendor-pagination.dto';
 export * from './vendor-param.Dto';
 export * from './verify-vendor.dto';
 export * from './vendor-pagination.dto';
+export * from './update-stats-refresh.dto';

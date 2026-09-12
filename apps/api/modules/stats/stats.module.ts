@@ -3,18 +3,24 @@ import { redis } from '../../lib/redis';
 import { CategoryRepository } from '../category/infrastructure/category.repository';
 import { ProductRepository } from '../product/infrastructure/product.repository';
 import { OrderItemCreatedStatsHandler } from './application/event-handlers/order-item-created.stats-handler';
+import { ProductStatsDenormalizationHandler } from './application/event-handlers/product-stats-denormalization.handler';
+import { statsAccessGuard } from './application/StatsAccessGuard';
 import { StatsViewGuard } from './application/StatsViewGuard';
 import { StatsController } from './presentation/StatsController';
 
 export function CreateStatsModule() {
   eventBus.register('order-item.created', new OrderItemCreatedStatsHandler());
+  eventBus.register(
+    'stats.product-denormalization-requested',
+    new ProductStatsDenormalizationHandler(),
+  );
 
   const viewGuard = new StatsViewGuard({
     redis,
     productRepo: new ProductRepository(),
     categoryRepo: new CategoryRepository(),
   });
-  const statsController = new StatsController(viewGuard);
+  const statsController = new StatsController(viewGuard, statsAccessGuard);
 
   return { statsController };
 }

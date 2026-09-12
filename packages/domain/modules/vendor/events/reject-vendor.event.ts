@@ -1,15 +1,15 @@
-import { IEvent } from "../../../events/event-bus.interface";
-import { EffectiveDate, Id, } from "../../../value-objects";
+import type { IEvent } from '../../../events/event-bus.interface';
+import { EffectiveDate, type Id } from '../../../value-objects';
 import type { VerificationInfoVO } from '../value-objects/verification-info.vo';
 
 export interface VendorRejectionPayload {
-    vendorId: Id;
-    rejectionInfo: VerificationInfoVO;
+  vendorId: Id;
+  rejectionInfo: VerificationInfoVO;
 }
 
 export class VendorVerificationRejectedEvent implements IEvent<VendorRejectionPayload> {
-    readonly type = 'vendor.rejected';
-    readonly occurredOn = EffectiveDate.today();
+  readonly type = 'vendor.rejected';
+  readonly occurredOn = EffectiveDate.today();
 
-    constructor(public readonly payload: VendorRejectionPayload) { }
+  constructor(public readonly payload: VendorRejectionPayload) {}
 }

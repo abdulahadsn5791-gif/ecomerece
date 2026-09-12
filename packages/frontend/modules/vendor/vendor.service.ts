@@ -1,88 +1,96 @@
 // vendor.service.ts
-import { http } from './../../lib';
+
 import type {
-    CreateVendorDto,
-    DeleteMyVendorDto,
-    DeleteVendorDto,
-    GetAdminPaginatedVendorsQueryDto,
-    GetPaginatedVendorsQueryDto,
-    RecoverVendorDto,
-    RejectVendorDto,
-    VendorListItemReadModel,
-    VendorResponseReadModel,
-    VerifyVendorDto,
+  CreateVendorDto,
+  DeleteMyVendorDto,
+  DeleteVendorDto,
+  GetAdminPaginatedVendorsQueryDto,
+  GetPaginatedVendorsQueryDto,
+  RecoverVendorDto,
+  RejectVendorDto,
+  UpdateVendorStatsRefreshDto,
+  VendorListItemReadModel,
+  VendorResponseReadModel,
+  VerifyVendorDto,
 } from '@ecomerece/shared';
+import { http } from './../../lib';
 
 /** Matches the backend's standard vendor mutation response envelope. */
 export type VendorMutationResult = {
-    message: string;
-    updatedData?: VendorResponseReadModel;
+  message: string;
+  updatedData?: VendorResponseReadModel;
 };
 
 export class VendorService {
-    getVendorById(id: string): Promise<VendorResponseReadModel> {
-        return http.get<VendorResponseReadModel>(`/vendor/${id}`);
-    }
+  getVendorById(id: string): Promise<VendorResponseReadModel> {
+    return http.get<VendorResponseReadModel>(`/vendor/${id}`);
+  }
 
-    getMyVendor(): Promise<VendorResponseReadModel> {
-        return http.get<VendorResponseReadModel>('/vendor/my');
-    }
+  getMyVendor(): Promise<VendorResponseReadModel> {
+    return http.get<VendorResponseReadModel>('/vendor/my');
+  }
 
-    createMyVendor(data: CreateVendorDto): Promise<VendorMutationResult> {
-        return http.post<VendorMutationResult>('/vendor/my', data);
-    }
+  createMyVendor(data: CreateVendorDto): Promise<VendorMutationResult> {
+    return http.post<VendorMutationResult>('/vendor/my', data);
+  }
 
-    deleteMyVendor(data: DeleteMyVendorDto): Promise<VendorMutationResult> {
-        return http.delete<VendorMutationResult>('/vendor/my', data);
-    }
+  deleteMyVendor(data: DeleteMyVendorDto): Promise<VendorMutationResult> {
+    return http.delete<VendorMutationResult>('/vendor/my', data);
+  }
 
-    softDeleteVendor(data: DeleteVendorDto): Promise<VendorMutationResult> {
-        return http.delete<VendorMutationResult>('/vendor/soft', data);
-    }
+  softDeleteVendor(data: DeleteVendorDto): Promise<VendorMutationResult> {
+    return http.delete<VendorMutationResult>('/vendor/soft', data);
+  }
 
-    recoverVendor(data: RecoverVendorDto): Promise<VendorMutationResult> {
-        return http.patch<VendorMutationResult>('/vendor/recover', data);
-    }
+  recoverVendor(data: RecoverVendorDto): Promise<VendorMutationResult> {
+    return http.patch<VendorMutationResult>('/vendor/recover', data);
+  }
 
-    verifyVendor(data: VerifyVendorDto): Promise<VendorMutationResult> {
-        return http.patch<VendorMutationResult>('/vendor/verify', data);
-    }
+  verifyVendor(data: VerifyVendorDto): Promise<VendorMutationResult> {
+    return http.patch<VendorMutationResult>('/vendor/verify', data);
+  }
 
-    rejectVendorVerification(data: RejectVendorDto): Promise<VendorMutationResult> {
-        return http.patch<VendorMutationResult>('/vendor/reject', data);
-    }
+  rejectVendorVerification(data: RejectVendorDto): Promise<VendorMutationResult> {
+    return http.patch<VendorMutationResult>('/vendor/reject', data);
+  }
 
-    getPaginatedVendors(
-        params: GetPaginatedVendorsQueryDto,
-    ): Promise<{ data: VendorListItemReadModel[]; meta: { nextCursor: string | null; prevCursor: string | null; hasMore: boolean } }> {
-        const searchParams = new URLSearchParams();
-        if (params.cursor) searchParams.append('cursor', params.cursor);
-        if (params.limit) searchParams.append('limit', String(params.limit));
-        if (params.direction) searchParams.append('direction', params.direction);
-        if (params.search) searchParams.append('search', params.search);
+  updateMyStatsRefresh(data: UpdateVendorStatsRefreshDto): Promise<VendorResponseReadModel> {
+    return http.patch<VendorResponseReadModel>('/vendor/my/stats-refresh', data);
+  }
 
-        const query = searchParams.toString();
-        const url = query ? `/vendor?${query}` : '/vendor';
+  getPaginatedVendors(params: GetPaginatedVendorsQueryDto): Promise<{
+    data: VendorListItemReadModel[];
+    meta: { nextCursor: string | null; prevCursor: string | null; hasMore: boolean };
+  }> {
+    const searchParams = new URLSearchParams();
+    if (params.cursor) searchParams.append('cursor', params.cursor);
+    if (params.limit) searchParams.append('limit', String(params.limit));
+    if (params.direction) searchParams.append('direction', params.direction);
+    if (params.search) searchParams.append('search', params.search);
 
-        return http.get(url);
-    }
+    const query = searchParams.toString();
+    const url = query ? `/vendor?${query}` : '/vendor';
 
-    getAdminPaginatedVendors(
-        params: GetAdminPaginatedVendorsQueryDto,
-    ): Promise<{ data: VendorListItemReadModel[]; meta: { nextCursor: string | null; prevCursor: string | null; hasMore: boolean } }> {
-        const searchParams = new URLSearchParams();
-        if (params.cursor) searchParams.append('cursor', params.cursor);
-        if (params.limit) searchParams.append('limit', String(params.limit));
-        if (params.direction) searchParams.append('direction', params.direction);
-        if (params.search) searchParams.append('search', params.search);
-        if (params.deleted !== undefined) searchParams.append('deleted', String(params.deleted));
-        if (params.verified !== undefined) searchParams.append('verified', String(params.verified));
+    return http.get(url);
+  }
 
-        const query = searchParams.toString();
-        const url = query ? `/vendor/admin/all?${query}` : '/vendor/admin/all';
+  getAdminPaginatedVendors(params: GetAdminPaginatedVendorsQueryDto): Promise<{
+    data: VendorListItemReadModel[];
+    meta: { nextCursor: string | null; prevCursor: string | null; hasMore: boolean };
+  }> {
+    const searchParams = new URLSearchParams();
+    if (params.cursor) searchParams.append('cursor', params.cursor);
+    if (params.limit) searchParams.append('limit', String(params.limit));
+    if (params.direction) searchParams.append('direction', params.direction);
+    if (params.search) searchParams.append('search', params.search);
+    if (params.deleted !== undefined) searchParams.append('deleted', String(params.deleted));
+    if (params.verified !== undefined) searchParams.append('verified', String(params.verified));
 
-        return http.get(url);
-    }
+    const query = searchParams.toString();
+    const url = query ? `/vendor/admin/all?${query}` : '/vendor/admin/all';
+
+    return http.get(url);
+  }
 }
 
 export const vendorService = new VendorService();

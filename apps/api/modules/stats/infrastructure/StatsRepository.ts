@@ -89,6 +89,155 @@ export class StatsRepository {
       .limit(limit)
       .lean();
   }
+
+  async getPaginatedByMetric(
+    entityType: EntityType,
+    aggregation: AggregationLevel,
+    metric: string,
+    sort: 'desc' | 'asc' = 'desc',
+    limit = 20,
+    cursor?: string,
+  ): Promise<{ items: StatsDocument[]; nextCursor: string | null }> {
+    const filter: Record<string, unknown> = { 'entity.type': entityType, aggregation };
+
+    if (cursor) {
+      const { v, id } = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf-8')) as {
+        v: number;
+        id: string;
+      };
+      if (sort === 'desc') {
+        filter.$or = [
+          { [`metrics.${metric}`]: { $lt: v } },
+          { [`metrics.${metric}`]: v, 'entity.id': { $gt: id } },
+        ];
+      } else {
+        filter.$or = [
+          { [`metrics.${metric}`]: { $gt: v } },
+          { [`metrics.${metric}`]: v, 'entity.id': { $gt: id } },
+        ];
+      }
+    }
+
+    const items = (await StatsModel.find(filter)
+      .sort({ [`metrics.${metric}`]: sort, 'entity.id': 1 })
+      .limit(limit)
+      .lean()) as StatsDocument[];
+
+    if (items.length === 0) return { items: [], nextCursor: null };
+
+    const last = items[items.length - 1];
+    const nextCursor = Buffer.from(
+      JSON.stringify({
+        v: (last.metrics as Record<string, number> | undefined)?.[metric] ?? 0,
+        id: last.entity?.id ?? '',
+      }),
+    ).toString('base64url');
+
+    return { items, nextCursor };
+  }
+
+  async getAggregateMetrics(
+    entityType: EntityType,
+    aggregation: AggregationLevel,
+    ids?: string[],
+  ): Promise<Record<string, number>> {
+    const match: Record<string, unknown> = { 'entity.type': entityType, aggregation };
+    if (ids && ids.length > 0) match['entity.id'] = { $in: ids };
+
+    const sums = [
+      ['views', 0],
+      ['clicks', 0],
+      ['purchases', 0],
+      ['revenue', 0],
+      ['quantity', 0],
+      ['addToCart', 0],
+      ['wishlist', 0],
+      ['refunds', 0],
+      ['refundAmount', 0],
+    ] as const;
+
+    const results = await StatsModel.aggregate<Record<string, number> & { _id: null }>([
+      { $match: match },
+      {
+        $group: {
+          _id: null,
+          ...Object.fromEntries(
+            sums.map(([field, initial]) => [field, { $sum: `$metrics.${field}` }]),
+          ),
+        },
+      },
+    ]);
+
+    if (results.length === 0) return Object.fromEntries(sums.map(([field]) => [field, 0]));
+    const { _id, ...metrics } = results[0];
+    void _id;
+    return metrics;
+  }
+
+  async getAggregateTimeSeries(
+    entityType: EntityType,
+    aggregation: Extract<AggregationLevel, 'daily' | 'weekly' | 'monthly'>,
+    from: string,
+    to: string,
+  ): Promise<{ key: string; metrics: Record<string, number> }[]> {
+    const dimensionField =
+      aggregation === 'daily' ? 'date' : aggregation === 'weekly' ? 'week' : 'month';
+
+    const sums = [
+      'views',
+      'clicks',
+      'purchases',
+      'revenue',
+      'quantity',
+      'addToCart',
+      'wishlist',
+      'refunds',
+      'refundAmount',
+    ] as const;
+
+    const rows = await StatsModel.aggregate<Record<string, number> & { _id: string }>([
+      {
+        $match: {
+          'entity.type': entityType,
+          aggregation,
+          [`dimensions.${dimensionField}`]: { $gte: from, $lte: to },
+        },
+      },
+      {
+        $group: {
+          _id: `$dimensions.${dimensionField}`,
+          ...Object.fromEntries(sums.map((field) => [field, { $sum: `$metrics.${field}` }])),
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return rows.map(({ _id, ...metrics }) => ({ key: _id, metrics }));
+  }
+
+  async getLifetimeDocs(entityType: EntityType, entityIds: string[]): Promise<StatsDocument[]> {
+    return StatsModel.find({
+      'entity.type': entityType,
+      'entity.id': { $in: entityIds },
+      aggregation: 'lifetime',
+    }).lean();
+  }
+
+  async getDocsBetween(
+    entityType: EntityType,
+    entityId: string,
+    aggregation: Extract<AggregationLevel, 'hourly' | 'daily' | 'weekly' | 'monthly'>,
+    field: 'date' | 'week' | 'month',
+    from: string,
+    to: string,
+  ): Promise<StatsDocument[]> {
+    return StatsModel.find({
+      'entity.type': entityType,
+      'entity.id': entityId,
+      aggregation,
+      [`dimensions.${field}`]: { $gte: from, $lte: to },
+    }).lean();
+  }
 }
 
 export const statsRepository = new StatsRepository();

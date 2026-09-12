@@ -54,8 +54,7 @@ typings/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
-bun.lock*
-bun.lockb
+
 
 # ---- Environment variables ----
 .env

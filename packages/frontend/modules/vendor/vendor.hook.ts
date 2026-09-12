@@ -6,12 +6,14 @@ import {
     DeleteMyVendorDtoSchema,
     DeleteVendorDtoSchema,
     getPaginatedVendorsQuerySchema,
+    getAdminPaginatedVendorsQuerySchema,
     RecoverVendorDtoSchema,
     RejectVendorDtoSchema,
     VerifyVendorDtoSchema,
     type CreateVendorDto,
     type DeleteMyVendorDto,
     type DeleteVendorDto,
+    type GetAdminPaginatedVendorsQueryDto,
     type GetPaginatedVendorsQueryDto,
     type RecoverVendorDto,
     type RejectVendorDto,
@@ -35,6 +37,16 @@ export function useGetPaginatedVendors(params: GetPaginatedVendorsQueryDto) {
     return useQuery({
         queryKey: [...VENDOR_QUERY_KEY, 'paginated', params],
         queryFn: () => vendorService.getPaginatedVendors(getPaginatedVendorsQuerySchema.parse(params)),
+    });
+}
+
+export function useGetAdminPaginatedVendors(params: GetAdminPaginatedVendorsQueryDto) {
+    return useQuery({
+        queryKey: [...VENDOR_QUERY_KEY, 'admin-paginated', params],
+        queryFn: () =>
+            vendorService.getAdminPaginatedVendors(
+                getAdminPaginatedVendorsQuerySchema.parse(params),
+            ),
     });
 }
 

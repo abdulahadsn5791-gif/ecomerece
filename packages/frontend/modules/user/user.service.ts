@@ -6,6 +6,8 @@ import type {
     DeleteMeDTO,
     DeleteUserDTO,
     ExtendBanDTO,
+    GetAdminPaginatedUsersQueryDto,
+    GetPaginatedUsersQueryDto,
     UserResponseReadModel,
     UserRoleDto,
 } from '@ecomerece/shared';
@@ -16,6 +18,15 @@ export type UserMutationResult = {
     updatedData?: UserResponseReadModel;
 };
 
+export type PaginatedUsersResult = {
+    data: UserResponseReadModel[];
+    meta: {
+        nextCursor: string | null;
+        prevCursor: string | null;
+        hasMore: boolean;
+    };
+};
+
 export class UserService {
     getMe(): Promise<UserResponseReadModel> {
         return http.get<UserResponseReadModel>('/users/me');
@@ -23,6 +34,34 @@ export class UserService {
 
     getUserById(id: string): Promise<UserResponseReadModel> {
         return http.get<UserResponseReadModel>(`/users/${id}`);
+    }
+
+    getPaginatedUsers(
+        params: GetPaginatedUsersQueryDto,
+    ): Promise<PaginatedUsersResult> {
+        const searchParams = new URLSearchParams();
+        if (params.search) searchParams.set('search', params.search);
+        if (params.cursor) searchParams.set('cursor', params.cursor);
+        if (params.limit) searchParams.set('limit', String(params.limit));
+        if (params.direction) searchParams.set('direction', params.direction);
+        const qs = searchParams.toString();
+        return http.get<PaginatedUsersResult>(`/users${qs ? `?${qs}` : ''}`);
+    }
+
+    getAdminPaginatedUsers(
+        params: GetAdminPaginatedUsersQueryDto,
+    ): Promise<PaginatedUsersResult> {
+        const searchParams = new URLSearchParams();
+        if (params.search) searchParams.set('search', params.search);
+        if (params.role) searchParams.set('role', params.role);
+        if (params.deleted !== undefined) searchParams.set('deleted', String(params.deleted));
+        if (params.blocked !== undefined) searchParams.set('blocked', String(params.blocked));
+        if (params.banned !== undefined) searchParams.set('banned', String(params.banned));
+        if (params.cursor) searchParams.set('cursor', params.cursor);
+        if (params.limit) searchParams.set('limit', String(params.limit));
+        if (params.direction) searchParams.set('direction', params.direction);
+        const qs = searchParams.toString();
+        return http.get<PaginatedUsersResult>(`/users/admin/all${qs ? `?${qs}` : ''}`);
     }
 
 

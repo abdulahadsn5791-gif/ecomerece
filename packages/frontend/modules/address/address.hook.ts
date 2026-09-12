@@ -5,8 +5,10 @@ import {
 
     createMyAddressDto,
     updateMyAddressDtoType,
+    getAdminPaginatedAddressesQuerySchema,
     type AddressResponseReadModel,
     type createMyAddressDtoType,
+    type GetAdminPaginatedAddressesQueryDto,
 } from '@ecomerece/shared';
 
 export const ADDRESS_QUERY_KEY = ['addresses'];
@@ -15,6 +17,16 @@ export function useGetMyAddresses() {
     return useQuery({
         queryKey: [...ADDRESS_QUERY_KEY, 'me'],
         queryFn: () => addressService.getMyAddresses(),
+    });
+}
+
+export function useGetAdminPaginatedAddresses(params: GetAdminPaginatedAddressesQueryDto) {
+    return useQuery({
+        queryKey: [...ADDRESS_QUERY_KEY, 'admin-paginated', params],
+        queryFn: () =>
+            addressService.getAdminPaginatedAddresses(
+                getAdminPaginatedAddressesQuerySchema.parse(params),
+            ),
     });
 }
 

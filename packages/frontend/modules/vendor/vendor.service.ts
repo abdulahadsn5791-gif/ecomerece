@@ -4,6 +4,7 @@ import type {
     CreateVendorDto,
     DeleteMyVendorDto,
     DeleteVendorDto,
+    GetAdminPaginatedVendorsQueryDto,
     GetPaginatedVendorsQueryDto,
     RecoverVendorDto,
     RejectVendorDto,
@@ -58,6 +59,23 @@ export class VendorService {
 
         const query = searchParams.toString();
         const url = query ? `/vendor?${query}` : '/vendor';
+
+        return http.get(url);
+    }
+
+    getAdminPaginatedVendors(
+        params: GetAdminPaginatedVendorsQueryDto,
+    ): Promise<{ data: VendorListItemReadModel[]; meta: { nextCursor: string | null; prevCursor: string | null; hasMore: boolean } }> {
+        const searchParams = new URLSearchParams();
+        if (params.cursor) searchParams.append('cursor', params.cursor);
+        if (params.limit) searchParams.append('limit', String(params.limit));
+        if (params.direction) searchParams.append('direction', params.direction);
+        if (params.search) searchParams.append('search', params.search);
+        if (params.deleted !== undefined) searchParams.append('deleted', String(params.deleted));
+        if (params.verified !== undefined) searchParams.append('verified', String(params.verified));
+
+        const query = searchParams.toString();
+        const url = query ? `/vendor/admin/all?${query}` : '/vendor/admin/all';
 
         return http.get(url);
     }

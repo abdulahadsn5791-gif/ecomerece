@@ -6,6 +6,7 @@ import {
     type ProductVariantResponseReadModel,
     createMyProductVariantDto,
     createMyProductVariantDtoType,
+    getAdminPaginatedVariantsQuerySchema,
     softDeleteMyVariantDto,
     toggleVariantApperaaracneDto,
     updateMyVariatPriceDtoType,
@@ -14,6 +15,7 @@ import {
     softDeleteMyVariantDtoType,
     upadteMyVariantMetaDto,
     updateMyVariatPriceDto,
+    type GetAdminPaginatedVariantsQueryDto,
 } from '@ecomerece/shared';
 
 export const PRODUCT_VARIANT_QUERY_KEY = ['product-variants'];
@@ -25,6 +27,16 @@ export function useGetVariantsByProductId(productId: string) {
         queryKey: [...PRODUCT_VARIANT_QUERY_KEY, 'product', productId],
         queryFn: () => productVariantService.getVariantsByProductId(productId),
         enabled: Boolean(productId),
+    });
+}
+
+export function useGetAdminPaginatedVariants(params: GetAdminPaginatedVariantsQueryDto) {
+    return useQuery({
+        queryKey: [...PRODUCT_VARIANT_QUERY_KEY, 'admin-paginated', params],
+        queryFn: () =>
+            productVariantService.getAdminPaginatedVariants(
+                getAdminPaginatedVariantsQuerySchema.parse(params),
+            ),
     });
 }
 

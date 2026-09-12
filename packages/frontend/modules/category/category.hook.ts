@@ -2,12 +2,13 @@
 import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { categoryService, type CategoryMutationResult } from './category.service';
 import {
-
     createCategoryDto,
     deleteCategoryDto,
+    getAdminPaginatedCategoriesSchema,
     getPaginatedDto,
     type createCategoryDtoType,
     type deleteCategoryType,
+    type GetAdminPaginatedCategoriesDto,
     type getPaginatedDtoType,
 
 } from '@ecomerece/shared';
@@ -28,6 +29,16 @@ export function useGetPaginatedCategories(params: getPaginatedDtoType) {
     return useQuery({
         queryKey: [...CATEGORY_QUERY_KEY, 'paginated', params],
         queryFn: () => categoryService.getPaginatedCategories(getPaginatedDto.parse(params)),
+    });
+}
+
+export function useGetAdminPaginatedCategories(params: GetAdminPaginatedCategoriesDto) {
+    return useQuery({
+        queryKey: [...CATEGORY_QUERY_KEY, 'admin-paginated', params],
+        queryFn: () =>
+            categoryService.getAdminPaginatedCategories(
+                getAdminPaginatedCategoriesSchema.parse(params),
+            ),
     });
 }
 

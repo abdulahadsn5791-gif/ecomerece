@@ -9,6 +9,7 @@ import {
     createMyProductVariantDtoType,
     softDeleteMyProductDtoType,
     CreateMyProductDtoSchema,
+    getAdminPaginatedProductsQuerySchema,
     recoverProductDtoType,
     blockProductDtoType,
     blockProductDto,
@@ -56,6 +57,25 @@ export function useGetPaginatedProducts(params: {
     return useQuery({
         queryKey: [...PRODUCT_QUERY_KEY, 'paginated', params],
         queryFn: () => productService.getPaginatedProducts(params),
+    });
+}
+
+export function useGetAdminPaginatedProducts(params: {
+    categoryId?: string;
+    vendorId?: string;
+    appearance?: 'public' | 'private';
+    search?: string;
+    deleted?: boolean;
+    blocked?: boolean;
+    cursor?: string;
+    limit?: number;
+    direction?: 'next' | 'prev';
+}) {
+    return useQuery({
+        queryKey: [...PRODUCT_QUERY_KEY, 'admin-paginated', params],
+        queryFn: () => productService.getAdminPaginatedProducts(
+            getAdminPaginatedProductsQuerySchema.parse(params),
+        ),
     });
 }
 

@@ -6,12 +6,16 @@ import {
     DeleteMeDTOSchema,
     DeleteUserDTOSchema,
     ExtendBanDTOSchema,
+    getAdminPaginatedUsersQuerySchema,
+    getPaginatedUsersQuerySchema,
     UserRoleDtoSchema,
     type BanUserDTO,
     type BlockUserDTO,
     type DeleteMeDTO,
     type DeleteUserDTO,
     type ExtendBanDTO,
+    type GetAdminPaginatedUsersQueryDto,
+    type GetPaginatedUsersQueryDto,
     type UserResponseReadModel,
     type UserRoleDto,
 } from '@ecomerece/shared';
@@ -34,6 +38,21 @@ export function useGetUserById(userId: string) {
         queryKey: [...USER_QUERY_KEY, userId],
         queryFn: () => userService.getUserById(userId),
         enabled: Boolean(userId),
+    });
+}
+
+export function useGetPaginatedUsers(params: GetPaginatedUsersQueryDto) {
+    return useQuery({
+        queryKey: [...USER_QUERY_KEY, 'paginated', params],
+        queryFn: () => userService.getPaginatedUsers(getPaginatedUsersQuerySchema.parse(params)),
+    });
+}
+
+export function useGetAdminPaginatedUsers(params: GetAdminPaginatedUsersQueryDto) {
+    return useQuery({
+        queryKey: [...USER_QUERY_KEY, 'admin-paginated', params],
+        queryFn: () =>
+            userService.getAdminPaginatedUsers(getAdminPaginatedUsersQuerySchema.parse(params)),
     });
 }
 

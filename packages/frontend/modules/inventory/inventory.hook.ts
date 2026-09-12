@@ -8,10 +8,12 @@ import {
     type removeMyInventoryStockDtoType,
     type updateMylowStockThresholdDtoType,
     type InventoryResponseReadModel,
+    type GetAdminPaginatedInventoryQueryDto,
     createMyInventoryDto,
     buyMyInventoryStockDto,
     removeMyInventoryStockDto,
     updateMylowStockThresholdDto,
+    getAdminPaginatedInventoryQuerySchema,
 } from '@ecomerece/shared';
 
 export const INVENTORY_QUERY_KEY = ['inventory'];
@@ -23,6 +25,16 @@ export function useGetInventoryByVariantId(variantId: string) {
         queryKey: [...INVENTORY_QUERY_KEY, 'variant', variantId],
         queryFn: () => inventoryService.getInventoryByVariantId(variantId),
         enabled: Boolean(variantId),
+    });
+}
+
+export function useGetAdminPaginatedInventory(params: GetAdminPaginatedInventoryQueryDto) {
+    return useQuery({
+        queryKey: [...INVENTORY_QUERY_KEY, 'admin-paginated', params],
+        queryFn: () =>
+            inventoryService.getAdminPaginatedInventory(
+                getAdminPaginatedInventoryQuerySchema.parse(params),
+            ),
     });
 }
 

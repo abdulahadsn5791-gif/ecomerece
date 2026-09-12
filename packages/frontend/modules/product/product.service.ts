@@ -1,6 +1,7 @@
 // product.service.ts
 import { http } from './../../lib';
 import type {
+    GetAdminPaginatedProductsQueryDto,
     ProductResponseReadModel,
     CreateMyProductDto,
     softDeleteMyProductDtoType,
@@ -55,6 +56,21 @@ export class ProductService {
         if (params.direction) searchParams.set('direction', params.direction);
         const qs = searchParams.toString();
         return http.get<PaginatedProductsResult>(`/product${qs ? `?${qs}` : ''}`);
+    }
+
+    getAdminPaginatedProducts(params: GetAdminPaginatedProductsQueryDto): Promise<PaginatedProductsResult> {
+        const searchParams = new URLSearchParams();
+        if (params.categoryId) searchParams.set('categoryId', params.categoryId);
+        if (params.vendorId) searchParams.set('vendorId', params.vendorId);
+        if (params.appearance) searchParams.set('appearance', params.appearance);
+        if (params.search) searchParams.set('search', params.search);
+        if (params.deleted !== undefined) searchParams.set('deleted', String(params.deleted));
+        if (params.blocked !== undefined) searchParams.set('blocked', String(params.blocked));
+        if (params.cursor) searchParams.set('cursor', params.cursor);
+        if (params.limit) searchParams.set('limit', String(params.limit));
+        if (params.direction) searchParams.set('direction', params.direction);
+        const qs = searchParams.toString();
+        return http.get<PaginatedProductsResult>(`/product/admin/all${qs ? `?${qs}` : ''}`);
     }
 
     createMyProduct(data: CreateMyProductDto): Promise<ProductMutationResult> {

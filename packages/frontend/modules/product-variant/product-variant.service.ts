@@ -2,6 +2,7 @@
 import { http } from './../../lib';
 import type {
     createMyProductVariantDtoType,
+    GetAdminPaginatedVariantsQueryDto,
     ProductVariantResponseReadModel,
     softDeleteMyVariantDtoType,
     toggleVariantApperaaracneDtoType,
@@ -15,9 +16,33 @@ export type ProductVariantMutationResult = {
     updatedData?: ProductVariantResponseReadModel;
 };
 
+export type PaginatedVariantsResult = {
+    data: ProductVariantResponseReadModel[];
+    meta: {
+        nextCursor: string | null;
+        prevCursor: string | null;
+        hasMore: boolean;
+    };
+};
+
 export class ProductVariantService {
     getVariantsByProductId(productId: string): Promise<ProductVariantResponseReadModel[]> {
         return http.get<ProductVariantResponseReadModel[]>(`/product-variants/${productId}`);
+    }
+
+    getAdminPaginatedVariants(
+        params: GetAdminPaginatedVariantsQueryDto,
+    ): Promise<PaginatedVariantsResult> {
+        const searchParams = new URLSearchParams();
+        if (params.productId) searchParams.set('productId', params.productId);
+        if (params.active !== undefined) searchParams.set('active', String(params.active));
+        if (params.deleted !== undefined) searchParams.set('deleted', String(params.deleted));
+        if (params.search) searchParams.set('search', params.search);
+        if (params.cursor) searchParams.set('cursor', params.cursor);
+        if (params.limit) searchParams.set('limit', String(params.limit));
+        if (params.direction) searchParams.set('direction', params.direction);
+        const qs = searchParams.toString();
+        return http.get<PaginatedVariantsResult>(`/product-variants/admin/all${qs ? `?${qs}` : ''}`);
     }
 
     createMyProductVariant(data: createMyProductVariantDtoType): Promise<ProductVariantMutationResult> {

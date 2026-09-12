@@ -4,6 +4,7 @@ import type {
     categoryResponseReadModels,
     createCategoryDtoType,
     deleteCategoryType,
+    GetAdminPaginatedCategoriesDto,
     getPaginatedDtoType,
 
 } from '@ecomerece/shared';
@@ -37,6 +38,23 @@ export class CategoryService {
 
         const query = searchParams.toString();
         const url = query ? `/category?${query}` : '/category';
+
+        return http.get<PaginatedCategoriesResult>(url);
+    }
+
+    getAdminPaginatedCategories(
+        params: GetAdminPaginatedCategoriesDto,
+    ): Promise<PaginatedCategoriesResult> {
+        const searchParams = new URLSearchParams();
+        if (params.cursor) searchParams.append('cursor', params.cursor);
+        if (params.limit) searchParams.append('limit', String(params.limit));
+        if (params.direction) searchParams.append('direction', params.direction);
+        if (params.search) searchParams.append('search', params.search);
+        if (params.deleted !== undefined) searchParams.append('deleted', String(params.deleted));
+        if (params.blocked !== undefined) searchParams.append('blocked', String(params.blocked));
+
+        const query = searchParams.toString();
+        const url = query ? `/category/admin/all?${query}` : '/category/admin/all';
 
         return http.get<PaginatedCategoriesResult>(url);
     }

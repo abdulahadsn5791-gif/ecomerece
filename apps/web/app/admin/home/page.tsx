@@ -1,6 +1,7 @@
 'use client';
 
-import { useGetHomeLayout, useThemeStore } from '@ecomerece/frontend';
+import { useGetHomeLayout } from '@ecomerece/frontend/home';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { motion } from 'framer-motion';
 import { HomeSkeleton } from './components/HomeSkeleton';
 import { HomeErrorState } from './components/HomeErrorState';

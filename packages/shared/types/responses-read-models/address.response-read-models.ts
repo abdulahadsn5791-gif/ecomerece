@@ -8,5 +8,5 @@ export interface AddressResponseReadModel {
     postalCode: string;
     country: string;
     fullAddress: string;
-    createdAt: NativeDate;
+    createdAt: Date;
 }

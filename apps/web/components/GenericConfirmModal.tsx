@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X, Loader2, Info, CheckCircle2, HelpCircle, AlertCircle } from 'lucide-react';
-import { parseModalError, ParsedFieldError, useThemeStore } from '@ecomerece/frontend';
+import { parseModalError, ParsedFieldError } from '@ecomerece/frontend/error';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 
 // ─── Variant Config ───────────────────────────────────────────────────────────
 

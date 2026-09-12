@@ -1,6 +1,6 @@
 "use client";
 
-import { useThemeStore } from "@ecomerece/frontend";
+import { useThemeStore } from "@ecomerece/frontend/theme";
 import type { HomeCategoryResponse } from "@ecomerece/shared";
 import { ArrowRight } from "lucide-react";
 import { DynamicIcon } from "@/lib/icons";

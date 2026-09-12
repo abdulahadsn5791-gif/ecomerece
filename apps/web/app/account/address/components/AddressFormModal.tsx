@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, AlertTriangle } from 'lucide-react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import type { createMyAddressDtoType } from '@ecomerece/shared';
 import MutationButton from '@/components/Mutationbutton';
 interface AddressFormModalProps {

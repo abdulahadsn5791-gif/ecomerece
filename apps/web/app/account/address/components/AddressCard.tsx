@@ -1,5 +1,5 @@
 import React from 'react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import type { AddressResponseReadModel } from '@ecomerece/shared';
 import { CheckCircle, MapPin, Pencil, Star, Trash2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';

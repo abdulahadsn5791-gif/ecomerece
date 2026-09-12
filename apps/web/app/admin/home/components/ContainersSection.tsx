@@ -1,10 +1,10 @@
 import {
   useAddProductContainer,
-  useGetPaginatedCategories,
-  useGetPaginatedVendors,
   useRemoveProductContainer,
   useUpdateProductContainer,
-} from '@ecomerece/frontend';
+} from '@ecomerece/frontend/home';
+import { useGetPaginatedCategories } from '@ecomerece/frontend/category';
+import { useGetPaginatedVendors } from '@ecomerece/frontend/vendor';
 import type {
   CreateProductContainerDtoType,
   DeleteProductContainerDtoType,

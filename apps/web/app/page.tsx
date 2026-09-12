@@ -1,6 +1,6 @@
 "use client"
 import { useState } from 'react';
-import { useGetHomeLayout } from '@ecomerece/frontend';
+import { useGetHomeLayout } from '@ecomerece/frontend/home';
 import HeroBanner from './client/home/components/HeroBanner';
 import FeaturesStrip from './client/home/components/FeaturesStrip';
 import Categories from './client/home/components/Categories';

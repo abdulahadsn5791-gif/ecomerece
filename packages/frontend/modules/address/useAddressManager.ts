@@ -11,7 +11,7 @@ import {
     useGetMyAddresses,
     useSetMyAddressAsDefault,
     useUpdateMyAddress,
-} from '@ecomerece/frontend';
+} from '@ecomerece/frontend/address';
 
 const INITIAL_ADDRESS_FORM: createMyAddressDtoType = {
     streetAddress: '',

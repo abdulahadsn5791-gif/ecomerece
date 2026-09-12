@@ -1,5 +1,5 @@
 import React from 'react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { Plus } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 

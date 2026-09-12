@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { useThemeStore } from "@ecomerece/frontend";
+import { useThemeStore } from "@ecomerece/frontend/theme";
 import type { HomeSlideResponse, HomePromoResponse } from "@ecomerece/shared";
 
 export default function HeroBanner({ slides, promos }: { slides: HomeSlideResponse[]; promos: HomePromoResponse[] }) {

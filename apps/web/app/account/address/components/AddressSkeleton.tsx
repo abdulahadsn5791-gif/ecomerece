@@ -1,5 +1,5 @@
 import React from 'react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 
 export default function AddressSkeleton() {
     const { darkMode } = useThemeStore();

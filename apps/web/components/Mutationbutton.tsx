@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 
 // ─── Type Definitions ─────────────────────────────────────────────────────────
 

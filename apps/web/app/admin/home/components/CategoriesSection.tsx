@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useThemeStore, useGetPaginatedCategories } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
+import { useGetPaginatedCategories } from '@ecomerece/frontend/category';
 import { Tag, Plus, Pencil, Trash2, GripVertical, Maximize2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
@@ -12,7 +13,7 @@ import {
   useAddCategory,
   useUpdateCategory,
   useRemoveCategory,
-} from '@ecomerece/frontend';
+} from '@ecomerece/frontend/home';
 import type {
   HomeCategoryResponse,
   CreateHomeCategoryDtoType,

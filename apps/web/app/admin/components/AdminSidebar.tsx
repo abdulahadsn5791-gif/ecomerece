@@ -1,6 +1,6 @@
 'use client';
 
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import {
   LayoutDashboard,
   ImageIcon,

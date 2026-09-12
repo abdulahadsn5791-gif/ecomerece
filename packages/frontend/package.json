@@ -19,6 +19,42 @@
             "web": "./adapters/storage/storage-adapter.web.ts",
             "react-native": "./adapters/storage/storage-adapter.native.ts",
             "default": "./adapters/storage/storage-adapter.web.ts"
+        },
+        "./theme": {
+            "types": "./services/theme.service.ts",
+            "default": "./services/theme.service.ts"
+        },
+        "./error": {
+            "types": "./services/parseModalError.service.ts",
+            "default": "./services/parseModalError.service.ts"
+        },
+        "./supabase": {
+            "types": "./services/supabaseClient.ts",
+            "default": "./services/supabaseClient.ts"
+        },
+        "./user": {
+            "types": "./modules/user/index.ts",
+            "default": "./modules/user/index.ts"
+        },
+        "./home": {
+            "types": "./modules/home/index.ts",
+            "default": "./modules/home/index.ts"
+        },
+        "./category": {
+            "types": "./modules/category/index.ts",
+            "default": "./modules/category/index.ts"
+        },
+        "./product": {
+            "types": "./modules/product/index.ts",
+            "default": "./modules/product/index.ts"
+        },
+        "./vendor": {
+            "types": "./modules/vendor/index.ts",
+            "default": "./modules/vendor/index.ts"
+        },
+        "./address": {
+            "types": "./modules/address/index.ts",
+            "default": "./modules/address/index.ts"
         }
     },
     "dependencies": {

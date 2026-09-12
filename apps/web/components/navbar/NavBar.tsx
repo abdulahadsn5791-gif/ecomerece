@@ -24,7 +24,8 @@ import {
     ChevronDown,
     LogIn,
 } from "lucide-react";
-import { useGetMe, useThemeStore } from "@ecomerece/frontend";
+import { useGetMe } from "@ecomerece/frontend/user";
+import { useThemeStore } from "@ecomerece/frontend/theme";
 import Link from "next/link";
 
 const accountItems = [

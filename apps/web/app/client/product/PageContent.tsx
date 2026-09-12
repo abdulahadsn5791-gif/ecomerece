@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useThemeStore } from "@ecomerece/frontend";
+import { useThemeStore } from "@ecomerece/frontend/theme";
 import {
     ShoppingCart,
     Heart,

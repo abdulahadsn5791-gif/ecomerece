@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { Sparkles, Plus, Pencil, Trash2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
@@ -9,7 +9,7 @@ import {
   useAddFeature,
   useUpdateFeature,
   useRemoveFeature,
-} from '@ecomerece/frontend';
+} from '@ecomerece/frontend/home';
 import type {
   HomeFeatureResponse,
   CreateFeatureDtoType,

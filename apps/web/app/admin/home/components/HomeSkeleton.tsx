@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import React from 'react';
 
 interface HomeSkeletonProps {

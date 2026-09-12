@@ -1,7 +1,8 @@
 "use client";
 
 import React from 'react';
-import { useProfileManager, useThemeStore } from '@ecomerece/frontend';
+import { useProfileManager } from '@ecomerece/frontend/user';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { motion } from 'framer-motion';
 import { ProfileSkeleton } from './ProfileSkeleton';
 import { ProfileErrorState } from './ProfileErrorState';

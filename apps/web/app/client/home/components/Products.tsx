@@ -1,6 +1,7 @@
 "use client";
 
-import { useThemeStore, useGetPaginatedProducts } from "@ecomerece/frontend";
+import { useThemeStore } from "@ecomerece/frontend/theme";
+import { useGetPaginatedProducts } from "@ecomerece/frontend/product";
 import type { HomeContainerResponse } from "@ecomerece/shared";
 import { ShoppingCart, ArrowRight, Sparkles, Star, Eye, Loader2 } from "lucide-react";
 import { useRef } from "react";

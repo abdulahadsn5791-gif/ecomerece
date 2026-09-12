@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { Layers, Plus, Pencil, Trash2, Maximize2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
@@ -9,7 +9,7 @@ import {
   useAddPromo,
   useUpdatePromo,
   useRemovePromo,
-} from '@ecomerece/frontend';
+} from '@ecomerece/frontend/home';
 import type {
   HomePromoResponse,
   CreatePromoDtoType,

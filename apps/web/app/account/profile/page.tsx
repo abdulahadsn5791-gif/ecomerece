@@ -1,6 +1,7 @@
 "use client";
 
-import { useProfileManager, useThemeStore } from '@ecomerece/frontend';
+import { useProfileManager } from '@ecomerece/frontend/user';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { motion } from 'framer-motion';
 import { ProfileSkeleton } from './components/ProfileSkeleton';
 import { ProfileErrorState } from './components/ProfileErrorState';

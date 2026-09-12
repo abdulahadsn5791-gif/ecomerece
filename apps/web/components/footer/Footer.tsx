@@ -1,7 +1,7 @@
 // components/Footer.tsx
 "use client";
 
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { Facebook, Instagram, Twitter, Linkedin, ArrowUpRight } from 'lucide-react';
 import React from 'react';
 

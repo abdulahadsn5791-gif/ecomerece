@@ -1,4 +1,4 @@
-import { useGetMe, useSoftDeleteMe } from '@ecomerece/frontend';
+import { useGetMe, useSoftDeleteMe } from '@ecomerece/frontend/user';
 
 export function useProfileManager() {
     const { data: user, isLoading, error, refetch, isFetching } = useGetMe();

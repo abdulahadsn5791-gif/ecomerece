@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import MutationButton from '@/components/Mutationbutton';
 import React from 'react';
 

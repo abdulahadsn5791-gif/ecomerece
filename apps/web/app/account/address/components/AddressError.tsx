@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Home } from 'lucide-react';
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import MutationButton from '@/components/Mutationbutton';
 
 interface AddressErrorStateProps {

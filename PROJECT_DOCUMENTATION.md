@@ -896,3 +896,4 @@ pm2 start ecosystem.config.js
 
 > [!WARNING]
 > `bun run lint:imports` is **broken** — it references the missing script `scripts/check-imports.ts`, so the architectural import-boundary validator is not currently runnable.
+Avoid adding unnecessary abstractions or changing the architecture merely to hide the problem. 

@@ -62,21 +62,21 @@ export function parseModalError(error: unknown): ParsedFieldError[] {
         if (Array.isArray(target)) {
             return target
                 .map(extractIssue)
-                .filter((item): item is ParsedFieldError => item !== null);
+                .filter((item: ParsedFieldError | null): item is ParsedFieldError => item !== null);
         }
 
         // ZodError instance (.issues)
         if (Array.isArray(target.issues)) {
             return target.issues
                 .map(extractIssue)
-                .filter((item): item is ParsedFieldError => item !== null);
+                .filter((item: ParsedFieldError | null): item is ParsedFieldError => item !== null);
         }
 
         // Server errors array (.errors)
         if (Array.isArray(target.errors)) {
             return target.errors
                 .map(extractIssue)
-                .filter((item): item is ParsedFieldError => item !== null);
+                .filter((item: ParsedFieldError | null): item is ParsedFieldError => item !== null);
         }
 
         // Standard object with message string (handles nested JSON message strings)

@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { supabase, useGetMe, useThemeStore } from '@ecomerece/frontend';
+import { supabase } from '@ecomerece/frontend/supabase';
+import { useGetMe } from '@ecomerece/frontend/user';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { useRouter } from 'next/navigation';
 
 

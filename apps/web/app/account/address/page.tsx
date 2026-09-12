@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useAddressManager, useThemeStore } from '@ecomerece/frontend';
+import { useAddressManager } from '@ecomerece/frontend/address';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import AddressHeader from './components/AddressHeader';
 import AddressList from './components/AddressList';
 import AddressFormModal from './components/AddressFormModal';

@@ -1,7 +1,7 @@
 // components/PromoBanner.tsx
 "use client";
 
-import { useThemeStore } from "@ecomerece/frontend";
+import { useThemeStore } from "@ecomerece/frontend/theme";
 import { ArrowRight, Sparkles, Timer } from "lucide-react";
 
 export default function PromoBanner() {

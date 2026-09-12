@@ -1,5 +1,5 @@
 'use client'
-import { useThemeStore } from '@ecomerece/frontend';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import React, { ReactNode } from 'react'
 
 function BgProvider({ children }: { children: ReactNode }) {

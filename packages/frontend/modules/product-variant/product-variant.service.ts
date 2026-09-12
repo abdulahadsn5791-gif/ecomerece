@@ -27,7 +27,7 @@ export type PaginatedVariantsResult = {
 
 export class ProductVariantService {
     getVariantsByProductId(productId: string): Promise<ProductVariantResponseReadModel[]> {
-        return http.get<ProductVariantResponseReadModel[]>(`/product-variants/${productId}`);
+        return http.get<ProductVariantResponseReadModel[]>(`/product-variant/${productId}`);
     }
 
     getAdminPaginatedVariants(
@@ -42,31 +42,31 @@ export class ProductVariantService {
         if (params.limit) searchParams.set('limit', String(params.limit));
         if (params.direction) searchParams.set('direction', params.direction);
         const qs = searchParams.toString();
-        return http.get<PaginatedVariantsResult>(`/product-variants/admin/all${qs ? `?${qs}` : ''}`);
+        return http.get<PaginatedVariantsResult>(`/product-variant/admin/all${qs ? `?${qs}` : ''}`);
     }
 
     createMyProductVariant(data: createMyProductVariantDtoType): Promise<ProductVariantMutationResult> {
-        return http.post<ProductVariantMutationResult>('/product-variants/my', data);
+        return http.post<ProductVariantMutationResult>('/product-variant/my', data);
     }
 
     updateMyVariantPrice(data: updateMyVariatPriceDtoType): Promise<ProductVariantMutationResult> {
-        return http.patch<ProductVariantMutationResult>('/product-variants/my/price', data);
+        return http.patch<ProductVariantMutationResult>('/product-variant/my/price', data);
     }
 
     updateMyVariantMeta(data: upadteMyVariantMetaDtoType): Promise<ProductVariantMutationResult> {
-        return http.patch<ProductVariantMutationResult>('/product-variants/my/meta', data);
+        return http.patch<ProductVariantMutationResult>('/product-variant/my/meta', data);
     }
 
     toggleMyVariantAppearance(data: toggleVariantApperaaracneDtoType): Promise<ProductVariantMutationResult> {
-        return http.patch<ProductVariantMutationResult>('/product-variants/my/appereance/toggle', data);
+        return http.patch<ProductVariantMutationResult>('/product-variant/my/appereance/toggle', data);
     }
 
     softDeleteMyVariant(data: softDeleteMyVariantDtoType): Promise<ProductVariantMutationResult> {
-        return http.delete<ProductVariantMutationResult>('/product-variants/my/delete/soft', data);
+        return http.delete<ProductVariantMutationResult>('/product-variant/my/delete/soft', data);
     }
 
     recoverVariant(id: string): Promise<ProductVariantMutationResult> {
-        return http.patch<ProductVariantMutationResult>(`/product-variants/recover/${id}`);
+        return http.patch<ProductVariantMutationResult>(`/product-variant/recover/${id}`);
     }
 }
 

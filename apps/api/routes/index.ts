@@ -6,6 +6,7 @@ import { OrderRoutes } from '../modules/order/presentation/order.routes';
 import { orderItemsRoutes } from '../modules/order-items/presentation/order-items.routes';
 import { productRoutes } from '../modules/product/presentation/product.routes';
 import { productVariantRoutes } from '../modules/product-variant/presentation/product-varaint.routes';
+import { reviewRoutes } from '../modules/reviews/presentation/review.routes';
 import usersRoutes from '../modules/user/presentation/user.routes';
 import vendorRoutes from '../modules/vendor/presentation/vendor.routes';
 import homeRoutes from '../modules/home/presentation/home.routes';
@@ -14,6 +15,7 @@ const routes = new Hono();
 
 routes.route('/product', productRoutes);
 routes.route('/product-variant', productVariantRoutes);
+routes.route('/review', reviewRoutes);
 routes.route('/product-inventory', inventoryRoutes);
 routes.route('/order', OrderRoutes);
 routes.route('/order-items', orderItemsRoutes);

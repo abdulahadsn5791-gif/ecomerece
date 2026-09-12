@@ -10,15 +10,19 @@ import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
 import { BaseService } from '../../../core/services/base.services';
 import { BadRequestError } from '../../../errors/app-error';
 import type { UserPersistence } from '../../user/infrastructure/user.models';
-import { GetVendorByUserIdQuery } from '../../vendor/application/queries/get-vendor-by-user-id.query';
 import { reviewMapper } from '../infrastructure/review.mapper';
 import type { ReviewRepository } from '../infrastructure/review.repository';
+import type { ReviewPersistence } from '../infrastructure/review.model';
 import { ReviewResponseReadModel } from '../../../../../packages/shared/types/responses-read-models/review.response-read-model';
-import { reviewMessages, ReviewMessagesType } from '../presentation/review.messages';
+import { reviewMessages, type ReviewMessagesType } from '../presentation/review.messages';
 import { PersonName } from '@ecomerece/domain';
 import { ReviewAggregate } from '@ecomerece/domain/modules/reviews/reviews.aggregate';
-import { createMyReviewDtoType } from '../../../../../packages/shared/request-dtos/review/create-my-review.dto';
-import { EnsureActiveOrderGetByIdHandler } from '../../order/application/query-handler/ensure-active-order-get-by-id.query-handler';
+import type {
+    createMyReviewDtoType,
+    GetPaginatedReviewsQueryDto,
+    GetAdminPaginatedReviewsQueryDto,
+} from '@ecomerece/shared';
+import type { FilterQuery } from 'mongoose';
 import { EnsureActiveOrderGetByIdQuery } from '../../order/application/queries/ensure-active-order-get-by-id.query';
 
 export class ReviewApplicationService extends BaseService {
@@ -40,13 +44,51 @@ export class ReviewApplicationService extends BaseService {
         const reviews = await this.reviewRepo.FindByProductId(pId);
         return reviews.map((review) => reviewMapper.aggregateToResponseReadModel(review));
     }
-    async queryReviews(data: get) {
+    // Public: non-deleted, non-blocked reviews — optionally filter by product / rating
+    async getPaginatedReviews(query: GetPaginatedReviewsQueryDto) {
+        const filter: FilterQuery<ReviewPersistence> = {
+            'deleted.deleted': false,
+            'block.blocked': false,
+        };
+        if (query.productId) filter.productId = Id.create(query.productId).value;
+        if (query.rating !== undefined) filter.rating = query.rating;
 
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+        const result = await this.reviewRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
 
-        if (data.cursor) cursor = Id.create(data.cursor);
-        if (data.limit) limit = Quantity.create(data.limit);
-        if (data.direction) direction = data.direction;
-        const categories = await this.reviewRepo.FindPaginated({});
+        return {
+            data: result.data.map((review) => reviewMapper.aggregateToReadModel(review)),
+            meta: result.meta,
+        };
+    }
+
+    // Admin: all reviews — no baseline restrictions, optional filters
+    async findAdminPaginatedReviews(query: GetAdminPaginatedReviewsQueryDto) {
+        const filter: FilterQuery<ReviewPersistence> = {};
+        if (query.productId) filter.productId = Id.create(query.productId).value;
+        if (query.authorId) filter.authorId = Id.create(query.authorId).value;
+        if (query.rating !== undefined) filter.rating = query.rating;
+        if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
+
+        const cursor = query.cursor ? Id.create(query.cursor) : undefined;
+        const limit = query.limit ? Quantity.create(query.limit) : undefined;
+        const result = await this.reviewRepo.FindPaginated({
+            filter,
+            cursor,
+            limit,
+            direction: query.direction,
+        });
+
+        return {
+            data: result.data.map((review) => reviewMapper.aggregateToReadModel(review)),
+            meta: result.meta,
+        };
     }
 
     async createReview(data: createMyReviewDtoType, actor: UserPersistence): Promise<ReviewMessagesType> {

@@ -1,5 +1,6 @@
 
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
+import type { FilterQuery } from 'mongoose';
 import { MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError } from '../../../errors/app-error';
 import { reviewMapper } from './review.mapper';
@@ -109,27 +110,29 @@ export class ReviewRepository
     }
 
     async FindPaginated(params: {
-        filter?: {};
+        filter?: FilterQuery<ReviewPersistence>;
         cursor?: Id;
         limit?: Quantity;
         direction?: 'next' | 'prev';
     }): Promise<{
-        data: any;
+        data: ReviewAggregate[];
         meta: {
             nextCursor: string | null;
             prevCursor: string | null;
             hasMore: boolean;
         };
     }> {
-        const info = {
+        const result = await this.paginateByCursor({
             filter: params.filter,
             cursor: params.cursor?.value,
             limit: params.limit?.value,
             direction: params.direction,
-        };
-        const result = await this.paginateByCursor(info);
+        });
+
         return {
-            data: result,
+            data: result.data.map((doc: ReviewPersistence) =>
+                reviewMapper.persistenceToAggregate(doc),
+            ),
             meta: result.meta,
         };
     }

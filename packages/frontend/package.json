@@ -55,6 +55,10 @@
         "./address": {
             "types": "./modules/address/index.ts",
             "default": "./modules/address/index.ts"
+        },
+        "./stats": {
+            "types": "./modules/stats/index.ts",
+            "default": "./modules/stats/index.ts"
         }
     },
     "dependencies": {

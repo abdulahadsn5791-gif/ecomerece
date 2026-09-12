@@ -108,6 +108,12 @@ export class VendorAppService extends BaseService {
         return VendorMapper.aggregateToResponseReadModel(vendor);
     }
 
+    async getMyVendor(actorId: Id): Promise<VendorResponseReadModel | null> {
+        const vendor = await this.vendorRepo.FindByOwnerId(actorId);
+        if (!vendor) return null;
+        return VendorMapper.aggregateToResponseReadModel(vendor);
+    }
+
     async findPaginatedVendors(query: GetPaginatedVendorsQueryDto) {
         // Public: non-deleted vendors only
         const filter: FilterQuery<VendorPersistence> = {

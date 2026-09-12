@@ -24,6 +24,10 @@ export class VendorService {
         return http.get<VendorResponseReadModel>(`/vendor/${id}`);
     }
 
+    getMyVendor(): Promise<VendorResponseReadModel> {
+        return http.get<VendorResponseReadModel>('/vendor/my');
+    }
+
     createMyVendor(data: CreateVendorDto): Promise<VendorMutationResult> {
         return http.post<VendorMutationResult>('/vendor/my', data);
     }

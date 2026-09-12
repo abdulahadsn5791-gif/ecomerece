@@ -33,6 +33,13 @@ export function useGetVendorById(vendorId: string) {
     });
 }
 
+export function useGetMyVendor() {
+    return useQuery({
+        queryKey: [...VENDOR_QUERY_KEY, 'my'],
+        queryFn: () => vendorService.getMyVendor(),
+    });
+}
+
 export function useGetPaginatedVendors(params: GetPaginatedVendorsQueryDto) {
     return useQuery({
         queryKey: [...VENDOR_QUERY_KEY, 'paginated', params],

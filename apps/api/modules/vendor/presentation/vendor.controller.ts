@@ -9,6 +9,7 @@ import {
     VendorParamDtoSchema,
     VerifyVendorDtoSchema,
 } from '@ecomerece/shared';
+import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import type { Context } from 'hono';
 import { BaseController } from '../../../core/controller/base.controller';
 import type { VendorAppService } from '../application/vendor.app.service';
@@ -17,6 +18,13 @@ export class VendorController extends BaseController<VendorAppService> {
     getVendorById = async (c: Context) => {
         const vendorId = this.param(c, 'id', VendorParamDtoSchema);
         return this.ok(c, await this.service.getVendorById(vendorId));
+    };
+
+    getMyVendor = async (c: Context) => {
+        const actor = c.get('user') as { _id: string };
+        const vendor = await this.service.getMyVendor(Id.create(actor._id));
+        if (!vendor) return this.notFound(c, 'No vendor found for this account');
+        return this.ok(c, vendor);
     };
 
     getPaginatedVendors = async (c: Context) => {

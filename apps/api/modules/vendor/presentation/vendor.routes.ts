@@ -7,6 +7,7 @@ const { vendorController } = CreateVendorModule();
 const vendorRoutes = new Hono();
 
 vendorRoutes.post('/my', authMiddleware, vendorController.createMyVendor);
+vendorRoutes.get('/my', authMiddleware, vendorController.getMyVendor);
 vendorRoutes.delete('/my', authMiddleware, vendorController.deleteMyVendor);
 vendorRoutes.delete('/soft', authMiddleware, adminMiddleware, vendorController.softDeleteVendor);
 vendorRoutes.patch('/recover', authMiddleware, adminMiddleware, vendorController.recoverVendor);

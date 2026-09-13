@@ -1,5 +1,10 @@
 import { buildMongoFilter } from '@ecomerece/domain';
-import type { AggregationLevel, EntityType, StatEvent } from '@ecomerece/shared';
+import {
+  type AggregationLevel,
+  type EntityType,
+  emptyMetrics,
+  type StatEvent,
+} from '@ecomerece/shared';
 import type { AnyBulkWriteOperation } from 'mongoose';
 import { type StatsDocument, StatsModel } from './StatsModel';
 
@@ -36,6 +41,42 @@ export class StatsRepository {
     if (operations.length === 0) return;
 
     // ordered: false so one bad op (e.g. a validation edge case) doesn't block the rest of the batch.
+    await StatsModel.bulkWrite(operations, { ordered: false });
+  }
+
+  /**
+   * Absolute overwrite (roll-up) of a set of stat slots. Unlike `bulkUpsert`
+   * (which `$inc`s), this `$set`s the full metric set, so re-running a
+   * denormalization/backfill never double counts. Values are idempotent.
+   */
+  async bulkSet(events: StatEvent[]): Promise<void> {
+    if (events.length === 0) return;
+
+    const operations: AnyBulkWriteOperation[] = [];
+
+    for (const event of events) {
+      const $set: Record<string, number> = {};
+      for (const [metric, value] of Object.entries({ ...emptyMetrics(), ...event.metrics })) {
+        $set[`metrics.${metric}`] = value;
+      }
+
+      operations.push({
+        updateOne: {
+          filter: buildMongoFilter(event),
+          update: {
+            $setOnInsert: {
+              entity: event.entity,
+              aggregation: event.aggregation,
+              dimensions: event.dimensions,
+            },
+            $set,
+          },
+          upsert: true,
+        },
+      });
+    }
+
+    if (operations.length === 0) return;
     await StatsModel.bulkWrite(operations, { ordered: false });
   }
 
@@ -221,6 +262,51 @@ export class StatsRepository {
       'entity.id': { $in: entityIds },
       aggregation: 'lifetime',
     }).lean();
+  }
+
+  /**
+   * Bucket-sum of stats for a subset of entities, grouped by a time dimension.
+   * Used to roll product-level series up into category-level series.
+   */
+  async getAggregateTimeSeriesForIds(
+    entityType: EntityType,
+    entityIds: string[],
+    aggregation: Extract<AggregationLevel, 'daily' | 'weekly' | 'monthly'>,
+    dimensionField: 'date' | 'week' | 'month',
+    from: string,
+    to: string,
+  ): Promise<{ key: string; metrics: Record<string, number> }[]> {
+    const sums = [
+      'views',
+      'clicks',
+      'purchases',
+      'revenue',
+      'quantity',
+      'addToCart',
+      'wishlist',
+      'refunds',
+      'refundAmount',
+    ] as const;
+
+    const rows = await StatsModel.aggregate<Record<string, number> & { _id: string }>([
+      {
+        $match: {
+          'entity.type': entityType,
+          'entity.id': { $in: entityIds },
+          aggregation,
+          [`dimensions.${dimensionField}`]: { $gte: from, $lte: to },
+        },
+      },
+      {
+        $group: {
+          _id: `$dimensions.${dimensionField}`,
+          ...Object.fromEntries(sums.map((field) => [field, { $sum: `$metrics.${field}` }])),
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return rows.map(({ _id, ...metrics }) => ({ key: _id, metrics }));
   }
 
   async getDocsBetween(

@@ -142,6 +142,7 @@ export const UserMapper = {
             role: user.role.role.value,
             isBlocked: user.block.blocked,
             isBanned: user.ban.isBan,
+            isDeleted: user.deleted.deleted,
             bannedUntil: user.ban.until?.value ?? null,
             lastLogin: user.lastLogin?.value ?? null,
             createdAt: user.createdAt.value,

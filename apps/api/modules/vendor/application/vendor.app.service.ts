@@ -101,13 +101,15 @@ export class VendorAppService extends BaseService {
   async getVendorById(id: string): Promise<VendorResponseReadModel> {
     const vendorId = Id.create(id);
     const vendor = await this.vendorRepo.FindByIdOrThrow(vendorId);
-    return VendorMapper.aggregateToResponseReadModel(vendor);
+    const stats = await this.vendorRepo.getStatsById(vendor.id);
+    return VendorMapper.aggregateToResponseReadModel(vendor, stats ?? undefined);
   }
 
   async getMyVendor(actorId: Id): Promise<VendorResponseReadModel | null> {
     const vendor = await this.vendorRepo.FindByOwnerId(actorId);
     if (!vendor) return null;
-    return VendorMapper.aggregateToResponseReadModel(vendor);
+    const stats = await this.vendorRepo.getStatsById(vendor.id);
+    return VendorMapper.aggregateToResponseReadModel(vendor, stats ?? undefined);
   }
 
   async findPaginatedVendors(query: GetPaginatedVendorsQueryDto) {
@@ -130,10 +132,13 @@ export class VendorAppService extends BaseService {
       collation: VENDOR_COLLATION,
     });
 
+    const statsByIds = await this.vendorRepo.getStatsByIds(result.data.map((v) => v.id));
+
     const data: VendorListItemReadModel[] = result.data.map((aggregate) => ({
       id: aggregate.id.value,
       title: aggregate.title.value,
       slug: aggregate.slug.value,
+      stats: statsByIds.get(aggregate.id.value),
     }));
 
     return {
@@ -162,10 +167,13 @@ export class VendorAppService extends BaseService {
       collation: VENDOR_COLLATION,
     });
 
+    const statsByIds = await this.vendorRepo.getStatsByIds(result.data.map((v) => v.id));
+
     const data: VendorListItemReadModel[] = result.data.map((aggregate) => ({
       id: aggregate.id.value,
       title: aggregate.title.value,
       slug: aggregate.slug.value,
+      stats: statsByIds.get(aggregate.id.value),
     }));
 
     return {
@@ -239,6 +247,7 @@ export class VendorAppService extends BaseService {
     vendor.setStatsRefreshEnabled(enabled);
     await this.vendorRepo.Save(vendor);
     await this.publishEvents(vendor);
-    return VendorMapper.aggregateToResponseReadModel(vendor);
+    const stats = await this.vendorRepo.getStatsById(vendor.id);
+    return VendorMapper.aggregateToResponseReadModel(vendor, stats ?? undefined);
   }
 }

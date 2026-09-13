@@ -66,6 +66,18 @@ export const updateProductStatsSettingsSchema = z.object({
     .max(24 * 28)
     .optional(),
   autoDenormalizeEnabled: z.coerce.boolean().optional(),
+  /**
+   * Worst-case staleness ceiling. Even if `intervalHours` is set much larger,
+   * a full denormalization runs at least every `maxStalenessHours` so the
+   * dashboards never show old data (default 24h).
+   */
+  maxStalenessHours: z.coerce
+    .number()
+    .min(1)
+    .max(24 * 28)
+    .optional(),
+  /** Number of force-refreshes each vendor may trigger per month. */
+  vendorForceRefreshQuota: z.coerce.number().min(0).max(1000).optional(),
 });
 
 export type UpdateProductStatsSettingsDto = z.infer<typeof updateProductStatsSettingsSchema>;

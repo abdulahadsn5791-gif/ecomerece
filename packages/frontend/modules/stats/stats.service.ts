@@ -79,10 +79,36 @@ export interface ProductStatsOverviewResponse {
   overview: ProductStatsOverview;
 }
 
+export interface CategoryStatsOverviewResponse {
+  entityType: 'category';
+  entityId: string;
+  overview: ProductStatsOverview;
+}
+
+export interface VendorStatsOverviewResponse {
+  entityType: 'vendor';
+  entityId: string;
+  overview: ProductStatsOverview;
+}
+
+export interface VendorForceRefreshUsage {
+  quota: number;
+  used: number;
+  remaining: number;
+}
+
+export interface VendorForceRefreshResult {
+  accepted: boolean;
+  used: number;
+  remaining: number;
+}
+
 export interface StatsSyncSettings {
   intervalHours: number;
   lastRun: number | null;
   autoDenormalizeEnabled: boolean;
+  maxStalenessHours: number;
+  vendorForceRefreshQuota: number;
 }
 
 export class StatsService {
@@ -129,6 +155,30 @@ export class StatsService {
     return http.get(`/stats/product/${productId}/overview?months=${months}&days=${days}`);
   }
 
+  getCategoryStatsOverview(
+    categoryId: string,
+    months = 12,
+    days = 30,
+  ): Promise<CategoryStatsOverviewResponse> {
+    return http.get(`/stats/category/${categoryId}/overview?months=${months}&days=${days}`);
+  }
+
+  getVendorStatsOverview(
+    vendorId: string,
+    months = 12,
+    days = 30,
+  ): Promise<VendorStatsOverviewResponse> {
+    return http.get(`/stats/vendor/${vendorId}/overview?months=${months}&days=${days}`);
+  }
+
+  getVendorForceRefreshUsage(): Promise<VendorForceRefreshUsage> {
+    return http.get('/stats/vendor/force-update/usage');
+  }
+
+  forceRefreshVendorStats(): Promise<VendorForceRefreshResult> {
+    return http.post('/stats/vendor/force-update', {});
+  }
+
   getAggregate(
     entityType: EntityType,
     params: { aggregation?: AggregationLevel; ids?: string[] } = {},
@@ -159,6 +209,8 @@ export class StatsService {
   updateSyncSettings(input: {
     intervalHours?: number;
     autoDenormalizeEnabled?: boolean;
+    maxStalenessHours?: number;
+    vendorForceRefreshQuota?: number;
   }): Promise<StatsSyncSettings> {
     return http.patch('/stats/settings', input);
   }

@@ -60,6 +60,33 @@ statsRouter.get(
 );
 
 statsRouter.get(
+  '/category/:entityId/overview',
+  authMiddleware,
+  adminMiddleware,
+  statsController.getCategoryStatsOverview,
+);
+
+statsRouter.get(
+  '/vendor/:entityId/overview',
+  authMiddleware,
+  createStatsAccessGuardMiddleware({
+    mode: 'mask',
+    vendorOnly: true,
+    entityIdParam: 'entityId',
+  }),
+  statsController.getVendorStatsOverview,
+);
+
+// Vendor-triggered force refresh (quota-limited). Only refreshes this vendor's
+// data — products, vendor roll-up, and the categories it sells in.
+statsRouter.get(
+  '/vendor/force-update/usage',
+  authMiddleware,
+  statsController.getVendorForceRefreshUsage,
+);
+statsRouter.post('/vendor/force-update', authMiddleware, statsController.forceRefreshMyVendorStats);
+
+statsRouter.get(
   '/:entityType/:entityId/lifetime',
   createStatsAccessGuardMiddleware({
     mode: 'mask',

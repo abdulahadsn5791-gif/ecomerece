@@ -1,4 +1,10 @@
-import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import {
+    useQuery,
+    useMutation,
+    useInfiniteQuery,
+    useQueryClient,
+    type QueryClient,
+} from '@tanstack/react-query';
 import { userService, type UserMutationResult } from './user.service';
 import {
     BanUserDTOSchema,
@@ -18,6 +24,7 @@ import {
     type GetPaginatedUsersQueryDto,
     type UserResponseReadModel,
     type UserRoleDto,
+    type UserRolesType,
 } from '@ecomerece/shared';
 
 export const USER_QUERY_KEY = ['users'];
@@ -53,6 +60,33 @@ export function useGetAdminPaginatedUsers(params: GetAdminPaginatedUsersQueryDto
         queryKey: [...USER_QUERY_KEY, 'admin-paginated', params],
         queryFn: () =>
             userService.getAdminPaginatedUsers(getAdminPaginatedUsersQuerySchema.parse(params)),
+    });
+}
+
+export interface AdminUsersInfiniteFilters {
+    search?: string;
+    role?: UserRolesType;
+    deleted?: boolean;
+    blocked?: boolean;
+    banned?: boolean;
+    limit?: number;
+}
+
+/** Infinite-scroll feed for the admin users page. Cursor-based (`nextCursor`). */
+export function useGetAdminUsersInfinite(filters: AdminUsersInfiniteFilters = {}) {
+    const { limit = 30, ...rest } = filters;
+    return useInfiniteQuery({
+        queryKey: [...USER_QUERY_KEY, 'admin-infinite', filters],
+        initialPageParam: undefined as string | undefined,
+        queryFn: ({ pageParam }) =>
+            userService.getAdminPaginatedUsers({
+                ...rest,
+                limit,
+                cursor: pageParam,
+                direction: 'next',
+            }),
+        getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
+        staleTime: 1000 * 60,
     });
 }
 

@@ -128,8 +128,9 @@ export class StatsQueryService {
     return statsRepository.getAggregateTimeSeries(entityType, aggregation, from, to);
   }
 
-  async getProductOverview(
-    productId: string,
+  async getEntityOverview(
+    entityType: EntityType,
+    entityId: string,
     months = 12,
     days = 30,
   ): Promise<ProductStatsOverview> {
@@ -139,31 +140,33 @@ export class StatsQueryService {
 
     const [lifetime, today, thisWeek, thisMonth, yearDocs, monthlyDocs, dailyDocs] =
       await Promise.all([
-        statsRepository.getEntityStats('product', productId, 'lifetime'),
-        statsRepository.getEntityStats('product', productId, 'daily', { 'dimensions.date': date }),
-        statsRepository.getEntityStats('product', productId, 'weekly', { 'dimensions.week': week }),
-        statsRepository.getEntityStats('product', productId, 'monthly', {
+        statsRepository.getEntityStats(entityType, entityId, 'lifetime'),
+        statsRepository.getEntityStats(entityType, entityId, 'daily', { 'dimensions.date': date }),
+        statsRepository.getEntityStats(entityType, entityId, 'weekly', {
+          'dimensions.week': week,
+        }),
+        statsRepository.getEntityStats(entityType, entityId, 'monthly', {
           'dimensions.month': month,
         }),
         statsRepository.getDocsBetween(
-          'product',
-          productId,
+          entityType,
+          entityId,
           'monthly',
           'month',
           `${year}-01`,
           `${year}-12`,
         ),
         statsRepository.getDocsBetween(
-          'product',
-          productId,
+          entityType,
+          entityId,
           'monthly',
           'month',
           backMonths(months, month)[0],
           month,
         ),
         statsRepository.getDocsBetween(
-          'product',
-          productId,
+          entityType,
+          entityId,
           'daily',
           'date',
           backDays(days, date)[0],

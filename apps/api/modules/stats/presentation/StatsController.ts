@@ -1,4 +1,4 @@
-import { getISOWeek, getTimeWindows } from '@ecomerece/domain';
+import { getISOWeek, getTimeWindows, Id } from '@ecomerece/domain';
 import {
   type AggregationLevel,
   type EntityType,
@@ -11,11 +11,15 @@ import {
 } from '@ecomerece/shared';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import { queryBus } from '../../../core/infrastructure/buses/in-memory-query-bus';
 import type { ViewEntityType } from '../../../middleware/statsViewGuard';
+import { GetVendorByUserIdQuery } from '../../vendor/application/queries/get-vendor-by-user-id.query';
+import { requestVendorStatsForceRefresh } from '../application/event-handlers/vendor-stats-force-refresh.handler';
 import { triggerProductStatsDenormalization } from '../application/ProductStatsSyncScheduler';
 import { statsBufferService } from '../application/StatsBufferService';
 import { statsQueryService } from '../application/StatsQueryService';
 import { statsSyncSettingsService } from '../application/StatsSyncSettingsService';
+import { vendorForceRefreshQuotaService } from '../application/VendorForceRefreshQuotaService';
 
 function shiftDateKeys(count: number, fromKey: string): string[] {
   const [y, m, d] = fromKey.split('-').map(Number);
@@ -140,16 +144,89 @@ export class StatsController {
 
   public getProductStatsOverview = async (c: Context) => {
     const productId = this.requireParam(c, 'entityId');
+    const overview = await this.getEntityOverview(c, 'product', productId);
+    return c.json({ entityType: 'product', entityId: productId, overview });
+  };
+
+  public getCategoryStatsOverview = async (c: Context) => {
+    const categoryId = this.requireParam(c, 'entityId');
+    const overview = await this.getEntityOverview(c, 'category', categoryId);
+    return c.json({ entityType: 'category', entityId: categoryId, overview });
+  };
+
+  public getVendorStatsOverview = async (c: Context) => {
+    const vendorId = this.requireParam(c, 'entityId');
+    const overview = await this.getEntityOverview(c, 'vendor', vendorId);
+
+    // Non-owners (and anonymous) get revenue figures masked; owners/admins see full.
+    if (!c.get('statsFullAccess')) {
+      overview.lifetime = this.maskFinancialMetrics(overview.lifetime);
+      overview.today = this.maskFinancialMetrics(overview.today);
+      overview.thisWeek = this.maskFinancialMetrics(overview.thisWeek);
+      overview.thisMonth = this.maskFinancialMetrics(overview.thisMonth);
+      overview.thisYear = this.maskFinancialMetrics(overview.thisYear);
+      overview.monthlySeries = overview.monthlySeries.map((point) => ({
+        ...point,
+        metrics: this.maskFinancialMetrics(point.metrics),
+      }));
+      overview.dailySeries = overview.dailySeries.map((point) => ({
+        ...point,
+        metrics: this.maskFinancialMetrics(point.metrics),
+      }));
+    }
+
+    return c.json({ entityType: 'vendor', entityId: vendorId, overview });
+  };
+
+  public getVendorForceRefreshUsage = async (c: Context) => {
+    const vendor = await this.resolveMyVendor(c);
+    if (!vendor) throw new HTTPException(404, { message: 'Vendor not found' });
+
+    const quota = await vendorForceRefreshQuotaService.getQuota();
+    const used = await vendorForceRefreshQuotaService.getUsage(vendor.id);
+    return c.json({ success: true, data: { quota, used, remaining: Math.max(quota - used, 0) } });
+  };
+
+  public forceRefreshMyVendorStats = async (c: Context) => {
+    const vendor = await this.resolveMyVendor(c);
+    if (!vendor) throw new HTTPException(404, { message: 'Vendor not found' });
+
+    const result = await requestVendorStatsForceRefresh(vendor.id);
+
+    if (!result.accepted) {
+      return c.json(
+        {
+          success: false,
+          data: { accepted: false, used: result.used, remaining: 0 },
+          message: 'Force-refresh quota exhausted for this month.',
+        },
+        429,
+      );
+    }
+
+    return c.json({
+      success: true,
+      data: { accepted: true, used: result.used, remaining: result.remaining },
+    });
+  };
+
+  private async resolveMyVendor(c: Context) {
+    const userId = c.get('userId') as string | undefined;
+    if (!userId) throw new HTTPException(401, { message: 'Authentication required' });
+    return queryBus.execute(new GetVendorByUserIdQuery({ userId: Id.create(userId) }));
+  }
+
+  private async getEntityOverview(c: Context, entityType: EntityType, entityId: string) {
     const parsed = getProductStatsOverviewQuerySchema.safeParse(c.req.query());
     if (!parsed.success) throw new HTTPException(400, { message: 'Invalid overview query params' });
 
-    const overview = await statsQueryService.getProductOverview(
-      productId,
+    return statsQueryService.getEntityOverview(
+      entityType,
+      entityId,
       parsed.data.months,
       parsed.data.days,
     );
-    return c.json({ entityType: 'product', entityId: productId, overview });
-  };
+  }
 
   public getPaginatedEntityStats = async (c: Context) => {
     const raw = { ...c.req.query(), entityType: c.req.param('entityType') };

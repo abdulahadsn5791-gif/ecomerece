@@ -24,7 +24,7 @@ import {
 } from '@ecomerece/domain/value-objects/street-address.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
 import { UrlVO } from '@ecomerece/domain/value-objects/url.vo';
-import type { VendorResponseReadModel } from '@ecomerece/shared';
+import type { Metrics, VendorResponseReadModel } from '@ecomerece/shared';
 import type { VendorPersistenceWithId } from './vendor.models';
 
 export const VendorMapper = {
@@ -168,12 +168,13 @@ export const VendorMapper = {
         verifiedAt: doc.verification.verifiedAt ?? null,
         rejectedReason: doc.verification.rejectedReason ?? null,
       },
+      stats: (doc.stats ?? {}) as Metrics,
       statsRefreshEnabled: doc.statsRefreshEnabled ?? true,
       isDeleted: doc.deleted.deleted,
     };
   },
 
-  aggregateToResponseReadModel(vendor: VendorAggregate): VendorResponseReadModel {
+  aggregateToResponseReadModel(vendor: VendorAggregate, stats?: Metrics): VendorResponseReadModel {
     return {
       id: vendor.id.value,
       ownerId: vendor.ownerId.value,
@@ -201,6 +202,7 @@ export const VendorMapper = {
         verifiedAt: vendor.verification.verifiedAt?.value ?? null,
         rejectedReason: vendor.verification.rejectedReason?.value ?? null,
       },
+      stats,
       statsRefreshEnabled: vendor.statsRefreshEnabled,
     };
   },

@@ -74,11 +74,16 @@ export function useGetAdminPaginatedProducts(params: {
   limit?: number;
   direction?: 'next' | 'prev';
   sort?: ProductAdminSort;
+  enabled?: boolean;
 }) {
+  const { enabled = true, ...queryParams } = params;
   return useQuery({
-    queryKey: [...PRODUCT_QUERY_KEY, 'admin-paginated', params],
+    queryKey: [...PRODUCT_QUERY_KEY, 'admin-paginated', queryParams],
     queryFn: () =>
-      productService.getAdminPaginatedProducts(getAdminPaginatedProductsQuerySchema.parse(params)),
+      productService.getAdminPaginatedProducts(
+        getAdminPaginatedProductsQuerySchema.parse(queryParams),
+      ),
+    enabled,
   });
 }
 

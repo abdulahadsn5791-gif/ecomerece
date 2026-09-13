@@ -67,6 +67,58 @@ export function useGetProductStatsOverview(
   });
 }
 
+export function useGetCategoryStatsOverview(
+  categoryId: string,
+  options: { months?: number; days?: number; enabled?: boolean } = {},
+) {
+  const { months = 12, days = 30, enabled = true } = options;
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, 'category', categoryId, 'overview', months, days],
+    queryFn: () => statsService.getCategoryStatsOverview(categoryId, months, days),
+    enabled: Boolean(categoryId) && enabled,
+  });
+}
+
+export function useGetVendorStatsOverview(
+  vendorId: string,
+  options: { months?: number; days?: number; enabled?: boolean } = {},
+) {
+  const { months = 12, days = 30, enabled = true } = options;
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, 'vendor', vendorId, 'overview', months, days],
+    queryFn: () => statsService.getVendorStatsOverview(vendorId, months, days),
+    enabled: Boolean(vendorId) && enabled,
+  });
+}
+
+export function useGetVendorForceRefreshUsage() {
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, 'vendor', 'force-update', 'usage'],
+    queryFn: () => statsService.getVendorForceRefreshUsage(),
+  });
+}
+
+export function useVendorForceRefresh() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => statsService.forceRefreshVendorStats(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...STATS_QUERY_KEY, 'vendor'] });
+      queryClient.invalidateQueries({ queryKey: [...STATS_QUERY_KEY, 'sync-settings'] });
+    },
+  });
+}
+
+export function useGetPaginatedCategoryStats(
+  params: { metric?: string; sort?: 'desc' | 'asc'; cursor?: string; limit?: number } = {},
+) {
+  return useQuery({
+    queryKey: [...STATS_QUERY_KEY, 'category', 'paginated', params],
+    queryFn: () =>
+      statsService.getPaginatedStats('category', { aggregation: 'lifetime', ...params }),
+  });
+}
+
 export function useGetStatsAggregate(
   entityType: EntityType,
   params: { aggregation?: AggregationLevel; ids?: string[] } = {},
@@ -99,8 +151,12 @@ export function useGetStatsSyncSettings() {
 export function useUpdateStatsSyncSettings() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: { intervalHours?: number; autoDenormalizeEnabled?: boolean }) =>
-      statsService.updateSyncSettings(input),
+    mutationFn: (input: {
+      intervalHours?: number;
+      autoDenormalizeEnabled?: boolean;
+      maxStalenessHours?: number;
+      vendorForceRefreshQuota?: number;
+    }) => statsService.updateSyncSettings(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...STATS_QUERY_KEY, 'sync-settings'] });
     },

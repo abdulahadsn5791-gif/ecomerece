@@ -1,62 +1,61 @@
-import { BadRequestError } from "../../../../../apps/api/errors/app-error";
-import { EffectiveDate, Reason } from "../../../value-objects";
-
+import { BadRequestError } from '../../../../../apps/api/errors/app-error';
+import type { EffectiveDate, Reason } from '../../../value-objects';
 
 export class VerificationInfoVO {
-    private constructor(
-        readonly isVerified: boolean,
-        readonly verifiedAt: EffectiveDate | null,
-        readonly rejectedReason: Reason | null,
-    ) { }
+  private constructor(
+    readonly isVerified: boolean,
+    readonly verifiedAt: EffectiveDate | null,
+    readonly rejectedReason: Reason | null,
+  ) {}
 
-    static verified(verifiedAt: EffectiveDate): VerificationInfoVO {
-        return new VerificationInfoVO(true, verifiedAt, null);
+  static verified(verifiedAt: EffectiveDate): VerificationInfoVO {
+    return new VerificationInfoVO(true, verifiedAt, null);
+  }
+
+  static rejected(reason: Reason): VerificationInfoVO {
+    return new VerificationInfoVO(false, null, reason);
+  }
+
+  static pending(): VerificationInfoVO {
+    return new VerificationInfoVO(false, null, null);
+  }
+
+  verify(verifiedAt: EffectiveDate): VerificationInfoVO {
+    if (this.isVerified) {
+      throw new BadRequestError('User is already verified.');
     }
 
-    static rejected(reason: Reason): VerificationInfoVO {
-        return new VerificationInfoVO(false, null, reason);
+    return new VerificationInfoVO(true, verifiedAt, null);
+  }
+
+  reject(reason: Reason): VerificationInfoVO {
+    if (!this.isVerified) {
+      throw new BadRequestError('This vendor has not been verified yet.');
     }
 
-    static pending(): VerificationInfoVO {
-        return new VerificationInfoVO(false, null, null);
-    }
+    return new VerificationInfoVO(false, null, reason);
+  }
 
-    verify(verifiedAt: EffectiveDate): VerificationInfoVO {
-        if (this.isVerified) {
-            throw new BadRequestError('User is already verified.');
-        }
+  reset(): VerificationInfoVO {
+    return VerificationInfoVO.pending();
+  }
+  static none() {
+    return new VerificationInfoVO(false, null, null);
+  }
 
-        return new VerificationInfoVO(true, verifiedAt, null);
-    }
+  static rehydrate(
+    isVerified: boolean,
+    verifiedAt: EffectiveDate | null,
+    rejectedReason: Reason | null,
+  ): VerificationInfoVO {
+    return new VerificationInfoVO(isVerified, verifiedAt, rejectedReason);
+  }
 
-    reject(reason: Reason): VerificationInfoVO {
-        if (!this.isVerified) {
-            throw new BadRequestError('This vendor has not been verified yet.');
-        }
+  get isPending(): boolean {
+    return !this.isVerified && this.verifiedAt === null && this.rejectedReason === null;
+  }
 
-        return new VerificationInfoVO(false, null, reason);
-    }
-
-    reset(): VerificationInfoVO {
-        return VerificationInfoVO.pending();
-    }
-    static none() {
-        return new VerificationInfoVO(false, null, null);
-    }
-
-    static rehydrate(
-        isVerified: boolean,
-        verifiedAt: EffectiveDate | null,
-        rejectedReason: Reason | null,
-    ): VerificationInfoVO {
-        return new VerificationInfoVO(isVerified, verifiedAt, rejectedReason);
-    }
-
-    get isPending(): boolean {
-        return !this.isVerified && this.verifiedAt === null && this.rejectedReason === null;
-    }
-
-    get isRejected(): boolean {
-        return !this.isVerified && this.rejectedReason !== null;
-    }
+  get isRejected(): boolean {
+    return !this.isVerified && this.rejectedReason !== null;
+  }
 }

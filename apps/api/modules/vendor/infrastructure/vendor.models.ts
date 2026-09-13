@@ -1,4 +1,12 @@
+import { METRIC_FIELDS } from '@ecomerece/shared';
 import mongoose, { type HydratedDocument, type InferSchemaType, Schema } from 'mongoose';
+
+const statFieldsSchemaDef = METRIC_FIELDS.reduce<Record<string, unknown>>((acc, field) => {
+  acc[field] = { type: Number, default: 0 };
+  return acc;
+}, {});
+
+const statsSchema = new Schema(statFieldsSchemaDef, { _id: false, minimize: false });
 
 const deletedSchema = new Schema(
   {
@@ -100,6 +108,20 @@ export const VendorSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    stats: {
+      type: statsSchema,
+      default: () => ({
+        views: 0,
+        clicks: 0,
+        purchases: 0,
+        revenue: 0,
+        quantity: 0,
+        addToCart: 0,
+        wishlist: 0,
+        refunds: 0,
+        refundAmount: 0,
+      }),
+    },
     deleted: {
       type: deletedSchema,
       required: true,
@@ -117,6 +139,11 @@ export const VendorSchema = new Schema(
 );
 
 VendorSchema.index({ title: 1 }, { collation: { locale: 'en', strength: 2 } });
+
+// Read-path indexes for denormalized metric sorting (admin vendor rankings).
+for (const metric of ['quantity', 'revenue', 'purchases', 'views']) {
+  VendorSchema.index({ [`stats.${metric}`]: -1 }, { name: `by_vendor_stats_${metric}` });
+}
 
 export type VendorPersistence = InferSchemaType<typeof VendorSchema>;
 export type VendorPersistenceWithId = VendorPersistence & {

@@ -1,11 +1,16 @@
 'use client';
 
 import { useGetMyPaginatedProducts } from '@ecomerece/frontend/product';
-import { useGetVendorTimeSeries } from '@ecomerece/frontend/stats';
+import {
+  useGetVendorForceRefreshUsage,
+  useGetVendorStatsOverview,
+  useGetVendorTimeSeries,
+  useVendorForceRefresh,
+} from '@ecomerece/frontend/stats';
 import { useThemeStore } from '@ecomerece/frontend/theme';
-import { useGetMyVendor, useUpdateMyStatsRefresh } from '@ecomerece/frontend/vendor';
+import { useGetMyVendor } from '@ecomerece/frontend/vendor';
 import { motion } from 'framer-motion';
-import { Boxes, DollarSign, MousePointerClick, ShoppingCart, Store } from 'lucide-react';
+import { Boxes, DollarSign, MousePointerClick, RefreshCw, ShoppingCart, Store } from 'lucide-react';
 import { useMemo } from 'react';
 import { fmtCurrency, fmtNumber } from '@/components/stats-page/format';
 import { MetricTile } from '@/components/stats-page/MetricTile';
@@ -21,7 +26,12 @@ function toUtcDateStr(d: Date): string {
 export default function VendorProductsStatsPage() {
   const { darkMode } = useThemeStore();
   const { data: vendor, isLoading: vendorLoading, error } = useGetMyVendor();
-  const updateRefresh = useUpdateMyStatsRefresh();
+  const { data: overview, isLoading: overviewLoading } = useGetVendorStatsOverview(
+    vendor?.id ?? '',
+    { enabled: Boolean(vendor?.id) },
+  );
+  const { data: quota } = useGetVendorForceRefreshUsage();
+  const forceRefresh = useVendorForceRefresh();
 
   const { data: productsResult, isLoading: productsLoading } = useGetMyPaginatedProducts({
     sort: 'most_revenue',
@@ -50,19 +60,8 @@ export default function VendorProductsStatsPage() {
     [timeseries.data],
   );
 
-  const aggregate = useMemo(
-    () =>
-      products.reduce(
-        (acc, p) => ({
-          revenue: acc.revenue + (p.stats?.revenue ?? 0),
-          quantity: acc.quantity + (p.stats?.quantity ?? 0),
-          purchases: acc.purchases + (p.stats?.purchases ?? 0),
-          views: acc.views + (p.stats?.views ?? 0),
-        }),
-        { revenue: 0, quantity: 0, purchases: 0, views: 0 },
-      ),
-    [products],
-  );
+  const lifetime = overview?.overview?.lifetime ?? {};
+  const today = overview?.overview?.today ?? {};
 
   const isNotFound =
     error && typeof error === 'object' && (error as { status?: number }).status === 404;
@@ -77,7 +76,7 @@ export default function VendorProductsStatsPage() {
     );
   }
 
-  if (vendorLoading || productsLoading) {
+  if (vendorLoading || productsLoading || overviewLoading) {
     return <StatsPageSkeleton />;
   }
 
@@ -91,30 +90,44 @@ export default function VendorProductsStatsPage() {
     );
   }
 
-  const toggleRefresh = () => {
-    if (!vendor) return;
-    updateRefresh.mutate({ enabled: !vendor.statsRefreshEnabled });
+  const remaining = quota?.remaining ?? 0;
+  const quotaExhausted = remaining <= 0;
+
+  const runForceRefresh = () => {
+    if (!vendor || forceRefresh.isPending) return;
+    forceRefresh.mutate();
   };
 
   const tiles = [
     {
       label: 'Revenue',
-      value: fmtCurrency(aggregate.revenue),
+      value: fmtCurrency(lifetime.revenue ?? 0),
       icon: DollarSign,
-      helper: `${products.length} products`,
+      helper: 'lifetime',
     },
-    { label: 'Units', value: fmtNumber(aggregate.quantity), icon: Boxes, helper: 'lifetime' },
+    {
+      label: 'Units',
+      value: fmtNumber(lifetime.quantity ?? 0),
+      icon: Boxes,
+      helper: 'lifetime',
+    },
     {
       label: 'Purchases',
-      value: fmtNumber(aggregate.purchases),
+      value: fmtNumber(lifetime.purchases ?? 0),
       icon: ShoppingCart,
       helper: 'lifetime',
     },
     {
       label: 'Views',
-      value: fmtNumber(aggregate.views),
+      value: fmtNumber(lifetime.views ?? 0),
       icon: MousePointerClick,
       helper: 'lifetime',
+    },
+    {
+      label: "Today's revenue",
+      value: fmtCurrency(today.revenue ?? 0),
+      icon: DollarSign,
+      helper: 'auto-synced daily',
     },
   ];
 
@@ -135,17 +148,31 @@ export default function VendorProductsStatsPage() {
             </p>
           </div>
 
-          <label className="flex items-center gap-2 text-sm px-4 py-2 rounded-xl cursor-pointer bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-            <input
-              type="checkbox"
-              checked={vendor?.statsRefreshEnabled ?? true}
-              onChange={toggleRefresh}
-              disabled={updateRefresh.isPending}
-              className="accent-emerald-500"
-            />
-            Auto-refresh stats
-          </label>
+          <button
+            type="button"
+            onClick={runForceRefresh}
+            disabled={forceRefresh.isPending || quotaExhausted}
+            className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-xl font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-500"
+          >
+            <RefreshCw className={`w-4 h-4 ${forceRefresh.isPending ? 'animate-spin' : ''}`} />
+            {forceRefresh.isPending
+              ? 'Refreshing…'
+              : quotaExhausted
+                ? 'Refresh quota used'
+                : `Refresh stats now (${remaining} left)`}
+          </button>
         </div>
+
+        {(forceRefresh.isError && (
+          <p className="mt-3 text-xs text-rose-500">
+            Refresh failed. Quota may be exhausted for this month — try again later.
+          </p>
+        )) ||
+          (forceRefresh.isSuccess && (
+            <p className="mt-3 text-xs text-emerald-500">
+              Stats refreshed. Remaining refreshes this month: {forceRefresh.data?.remaining ?? 0}
+            </p>
+          ))}
       </motion.div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">

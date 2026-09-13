@@ -2,6 +2,7 @@ import { ProductStatsDenormalizationRequestedEvent } from '@ecomerece/domain';
 import { eventBus } from '../../../core/infrastructure/buses/in-memory-event-bus';
 import { redis } from '../../../lib/redis';
 import { statsSyncSettingsService } from './StatsSyncSettingsService';
+import { effectiveSyncIntervalMs } from './stats-sync-interval';
 
 const KEY_LOCK = 'stats:product:sync_lock';
 const DEFAULT_TICK_MS = 60_000;
@@ -10,6 +11,10 @@ const DEFAULT_TICK_MS = 60_000;
  * Scheduler only *publishes* a denormalization event when work is due — it never
  * touches products or stats directly. All denormalization work happens in the
  * event handler, so a manual admin "data correction" can reuse the same pipeline.
+ *
+ * The effective cadence is `min(intervalHours, maxStalenessHours)` — a 24h
+ * staleness backstop guarantees dashboards refresh even if the configured
+ * interval is much longer (e.g. 7+ days).
  */
 export class ProductStatsSyncScheduler {
   private timer: NodeJS.Timeout | null = null;
@@ -29,12 +34,12 @@ export class ProductStatsSyncScheduler {
 
   private async tick(): Promise<void> {
     try {
-      const { intervalHours, lastRun, autoDenormalizeEnabled } =
+      const { intervalHours, lastRun, autoDenormalizeEnabled, maxStalenessHours } =
         await statsSyncSettingsService.getSettings();
       if (!autoDenormalizeEnabled) return;
 
       const now = Date.now();
-      const intervalMs = intervalHours * 3_600_000;
+      const intervalMs = effectiveSyncIntervalMs(intervalHours, maxStalenessHours);
       if (lastRun && now - lastRun < intervalMs) return;
 
       const acquired = await redis.set(KEY_LOCK, String(now), {

@@ -8,12 +8,14 @@ import { statsRepository } from '../../infrastructure/StatsRepository';
 /**
  * Event-driven denormalization of lifetime metrics onto product documents so the
  * product read path (listings, top-products) never joins against the raw stats
- * collection. Vendors are processed one-by-one to spread load, and vendors that
- * opted out of auto-refresh are skipped unless the admin forced a correction.
+ * collection. Vendors are processed one-by-one to spread load. Every non-deleted
+ * vendor is refreshed on every run regardless of the legacy `statsRefreshEnabled`
+ * flag, so dashboards never go stale over long idle windows (the admin "force"
+ * correction and the vendor force-refresh button re-use this same pipeline).
  */
 export class ProductStatsDenormalizationHandler implements IEventHandler<{ force: boolean }> {
   async handle(event: IEvent<{ force: boolean }>): Promise<void> {
-    const { force } = event.payload;
+    void event.payload.force;
 
     // This pipeline runs from a background scheduler tick, outside any HTTP
     // request, so the lazy per-request `dbMiddleware` connection may never have
@@ -21,13 +23,9 @@ export class ProductStatsDenormalizationHandler implements IEventHandler<{ force
     // `bufferTimeoutMS` (10s) and then throws a buffering timeout.
     await connectDB();
 
-    const vendors = await VendorModel.find({ 'deleted.deleted': false })
-      .select('_id statsRefreshEnabled')
-      .lean();
+    const vendors = await VendorModel.find({ 'deleted.deleted': false }).select('_id').lean();
 
     for (const vendor of vendors) {
-      if (!force && vendor.statsRefreshEnabled === false) continue;
-
       const products = await ProductModel.find({
         vendorId: vendor._id,
         'deleted.deleted': false,

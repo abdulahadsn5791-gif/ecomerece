@@ -1,7 +1,10 @@
+import type { Metrics } from '../StatTypes';
+
 export type VendorListItemReadModel = {
   id: string;
   title: string;
   slug: string;
+  stats?: Metrics;
 };
 
 export type VendorResponseReadModel = {
@@ -38,6 +41,8 @@ export type VendorResponseReadModel = {
   //     rating: number;
   //     totalReviews: number;
   // };
+  /** Denormalized lifetime metrics for the vendor, refreshed by the stats pipeline. */
+  stats?: Metrics;
   verification: {
     isVerified: boolean;
     verifiedAt: Date | null;

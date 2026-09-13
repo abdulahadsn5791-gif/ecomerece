@@ -1,6 +1,7 @@
 import type { IVendorRepository, VendorAggregate } from '@ecomerece/domain';
 import type { Id } from '@ecomerece/domain/value-objects/id.vo';
 import type { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
+import type { Metrics } from '@ecomerece/shared';
 import { type CollationOptions, MongoRepository } from '../../../core/repository/mongo.repository';
 import { BadRequestError, ConcurrencyError, NotFoundError } from '../../../errors/app-error';
 import { VendorMapper } from './vendor.mapper';
@@ -94,6 +95,22 @@ export class VendorRepository
     return !!(await super.exists({
       _id: id.value,
     }));
+  }
+
+  async getStatsById(id: Id): Promise<Metrics | null> {
+    const doc = await VendorModel.findById(id.value).select('stats').lean();
+    return (doc?.stats as Metrics | undefined) ?? null;
+  }
+
+  async getStatsByIds(ids: Id[]): Promise<Map<string, Metrics>> {
+    const rawIds = ids.map((id) => id.value);
+    if (rawIds.length === 0) return new Map();
+
+    const docs = await VendorModel.find({ _id: { $in: rawIds } })
+      .select('_id stats')
+      .lean();
+
+    return new Map(docs.map((doc) => [String(doc._id), (doc.stats ?? {}) as Metrics]));
   }
 
   async FindPaginated(params: {

@@ -8,6 +8,7 @@ export interface UserResponseReadModel {
   role: UserRolesType;
   isBlocked: boolean;
   isBanned: boolean;
+  isDeleted: boolean;
   bannedUntil: Date | null;
   lastLogin: Date | null;
   createdAt: Date;

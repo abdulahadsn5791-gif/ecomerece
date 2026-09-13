@@ -1,4 +1,4 @@
 export type desclaimerItem = {
-    name: string,
-    title: string
-}
+  name: string;
+  title: string;
+};

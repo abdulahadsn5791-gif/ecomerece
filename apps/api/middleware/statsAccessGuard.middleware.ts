@@ -15,6 +15,8 @@ export interface StatsAccessGuardOptions {
   mode: 'throw' | 'mask';
   /** Always treat the entity as a product regardless of `entityTypeParam`. */
   productOnly?: boolean;
+  /** Always treat the entity as a vendor regardless of `entityTypeParam`. */
+  vendorOnly?: boolean;
   /** Test seam: inject a guard stub. Defaults to the shared singleton. */
   guard?: StatsAccessGuard;
 }
@@ -24,7 +26,14 @@ export interface StatsAccessGuardOptions {
  * middleware level like the other guards in `apps/api/middleware/`.
  */
 export function createStatsAccessGuardMiddleware(options: StatsAccessGuardOptions) {
-  const { entityTypeParam, entityIdParam, mode, productOnly, guard = statsAccessGuard } = options;
+  const {
+    entityTypeParam,
+    entityIdParam,
+    mode,
+    productOnly,
+    vendorOnly,
+    guard = statsAccessGuard,
+  } = options;
 
   return async (c: Context, next: Next) => {
     const entityId = c.req.param(entityIdParam) ?? '';
@@ -41,7 +50,11 @@ export function createStatsAccessGuardMiddleware(options: StatsAccessGuardOption
       return next();
     }
 
-    const entityType = productOnly ? 'product' : (c.req.param(entityTypeParam ?? '') ?? '');
+    const entityType = productOnly
+      ? 'product'
+      : vendorOnly
+        ? 'vendor'
+        : (c.req.param(entityTypeParam ?? '') ?? '');
     if (entityType !== 'product' && entityType !== 'vendor') {
       c.set('statsFullAccess', true);
       return next();

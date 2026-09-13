@@ -21,11 +21,15 @@ export const StatsSyncSettingsCard = ({ accent = '#7C3AED' }: StatsSyncSettingsC
   const trigger = useTriggerProductStatsDenormalization();
 
   const [intervalInput, setIntervalInput] = useState<string>('');
+  const [stalenessInput, setStalenessInput] = useState<string>('');
+  const [quotaInput, setQuotaInput] = useState<string>('');
   const [autoEnabled, setAutoEnabled] = useState<boolean>(true);
 
   useEffect(() => {
     if (settings) {
       setIntervalInput(String(settings.intervalHours));
+      setStalenessInput(String(settings.maxStalenessHours));
+      setQuotaInput(String(settings.vendorForceRefreshQuota));
       setAutoEnabled(settings.autoDenormalizeEnabled);
     }
   }, [settings]);
@@ -46,6 +50,18 @@ export const StatsSyncSettingsCard = ({ accent = '#7C3AED' }: StatsSyncSettingsC
     const parsed = Number(intervalInput);
     if (!Number.isFinite(parsed) || parsed <= 0) return;
     updateSettings.mutate({ intervalHours: Math.round(parsed) });
+  };
+
+  const saveStaleness = () => {
+    const parsed = Number(stalenessInput);
+    if (!Number.isFinite(parsed) || parsed <= 0) return;
+    updateSettings.mutate({ maxStalenessHours: Math.round(parsed) });
+  };
+
+  const saveQuota = () => {
+    const parsed = Number(quotaInput);
+    if (!Number.isFinite(parsed) || parsed < 0) return;
+    updateSettings.mutate({ vendorForceRefreshQuota: Math.round(parsed) });
   };
 
   const toggleAuto = (next: boolean) => {
@@ -105,6 +121,29 @@ export const StatsSyncSettingsCard = ({ accent = '#7C3AED' }: StatsSyncSettingsC
           </div>
 
           <div>
+            <label
+              htmlFor="staleAfter"
+              className={`text-xs font-medium ${labelCls}`}
+              title="Worst-case staleness ceiling — a full denormalization runs at least this often even when the interval above is much longer."
+            >
+              Max staleness (hours)
+            </label>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                id="staleAfter"
+                type="number"
+                min={1}
+                max={672}
+                value={stalenessInput}
+                onChange={(e) => setStalenessInput(e.target.value)}
+                onBlur={saveStaleness}
+                onKeyDown={(e) => e.key === 'Enter' && saveStaleness()}
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          <div>
             <span className={`text-xs font-medium ${labelCls}`}>Denormalize automatically</span>
             <button
               type="button"
@@ -131,6 +170,29 @@ export const StatsSyncSettingsCard = ({ accent = '#7C3AED' }: StatsSyncSettingsC
                 {autoEnabled ? 'On' : 'Off'}
               </span>
             </button>
+          </div>
+
+          <div>
+            <label
+              htmlFor="vendorQuota"
+              className={`text-xs font-medium ${labelCls}`}
+              title="How many force-refreshes each vendor may trigger per month from their dashboard."
+            >
+              Vendor force-refresh quota (per month)
+            </label>
+            <div className="flex items-center gap-2 mt-1.5">
+              <input
+                id="vendorQuota"
+                type="number"
+                min={0}
+                max={1000}
+                value={quotaInput}
+                onChange={(e) => setQuotaInput(e.target.value)}
+                onBlur={saveQuota}
+                onKeyDown={(e) => e.key === 'Enter' && saveQuota()}
+                className={inputCls}
+              />
+            </div>
           </div>
 
           <div className="sm:col-span-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">

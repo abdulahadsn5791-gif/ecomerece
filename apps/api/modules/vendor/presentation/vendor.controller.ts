@@ -7,6 +7,9 @@ import {
   getPaginatedVendorsQuerySchema,
   RecoverVendorDtoSchema,
   RejectVendorDtoSchema,
+  UpdateMyVendorContactDtoSchema,
+  UpdateMyVendorImageDtoSchema,
+  UpdateMyVendorMetaDtoSchema,
   updateVendorStatsRefreshSchema,
   VendorParamDtoSchema,
   VerifyVendorDtoSchema,
@@ -48,6 +51,24 @@ export class VendorController extends BaseController<VendorAppService> {
     const actor = c.get('user');
     const data = await this.body(c, DeleteMyVendorDtoSchema);
     return this.ok(c, await this.service.deleteMyVendor(data, actor));
+  };
+
+  updateMyVendorMeta = async (c: Context) => {
+    const actor = c.get('user');
+    const data = await this.body(c, UpdateMyVendorMetaDtoSchema);
+    return this.ok(c, await this.service.updateMyVendorMeta(data, actor));
+  };
+
+  updateMyVendorContact = async (c: Context) => {
+    const actor = c.get('user');
+    const data = await this.body(c, UpdateMyVendorContactDtoSchema);
+    return this.ok(c, await this.service.updateMyVendorContact(data, actor));
+  };
+
+  updateMyVendorImage = async (c: Context) => {
+    const actor = c.get('user');
+    const data = await this.body(c, UpdateMyVendorImageDtoSchema);
+    return this.ok(c, await this.service.updateMyVendorImage(data, actor));
   };
 
   softDeleteVendor = async (c: Context) => {

@@ -66,6 +66,11 @@ const ProductImageSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    imageKey: {
+      type: String,
+      default: null,
+    },
   },
   {
     _id: false,

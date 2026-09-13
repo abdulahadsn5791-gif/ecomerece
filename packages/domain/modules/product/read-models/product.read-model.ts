@@ -1,48 +1,49 @@
 export interface ProductReadModel {
-    id: string;
-    version: number;
-    title: string;
-    categoryId: string,
-    minPrice: number,
-    maxPrice: number,
-    minDiscountedPrice: number,
-    maxDiscountedPrice: number,
-    averageRating: number,
-    vendorTitle: string,
-    inStock: boolean,
-    totalReviews: number,
-    appearance: 'public' | 'private';
-    block: {
-        blocked: boolean;
-        blockedFrom: Date | null;
-        blockedBy: string | null;
-        reason: string | null;
-    };
-    deleted: {
-        deleted: boolean;
-        deletedFrom: Date | null;
-        deletedBy: string | null;
-        reason: string | null;
-    };
-    description: string;
-    vendorId: string;
-    ingredient: {
-        isIngredients: boolean;
-        ingredients: string[];
-    };
-    disclaimer: {
-        isDisclaimer: boolean;
-        disclaimers: {
-            name: string;
-            title: string;
-        }[];
-    };
-    image: {
-        images: {
-            url: string;
-            alt: string;
-            default: boolean;
-        }[];
-    };
-    createdAt: Date;
+  id: string;
+  version: number;
+  title: string;
+  categoryId: string;
+  minPrice: number;
+  maxPrice: number;
+  minDiscountedPrice: number;
+  maxDiscountedPrice: number;
+  averageRating: number;
+  vendorTitle: string;
+  inStock: boolean;
+  totalReviews: number;
+  appearance: 'public' | 'private';
+  block: {
+    blocked: boolean;
+    blockedFrom: Date | null;
+    blockedBy: string | null;
+    reason: string | null;
+  };
+  deleted: {
+    deleted: boolean;
+    deletedFrom: Date | null;
+    deletedBy: string | null;
+    reason: string | null;
+  };
+  description: string;
+  vendorId: string;
+  ingredient: {
+    isIngredients: boolean;
+    ingredients: string[];
+  };
+  disclaimer: {
+    isDisclaimer: boolean;
+    disclaimers: {
+      name: string;
+      title: string;
+    }[];
+  };
+  image: {
+    images: {
+      url: string;
+      alt: string;
+      default: boolean;
+      imageKey?: string;
+    }[];
+  };
+  createdAt: Date;
 }

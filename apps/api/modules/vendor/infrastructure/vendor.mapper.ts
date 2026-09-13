@@ -49,7 +49,12 @@ export const VendorMapper = {
         doc.deleted.reason ? Reason.create(doc.deleted.reason) : null,
       ),
 
-      ImageInfoVO.rehydrate(UrlVO.create(doc.images.logo), UrlVO.create(doc.images.banner)),
+      ImageInfoVO.rehydrate(
+        UrlVO.create(doc.images.logo),
+        UrlVO.create(doc.images.banner),
+        (doc.images as { logoKey?: string | null }).logoKey ?? undefined,
+        (doc.images as { bannerKey?: string | null }).bannerKey ?? undefined,
+      ),
 
       ContactInfoVO.rehydrate(
         PhoneNumber.create(doc.contact.phone),
@@ -80,6 +85,8 @@ export const VendorMapper = {
       images: {
         logo: vendor.image.logo.value,
         banner: vendor.image.banner.value,
+        logoKey: vendor.image.logoKey ?? null,
+        bannerKey: vendor.image.bannerKey ?? null,
       },
 
       contact: {

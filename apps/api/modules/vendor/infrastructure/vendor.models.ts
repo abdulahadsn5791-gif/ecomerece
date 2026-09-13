@@ -22,6 +22,8 @@ const imagesSchema = new Schema(
   {
     logo: { type: String, required: true },
     banner: { type: String, required: true },
+    logoKey: { type: String, default: null },
+    bannerKey: { type: String, default: null },
   },
   { _id: false },
 );

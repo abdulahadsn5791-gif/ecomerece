@@ -15,13 +15,25 @@ import {
   RecoverVendorDtoSchema,
   type RejectVendorDto,
   RejectVendorDtoSchema,
+  type UpdateMyVendorContactDto,
+  UpdateMyVendorContactDtoSchema,
+  type UpdateMyVendorImageDto,
+  UpdateMyVendorImageDtoSchema,
+  type UpdateMyVendorMetaDto,
+  UpdateMyVendorMetaDtoSchema,
   type UpdateVendorStatsRefreshDto,
   updateVendorStatsRefreshSchema,
   type VendorResponseReadModel,
   type VerifyVendorDto,
   VerifyVendorDtoSchema,
 } from '@ecomerece/shared';
-import { type QueryClient, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  type QueryClient,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { type VendorMutationResult, vendorService } from './vendor.service';
 
 export const VENDOR_QUERY_KEY = ['vendors'];
@@ -174,5 +186,43 @@ export function useUpdateMyStatsRefresh() {
         (old) => (old && old.id === data.id ? data : old),
       );
     },
+  });
+}
+
+function applyMyVendorUpdate(queryClient: QueryClient, updated: VendorResponseReadModel): void {
+  queryClient.setQueryData<VendorResponseReadModel | undefined>(
+    [...VENDOR_QUERY_KEY, 'my'],
+    (old) => (old && old.id === updated.id ? updated : old),
+  );
+  queryClient.setQueryData<VendorResponseReadModel | undefined>(
+    [...VENDOR_QUERY_KEY, 'me'],
+    (old) => (old && old.id === updated.id ? updated : old),
+  );
+}
+
+export function useUpdateMyVendorMeta() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateMyVendorMetaDto) =>
+      vendorService.updateMyVendorMeta(UpdateMyVendorMetaDtoSchema.parse(data)),
+    onSuccess: (updated) => applyMyVendorUpdate(queryClient, updated),
+  });
+}
+
+export function useUpdateMyVendorContact() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateMyVendorContactDto) =>
+      vendorService.updateMyVendorContact(UpdateMyVendorContactDtoSchema.parse(data)),
+    onSuccess: (updated) => applyMyVendorUpdate(queryClient, updated),
+  });
+}
+
+export function useUpdateMyVendorImage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateMyVendorImageDto) =>
+      vendorService.updateMyVendorImage(UpdateMyVendorImageDtoSchema.parse(data)),
+    onSuccess: (updated) => applyMyVendorUpdate(queryClient, updated),
   });
 }

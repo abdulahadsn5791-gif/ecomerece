@@ -63,7 +63,12 @@ export const ProductMapper = {
       ),
       ImagesVO.rehydrate(
         doc.image.images.map((image) =>
-          ImageVO.rehydrate(UrlVO.create(image.url), AltVO.create(image.alt), image.default),
+          ImageVO.rehydrate(
+            UrlVO.create(image.url),
+            AltVO.create(image.alt),
+            image.default,
+            (image as { imageKey?: string | null }).imageKey ?? undefined,
+          ),
         ),
       ),
       DeleteInfoVO.rehydrate(

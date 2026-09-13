@@ -8,6 +8,9 @@ import type {
   GetPaginatedVendorsQueryDto,
   RecoverVendorDto,
   RejectVendorDto,
+  UpdateMyVendorContactDto,
+  UpdateMyVendorImageDto,
+  UpdateMyVendorMetaDto,
   UpdateVendorStatsRefreshDto,
   VendorListItemReadModel,
   VendorResponseReadModel,
@@ -56,6 +59,18 @@ export class VendorService {
 
   updateMyStatsRefresh(data: UpdateVendorStatsRefreshDto): Promise<VendorResponseReadModel> {
     return http.patch<VendorResponseReadModel>('/vendor/my/stats-refresh', data);
+  }
+
+  updateMyVendorMeta(data: UpdateMyVendorMetaDto): Promise<VendorResponseReadModel> {
+    return http.patch<VendorResponseReadModel>('/vendor/my/meta', data);
+  }
+
+  updateMyVendorContact(data: UpdateMyVendorContactDto): Promise<VendorResponseReadModel> {
+    return http.patch<VendorResponseReadModel>('/vendor/my/contact', data);
+  }
+
+  updateMyVendorImage(data: UpdateMyVendorImageDto): Promise<VendorResponseReadModel> {
+    return http.patch<VendorResponseReadModel>('/vendor/my/image', data);
   }
 
   getPaginatedVendors(params: GetPaginatedVendorsQueryDto): Promise<{

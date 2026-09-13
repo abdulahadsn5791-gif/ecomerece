@@ -7,11 +7,24 @@ const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'i
 const ACCEPTED_EXT = 'png,jpg,jpeg,gif,webp,avif';
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
+type Tone = 'violet' | 'emerald';
+
 interface ImageInputProps {
   value: string;
   onChange: (value: string) => void;
   darkMode: boolean;
+  tone?: Tone;
 }
+
+const TONE_FOCUS: Record<Tone, string> = {
+  violet: 'focus:ring-violet-500',
+  emerald: 'focus:ring-emerald-500',
+};
+
+const TONE_BUTTON: Record<Tone, string> = {
+  violet: 'bg-violet-600 hover:bg-violet-700 focus-visible:ring-violet-500',
+  emerald: 'bg-emerald-600 hover:bg-emerald-700 focus-visible:ring-emerald-500',
+};
 
 /**
  * Image field for create/edit forms.
@@ -20,7 +33,7 @@ interface ImageInputProps {
  * (converted client-side to a base64 data URI that the API uploads). The
  * preview is collapsed by default — expand it to view the image fullscreen.
  */
-export function ImageInput({ value, onChange, darkMode }: ImageInputProps) {
+export function ImageInput({ value, onChange, darkMode, tone = 'violet' }: ImageInputProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -28,7 +41,7 @@ export function ImageInput({ value, onChange, darkMode }: ImageInputProps) {
   const isDataUri = value.startsWith('data:image/');
   const displayLabel = isDataUri && value.length > 80 ? `${value.slice(0, 60)}…` : value;
 
-  const inputCls = `w-full p-3 text-sm rounded-2xl border-0 focus:outline-none focus:ring-2 focus:ring-violet-500 ${
+  const inputCls = `w-full p-3 text-sm rounded-2xl border-0 focus:outline-none focus:ring-2 ${TONE_FOCUS[tone]} ${
     darkMode
       ? 'bg-neutral-800 text-white placeholder-neutral-500'
       : 'bg-neutral-100 text-neutral-900 placeholder-neutral-400'
@@ -57,7 +70,7 @@ export function ImageInput({ value, onChange, darkMode }: ImageInputProps) {
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold text-white transition-all bg-violet-600 hover:bg-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 active:scale-95"
+          className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold text-white transition-all focus-visible:outline-none focus-visible:ring-2 active:scale-95 ${TONE_BUTTON[tone]}`}
         >
           <UploadCloud className="w-4 h-4" />
           Choose Image
@@ -107,6 +120,7 @@ export function ImageInput({ value, onChange, darkMode }: ImageInputProps) {
           }`}
         >
           <div className="w-14 h-12 rounded-lg overflow-hidden shrink-0 bg-neutral-900">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={value}
               alt="Uploaded preview thumbnail"

@@ -3,8 +3,7 @@ import { useThemeStore } from '@ecomerece/frontend/theme';
 import { ImageIcon, Plus, Pencil, Trash2, GripVertical, Maximize2 } from 'lucide-react';
 import MutationButton from '@/components/Mutationbutton';
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
-import { ImageInput } from './ImageInput';
-import { ImageLightbox } from './ImageLightbox';
+import { ImageInput, ImageLightbox } from '@/components/image';
 import { useAddSlide, useUpdateSlide, useRemoveSlide } from '@ecomerece/frontend/home';
 import type {
   HomeSlideResponse,

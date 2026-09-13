@@ -182,9 +182,9 @@ export class VendorAggregate extends AggregateRoot {
     );
   }
 
-  updateImage(logo: UrlVO, banner: UrlVO) {
-    this._image = this._image.changeBanner(banner);
-    this._image = this.image.changeLogo(logo);
+  updateImage(logo: UrlVO, banner: UrlVO, logoKey?: string, bannerKey?: string) {
+    this._image = this._image.changeBanner(banner, bannerKey);
+    this._image = this.image.changeLogo(logo, logoKey);
     this.raise(new VendorImageUpdatedEvent({ vendorId: this._id, ownerId: this._ownerId }));
   }
 

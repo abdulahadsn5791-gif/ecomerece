@@ -1,4 +1,11 @@
-import { ContactInfoVO, ImageInfoVO, VendorAggregate } from '@ecomerece/domain';
+import {
+  ContactInfoVO,
+  type IImageStoragePort,
+  ImageInfoVO,
+  ImageKey,
+  ImageSource,
+  VendorAggregate,
+} from '@ecomerece/domain';
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
 import { EmailVO } from '@ecomerece/domain/value-objects/email.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
@@ -24,6 +31,9 @@ import type {
   GetPaginatedVendorsQueryDto,
   RecoverVendorDto,
   RejectVendorDto,
+  UpdateMyVendorContactDto,
+  UpdateMyVendorImageDto,
+  UpdateMyVendorMetaDto,
   VendorListItemReadModel,
   VendorResponseReadModel,
   VerifyVendorDto,
@@ -47,8 +57,55 @@ export class VendorAppService extends BaseService {
     private readonly vendorRepo: VendorRepository,
     private readonly eventBus: InMemoryEventBus,
     private readonly internalService: VendorInternalService,
+    private readonly imageStorage: IImageStoragePort,
   ) {
     super();
+  }
+
+  private isDataUri(value: string): boolean {
+    return value.startsWith('data:image/');
+  }
+
+  private decodeDataUri(value: string): { contentType: string; bytes: Uint8Array } {
+    const separator = value.indexOf(',');
+    const header = value.slice(5, separator);
+    return {
+      contentType: header.split(';')[0],
+      bytes: Buffer.from(value.slice(separator + 1), 'base64'),
+    };
+  }
+
+  private async resolveImage(
+    value: string,
+    folder: string,
+  ): Promise<{ url: UrlVO; imageKey?: string }> {
+    if (!this.isDataUri(value)) {
+      return { url: UrlVO.create(value) };
+    }
+    const { contentType, bytes } = this.decodeDataUri(value);
+    const stored = await this.imageStorage.upload(ImageSource.fromBytes(bytes, contentType), {
+      folder,
+      access: 'public',
+    });
+    return { url: UrlVO.create(stored.publicUrl), imageKey: stored.key.value };
+  }
+
+  /** Best-effort cleanup — a failed delete must never fail the request. */
+  private async deleteImage(key?: string): Promise<void> {
+    if (!key) return;
+    try {
+      await this.imageStorage.delete(ImageKey.rehydrate(key));
+    } catch (error) {
+      console.error(
+        `[vendor] failed to clean up stored image '${key}':`,
+        error instanceof Error ? error.message : error,
+      );
+    }
+  }
+
+  private async toResponseReadModel(vendor: VendorAggregate): Promise<VendorResponseReadModel> {
+    const stats = await this.vendorRepo.getStatsById(vendor.id);
+    return VendorMapper.aggregateToResponseReadModel(vendor, stats ?? undefined);
   }
 
   private async publishEvents(vendor: VendorAggregate): Promise<void> {
@@ -108,8 +165,70 @@ export class VendorAppService extends BaseService {
   async getMyVendor(actorId: Id): Promise<VendorResponseReadModel | null> {
     const vendor = await this.vendorRepo.FindByOwnerId(actorId);
     if (!vendor) return null;
-    const stats = await this.vendorRepo.getStatsById(vendor.id);
-    return VendorMapper.aggregateToResponseReadModel(vendor, stats ?? undefined);
+    return this.toResponseReadModel(vendor);
+  }
+
+  async updateMyVendorMeta(
+    data: UpdateMyVendorMetaDto,
+    actor: UserPersistence,
+  ): Promise<VendorResponseReadModel> {
+    const actorId = Id.create(actor._id);
+    const vendor = await this.vendorRepo.FindByOwnerIdOrThrow(actorId);
+    vendor.updatedMeta(
+      Title.create(data.title),
+      Slug.create(data.slug),
+      Description.create(data.description),
+    );
+    await this.vendorRepo.Save(vendor);
+    await this.publishEvents(vendor);
+    return this.toResponseReadModel(vendor);
+  }
+
+  async updateMyVendorContact(
+    data: UpdateMyVendorContactDto,
+    actor: UserPersistence,
+  ): Promise<VendorResponseReadModel> {
+    const actorId = Id.create(actor._id);
+    const vendor = await this.vendorRepo.FindByOwnerIdOrThrow(actorId);
+    vendor.updateContact(
+      PhoneNumber.create(data.phone),
+      EmailVO.create(data.email),
+      AddressVO.create(
+        StreetAddressVO.create(data.address.streetAddress),
+        CityVO.create(data.address.city),
+        StateVO.create(data.address.state),
+        PostalCodeVO.create(data.address.postalCode),
+        CountryVO.create(data.address.country),
+      ),
+    );
+    await this.vendorRepo.Save(vendor);
+    await this.publishEvents(vendor);
+    return this.toResponseReadModel(vendor);
+  }
+
+  async updateMyVendorImage(
+    data: UpdateMyVendorImageDto,
+    actor: UserPersistence,
+  ): Promise<VendorResponseReadModel> {
+    const actorId = Id.create(actor._id);
+    const vendor = await this.vendorRepo.FindByOwnerIdOrThrow(actorId);
+    const previousKeys = [vendor.image.logoKey, vendor.image.bannerKey].filter(
+      (key): key is string => Boolean(key),
+    );
+    const [logo, banner] = await Promise.all([
+      this.resolveImage(data.logo, 'vendors'),
+      this.resolveImage(data.banner, 'vendors'),
+    ]);
+    vendor.updateImage(logo.url, banner.url, logo.imageKey, banner.imageKey);
+    await this.vendorRepo.Save(vendor);
+    await this.publishEvents(vendor);
+    const currentKeys = [logo.imageKey, banner.imageKey].filter((key): key is string =>
+      Boolean(key),
+    );
+    await Promise.all(
+      previousKeys.filter((key) => !currentKeys.includes(key)).map((key) => this.deleteImage(key)),
+    );
+    return this.toResponseReadModel(vendor);
   }
 
   async findPaginatedVendors(query: GetPaginatedVendorsQueryDto) {

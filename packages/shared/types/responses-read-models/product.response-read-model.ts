@@ -38,6 +38,7 @@ export interface ProductResponseReadModel {
       url: string;
       alt: string;
       default: boolean;
+      imageKey?: string;
     }[];
   };
   stats?: PublicProductStats;

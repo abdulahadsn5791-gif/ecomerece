@@ -1,4 +1,12 @@
-import { DisclaimerVO, ImagesVO, IngredientsVO, ProductAggregate } from '@ecomerece/domain';
+import {
+  DisclaimerVO,
+  type IImageStoragePort,
+  ImageKey,
+  ImageSource,
+  ImagesVO,
+  IngredientsVO,
+  ProductAggregate,
+} from '@ecomerece/domain';
 import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import type { IQueryBus } from '@ecomerece/domain/query/query-bus.interface';
 import { AltVO } from '@ecomerece/domain/value-objects/alt.vo';
@@ -45,8 +53,50 @@ export class ProductApplicationService extends BaseService {
     private readonly queryBus: IQueryBus,
     private readonly productRepo: ProductRepository,
     private readonly eventBus: IEventBus,
+    private readonly imageStorage: IImageStoragePort,
   ) {
     super();
+  }
+
+  private isDataUri(value: string): boolean {
+    return value.startsWith('data:image/');
+  }
+
+  private decodeDataUri(value: string): { contentType: string; bytes: Uint8Array } {
+    const separator = value.indexOf(',');
+    const header = value.slice(5, separator);
+    return {
+      contentType: header.split(';')[0],
+      bytes: Buffer.from(value.slice(separator + 1), 'base64'),
+    };
+  }
+
+  private async resolveImage(
+    value: string,
+    folder: string,
+  ): Promise<{ url: UrlVO; imageKey?: string }> {
+    if (!this.isDataUri(value)) {
+      return { url: UrlVO.create(value) };
+    }
+    const { contentType, bytes } = this.decodeDataUri(value);
+    const stored = await this.imageStorage.upload(ImageSource.fromBytes(bytes, contentType), {
+      folder,
+      access: 'public',
+    });
+    return { url: UrlVO.create(stored.publicUrl), imageKey: stored.key.value };
+  }
+
+  /** Best-effort cleanup — a failed delete must never fail the request. */
+  private async deleteImage(key?: string): Promise<void> {
+    if (!key) return;
+    try {
+      await this.imageStorage.delete(ImageKey.rehydrate(key));
+    } catch (error) {
+      console.error(
+        `[product] failed to clean up stored image '${key}':`,
+        error instanceof Error ? error.message : error,
+      );
+    }
   }
 
   private async publishEvents(product: ProductAggregate): Promise<void> {
@@ -73,9 +123,17 @@ export class ProductApplicationService extends BaseService {
       'User don,t own an vendor',
     );
     const vendorId = Id.create(vendor.id);
+    const resolvedImages = await Promise.all(
+      data.image.images.map((val) => this.resolveImage(val.url, 'products')),
+    );
     const images = ImagesVO.create(
-      data.image.images.map((val) =>
-        ImageVO.create(UrlVO.create(val.url), AltVO.create(val.alt), val.default),
+      data.image.images.map((val, index) =>
+        ImageVO.create(
+          resolvedImages[index].url,
+          AltVO.create(val.alt),
+          val.default,
+          resolvedImages[index].imageKey,
+        ),
       ),
     );
     const categoryId = Id.create(data.categoryId);
@@ -299,8 +357,16 @@ export class ProductApplicationService extends BaseService {
     );
     const vendorId = Id.create(vendor.id);
     const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
-    const images = data.images.map((value) =>
-      ImageVO.create(UrlVO.create(value.url), AltVO.create(value.alt), value.isDefault),
+    const resolvedImages = await Promise.all(
+      data.images.map((value) => this.resolveImage(value.url, 'products')),
+    );
+    const images = data.images.map((value, index) =>
+      ImageVO.create(
+        resolvedImages[index].url,
+        AltVO.create(value.alt),
+        value.isDefault,
+        resolvedImages[index].imageKey,
+      ),
     );
     product.addImages(images, actorId);
     await this.productRepo.Save(product);
@@ -339,10 +405,16 @@ export class ProductApplicationService extends BaseService {
     );
     const vendorId = Id.create(vendor.id);
     const product = await this.productRepo.EnsureOwnerShipOrThrow(productId, vendorId);
+    const removedRefs = new Set(data.images.map((value) => value.url));
+    const removedKeys = product.images.value
+      .filter((image) => removedRefs.has(image.url.value))
+      .map((image) => image.imageKey)
+      .filter((key): key is string => Boolean(key));
     const urls = data.images.map((value) => UrlVO.create(value.url));
     product.removeImages(urls, actorId);
     await this.productRepo.Save(product);
     await this.publishEvents(product);
+    await Promise.all(removedKeys.map((key) => this.deleteImage(key)));
     return productMessages.imageUpdated(productId, actorId);
   }
 

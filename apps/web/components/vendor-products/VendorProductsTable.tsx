@@ -12,7 +12,8 @@ import { useThemeStore } from '@ecomerece/frontend/theme';
 import type { ProductAdminResponseReadModel } from '@ecomerece/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, ImageOff, Loader2, Package, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, ImageOff, Loader2, Package, Pen, Plus, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { ReasonActionModal } from '@/components/admin-catalog/ReasonActionModal';
 import { type RowActionItem, RowActionMenu } from '@/components/admin-catalog/RowActionMenu';
@@ -33,6 +34,7 @@ function defaultImage(p: ProductAdminResponseReadModel) {
 export function VendorProductsTable() {
   const { darkMode } = useThemeStore();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -147,8 +149,16 @@ export function VendorProductsTable() {
         : 'bg-neutral-100 text-neutral-600 border-neutral-200';
 
   const menuItems = (p: ProductAdminResponseReadModel): RowActionItem[] => {
-    if (p.isBlocked || p.isDeleted) return [];
-    return [
+    const items: RowActionItem[] = [
+      {
+        key: 'edit',
+        label: 'Edit product',
+        icon: Pen,
+        onClick: () => router.push(`/vendor/products/${p.id}`),
+      },
+    ];
+    if (p.isBlocked || p.isDeleted) return items;
+    items.push(
       {
         key: 'appearance',
         label: p.appearance === 'public' ? 'Make private' : 'Make public',
@@ -162,7 +172,8 @@ export function VendorProductsTable() {
         danger: true,
         onClick: () => setDeleteTarget(p),
       },
-    ];
+    );
+    return items;
   };
 
   const card = `rounded-[28px] p-6 ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-sm border border-transparent'}`;
@@ -183,16 +194,26 @@ export function VendorProductsTable() {
         className={card}
       >
         <div className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <Package
-                className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
-              />
-              My products
-            </h2>
-            <p className={`text-sm mt-1 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
-              Manage appearance and soft-delete products from your catalog.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Package
+                  className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
+                />
+                My products
+              </h2>
+              <p className={`text-sm mt-1 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                Manage appearance and soft-delete products from your catalog.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push('/vendor/products/new')}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+              Add product
+            </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">

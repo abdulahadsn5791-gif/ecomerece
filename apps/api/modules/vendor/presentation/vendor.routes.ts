@@ -8,6 +8,9 @@ const vendorRoutes = new Hono();
 
 vendorRoutes.post('/my', authMiddleware, vendorController.createMyVendor);
 vendorRoutes.get('/my', authMiddleware, vendorController.getMyVendor);
+vendorRoutes.patch('/my/meta', authMiddleware, vendorController.updateMyVendorMeta);
+vendorRoutes.patch('/my/contact', authMiddleware, vendorController.updateMyVendorContact);
+vendorRoutes.patch('/my/image', authMiddleware, vendorController.updateMyVendorImage);
 vendorRoutes.patch('/my/stats-refresh', authMiddleware, vendorController.updateMyStatsRefresh);
 vendorRoutes.delete('/my', authMiddleware, vendorController.deleteMyVendor);
 vendorRoutes.delete('/soft', authMiddleware, adminMiddleware, vendorController.softDeleteVendor);

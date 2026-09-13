@@ -5,8 +5,8 @@ import {
   type blockLiftProductDtoType,
   blockProductDto,
   type blockProductDtoType,
+  type CreateMyProductDto,
   CreateMyProductDtoSchema,
-  type createMyProductVariantDtoType,
   deafultImageDto,
   type deafultImageDtoType,
   disclaimerItemsDto,
@@ -189,7 +189,7 @@ function applyProductMutationResult(queryClient: QueryClient, result: ProductMut
 export function useCreateMyProduct() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: createMyProductVariantDtoType) =>
+    mutationFn: (data: CreateMyProductDto) =>
       productService.createMyProduct(CreateMyProductDtoSchema.parse(data)),
     onSuccess: (data) => applyProductMutationResult(queryClient, data),
   });

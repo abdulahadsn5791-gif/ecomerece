@@ -7,7 +7,14 @@ import { authAdapter } from '@ecomerece/frontend/auth';
 
 
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Default to the same-origin `/api` prefix: the Next.js web app rewrites
+// `/api/*` → the Hono backend (see apps/web/next.config.ts), so the browser
+// only ever talks to the host it loaded the page from. This works on
+// localhost AND on LAN/public origins (192.168.x.x, VPS IPs, etc.), and
+// avoids CORS + "localhost on the client machine" failures. Set
+// NEXT_PUBLIC_API_URL to an absolute URL only for deployments that call the
+// API directly (e.g. React Native/standalone clients).
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     let response: Response;

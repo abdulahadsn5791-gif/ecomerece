@@ -1,5 +1,5 @@
 // category.hook.ts
-import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useInfiniteQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { categoryService, type CategoryMutationResult } from './category.service';
 import {
     createCategoryDto,
@@ -39,6 +39,31 @@ export function useGetAdminPaginatedCategories(params: GetAdminPaginatedCategori
             categoryService.getAdminPaginatedCategories(
                 getAdminPaginatedCategoriesSchema.parse(params),
             ),
+    });
+}
+
+export interface AdminCategoriesInfiniteFilters {
+    search?: string;
+    deleted?: boolean;
+    blocked?: boolean;
+    limit?: number;
+}
+
+/** Infinite-scroll feed for the admin categories page. Cursor-based (`nextCursor`). */
+export function useGetAdminCategoriesInfinite(filters: AdminCategoriesInfiniteFilters = {}) {
+    const { limit = 30, ...rest } = filters;
+    return useInfiniteQuery({
+        queryKey: [...CATEGORY_QUERY_KEY, 'admin-infinite', filters],
+        initialPageParam: undefined as string | undefined,
+        queryFn: ({ pageParam }) =>
+            categoryService.getAdminPaginatedCategories({
+                ...rest,
+                limit,
+                cursor: pageParam,
+                direction: 'next',
+            }),
+        getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
+        staleTime: 1000 * 60,
     });
 }
 

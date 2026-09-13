@@ -3,4 +3,6 @@ export type categoryResponseReadModels = {
   image: string;
   title: string;
   createdAt: Date;
+  isDeleted: boolean;
+  idBlocked: boolean;
 };

@@ -18,6 +18,7 @@ interface VendorNavItem {
 const primaryItems: VendorNavItem[] = [
   { label: 'Overview', icon: LayoutDashboard, href: '/vendor/dashboard' },
   { label: 'Performance', icon: BarChart3, href: '/vendor/products-stats' },
+  { label: 'Products', icon: Truck, href: '/vendor/products' },
 ];
 
 export default function VendorSidebar() {
@@ -106,12 +107,6 @@ export default function VendorSidebar() {
           </nav>
 
           <div className={`mt-3 pt-3 border-t ${borderColor}`}>
-            <div
-              className={`flex items-center gap-3 pl-[10px] pr-3 py-2 rounded-lg text-sm ${mutedText}`}
-            >
-              <Truck className="w-4 h-4 shrink-0" />
-              <span className="flex-1">Products</span>
-            </div>
             <div
               className={`flex items-center gap-3 pl-[10px] pr-3 py-2 rounded-lg text-sm ${mutedText}`}
             >

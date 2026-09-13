@@ -21,7 +21,7 @@ import {
   type VerifyVendorDto,
   VerifyVendorDtoSchema,
 } from '@ecomerece/shared';
-import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type VendorMutationResult, vendorService } from './vendor.service';
 
 export const VENDOR_QUERY_KEY = ['vendors'];
@@ -55,6 +55,31 @@ export function useGetAdminPaginatedVendors(params: GetAdminPaginatedVendorsQuer
     queryKey: [...VENDOR_QUERY_KEY, 'admin-paginated', params],
     queryFn: () =>
       vendorService.getAdminPaginatedVendors(getAdminPaginatedVendorsQuerySchema.parse(params)),
+  });
+}
+
+export interface AdminVendorsInfiniteFilters {
+  search?: string;
+  verified?: boolean;
+  deleted?: boolean;
+  limit?: number;
+}
+
+/** Infinite-scroll feed for the admin vendors page. Cursor-based (`nextCursor`). */
+export function useGetAdminVendorsInfinite(filters: AdminVendorsInfiniteFilters = {}) {
+  const { limit = 30, ...rest } = filters;
+  return useInfiniteQuery({
+    queryKey: [...VENDOR_QUERY_KEY, 'admin-infinite', filters],
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam }) =>
+      vendorService.getAdminPaginatedVendors({
+        ...rest,
+        limit,
+        cursor: pageParam,
+        direction: 'next',
+      }),
+    getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
+    staleTime: 1000 * 60,
   });
 }
 

@@ -2,10 +2,10 @@
 
 import { useThemeStore } from '@ecomerece/frontend/theme';
 import { motion } from 'framer-motion';
-import { ShoppingBag } from 'lucide-react';
-import { AdminProductsTable } from '@/components/admin-products/AdminProductsTable';
+import { Package } from 'lucide-react';
+import { VendorProductsTable } from '@/components/vendor-products/VendorProductsTable';
 
-export default function AdminProductsPage() {
+export default function VendorProductsPage() {
   const { darkMode } = useThemeStore();
 
   return (
@@ -19,21 +19,21 @@ export default function AdminProductsPage() {
         <div className="flex items-start gap-4">
           <div
             className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-              darkMode ? 'bg-violet-500/15 text-violet-400' : 'bg-violet-100 text-violet-600'
+              darkMode ? 'bg-emerald-500/15 text-emerald-400' : 'bg-emerald-100 text-emerald-600'
             }`}
           >
-            <ShoppingBag className="w-6 h-6" />
+            <Package className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Products</h1>
+            <h1 className="text-2xl font-bold">My Products</h1>
             <p className={`text-sm mt-1 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
-              Review, block, or inspect the stats of any product in the catalog.
+              Control appearance, soft-delete listings, and inspect performance per product.
             </p>
           </div>
         </div>
       </motion.div>
 
-      <AdminProductsTable />
+      <VendorProductsTable />
     </main>
   );
 }

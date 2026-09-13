@@ -174,6 +174,12 @@ export class VendorAppService extends BaseService {
       title: aggregate.title.value,
       slug: aggregate.slug.value,
       stats: statsByIds.get(aggregate.id.value),
+      verification: {
+        isVerified: aggregate.verification.isVerified,
+        rejectedReason: aggregate.verification.rejectedReason?.value ?? null,
+      },
+      isDeleted: aggregate.delete.isDeleted,
+      createdAt: aggregate.createdAt.value,
     }));
 
     return {

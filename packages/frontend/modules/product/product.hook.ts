@@ -32,7 +32,13 @@ import {
   updateProductMetaDto,
   type updateProductMetaDtoType,
 } from '@ecomerece/shared';
-import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  type QueryClient,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { type ProductMutationResult, productService } from './product.service';
 
 export const PRODUCT_QUERY_KEY = ['products'];
@@ -100,6 +106,65 @@ export function useGetMyPaginatedProducts(params: {
     queryKey: [...PRODUCT_QUERY_KEY, 'my-paginated', params],
     queryFn: () =>
       productService.getMyPaginatedProducts(getMyPaginatedProductsQuerySchema.parse(params)),
+  });
+}
+
+export interface MyProductsInfiniteFilters {
+  search?: string;
+  categoryId?: string;
+  appearance?: 'public' | 'private';
+  sort?: ProductAdminSort;
+  limit?: number;
+}
+
+/** Infinite-scroll feed of the vendor's own products. Cursor-based (`nextCursor`). */
+export function useGetMyProductsInfinite(filters: MyProductsInfiniteFilters = {}) {
+  const { limit = 30, sort = 'newest', ...rest } = filters;
+  const queryFilters = { ...rest, limit, sort };
+  return useInfiniteQuery({
+    queryKey: [...PRODUCT_QUERY_KEY, 'my-infinite', queryFilters],
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam }) =>
+      productService.getMyPaginatedProducts({
+        ...rest,
+        sort,
+        limit,
+        cursor: pageParam,
+        direction: 'next',
+      }),
+    getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
+    staleTime: 1000 * 60,
+  });
+}
+
+export interface AdminProductsInfiniteFilters {
+  search?: string;
+  categoryId?: string;
+  vendorId?: string;
+  appearance?: 'public' | 'private';
+  deleted?: boolean;
+  blocked?: boolean;
+  sort?: ProductAdminSort;
+  limit?: number;
+}
+
+/** Infinite-scroll feed for the admin products page. Cursor-based (`nextCursor`). */
+export function useGetAdminProductsInfinite(filters: AdminProductsInfiniteFilters = {}) {
+  const { limit = 30, sort = 'newest', ...rest } = filters;
+  const queryFilters = { ...rest, limit, sort };
+  return useInfiniteQuery({
+    queryKey: [...PRODUCT_QUERY_KEY, 'admin-infinite', queryFilters],
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam }) =>
+      productService.getAdminPaginatedProducts({
+        ...rest,
+        sort,
+        limit,
+        cursor: pageParam,
+        direction: 'next',
+      }),
+    getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
+    staleTime: 1000 * 60,
   });
 }
 

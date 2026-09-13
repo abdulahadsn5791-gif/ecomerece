@@ -47,4 +47,6 @@ export interface ProductResponseReadModel {
 /** Admin/vendor response — includes the full denormalized metrics, revenue included. */
 export interface ProductAdminResponseReadModel extends Omit<ProductResponseReadModel, 'stats'> {
   stats?: Metrics;
+  isDeleted: boolean;
+  isBlocked: boolean;
 }

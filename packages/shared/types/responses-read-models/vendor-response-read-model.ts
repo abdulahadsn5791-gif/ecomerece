@@ -5,6 +5,13 @@ export type VendorListItemReadModel = {
   title: string;
   slug: string;
   stats?: Metrics;
+  /** Present on the admin list so admins can render verification/delete badges. */
+  verification?: {
+    isVerified: boolean;
+    rejectedReason: string | null;
+  };
+  isDeleted?: boolean;
+  createdAt?: Date;
 };
 
 export type VendorResponseReadModel = {

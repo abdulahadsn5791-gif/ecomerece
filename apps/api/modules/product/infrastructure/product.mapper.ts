@@ -283,6 +283,11 @@ export const ProductMapper = {
 
   aggregateToAdminResponseReadModel(product: ProductAggregate) {
     const base = this.aggregateToResponseReadModel(product);
-    return { ...base, stats: { ...product.stats } };
+    return {
+      ...base,
+      stats: { ...product.stats },
+      isDeleted: product.delete.isDeleted,
+      isBlocked: product.block.isBlocked,
+    };
   },
 };

@@ -1,5 +1,6 @@
 import type { IEvent, IEventHandler } from '@ecomerece/domain';
 import { emptyMetrics, type Metrics } from '@ecomerece/shared';
+import { connectDB } from '../../../../lib/mongo';
 import { ProductModel } from '../../../product/infrastructure/product.model';
 import { VendorModel } from '../../../vendor/infrastructure/vendor.models';
 import { statsRepository } from '../../infrastructure/StatsRepository';
@@ -13,6 +14,12 @@ import { statsRepository } from '../../infrastructure/StatsRepository';
 export class ProductStatsDenormalizationHandler implements IEventHandler<{ force: boolean }> {
   async handle(event: IEvent<{ force: boolean }>): Promise<void> {
     const { force } = event.payload;
+
+    // This pipeline runs from a background scheduler tick, outside any HTTP
+    // request, so the lazy per-request `dbMiddleware` connection may never have
+    // been established. Ensure it here or Mongoose buffers the first query for
+    // `bufferTimeoutMS` (10s) and then throws a buffering timeout.
+    await connectDB();
 
     const vendors = await VendorModel.find({ 'deleted.deleted': false })
       .select('_id statsRefreshEnabled')

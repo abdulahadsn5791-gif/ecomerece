@@ -1,6 +1,6 @@
-import { ForbiddenError, NotFoundError } from '../../../errors/app-error';
-import { ProductModel } from '../../product/infrastructure/product.model';
-import { VendorModel } from '../../vendor/infrastructure/vendor.models';
+import { ForbiddenError, NotFoundError } from '../errors/app-error';
+import { ProductModel } from '../modules/product/infrastructure/product.model';
+import { VendorModel } from '../modules/vendor/infrastructure/vendor.models';
 
 /**
  * Owner/admin guard for revenue-sensitive stats reads, implemented with direct
@@ -14,7 +14,7 @@ export class StatsAccessGuard {
   async ensureProductReadable(
     productId: string,
     role: string | undefined,
-    userId: string,
+    userId: string | undefined,
   ): Promise<void> {
     if (role === 'admin') return;
 
@@ -31,7 +31,7 @@ export class StatsAccessGuard {
     entityType: string,
     entityId: string,
     role: string | undefined,
-    userId: string,
+    userId: string | undefined,
   ): Promise<void> {
     if (role === 'admin') return;
     if (entityType === 'product') return this.ensureProductReadable(entityId, role, userId);

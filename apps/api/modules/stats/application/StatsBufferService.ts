@@ -1,5 +1,6 @@
 import { buildStatKey, expandToStatEvents } from '@ecomerece/domain';
 import type { StatEvent, TrackInput } from '@ecomerece/shared';
+import { connectDB } from '../../../lib/mongo';
 import { statsRepository } from '../infrastructure/StatsRepository';
 
 // Safety valve: if the buffer grows past this because the DB is slow/down,
@@ -52,6 +53,10 @@ export class StatsBufferService {
     this.buffer = new Map();
 
     try {
+      // The flush timer runs outside any HTTP request, so the lazy per-request
+      // `dbMiddleware` connection may not be established yet. `connectDB()` is
+      // a cheap no-op when the cached connection is already live.
+      await connectDB();
       await statsRepository.bulkUpsert(Array.from(batch.values()));
     } catch (error) {
       console.error('[stats] flush failed, re-queuing batch for retry on next tick:', error);

@@ -1,5 +1,4 @@
 import { getISOWeek, getTimeWindows } from '@ecomerece/domain';
-import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import {
   type AggregationLevel,
   type EntityType,
@@ -12,16 +11,11 @@ import {
 } from '@ecomerece/shared';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
+import type { ViewEntityType } from '../../../middleware/statsViewGuard';
 import { triggerProductStatsDenormalization } from '../application/ProductStatsSyncScheduler';
-import { type StatsAccessGuard, statsAccessGuard } from '../application/StatsAccessGuard';
 import { statsBufferService } from '../application/StatsBufferService';
 import { statsQueryService } from '../application/StatsQueryService';
 import { statsSyncSettingsService } from '../application/StatsSyncSettingsService';
-import type { StatsViewGuard, ViewEntityType } from '../application/StatsViewGuard';
-
-function monthKey(date: Date): string {
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
-}
 
 function shiftDateKeys(count: number, fromKey: string): string[] {
   const [y, m, d] = fromKey.split('-').map(Number);
@@ -51,16 +45,11 @@ function backWeeks(count: number, fromWeek: string): string[] {
 }
 
 export class StatsController {
-  constructor(
-    private readonly viewGuard: StatsViewGuard,
-    private readonly accessGuard: StatsAccessGuard = statsAccessGuard,
-  ) {}
+  public recordProductView = (c: Context) => this.recordView(c, 'product');
 
-  public recordProductView = (c: Context) => this.recordView(c, 'product', 'productId');
+  public recordCategoryView = (c: Context) => this.recordView(c, 'category');
 
-  public recordCategoryView = (c: Context) => this.recordView(c, 'category', 'categoryId');
-
-  public recordPageView = (c: Context) => this.recordView(c, 'page', 'pageKey');
+  public recordPageView = (c: Context) => this.recordView(c, 'page');
 
   public recordProductClick = (c: Context) => {
     const productId = this.requireParam(c, 'productId');
@@ -72,33 +61,11 @@ export class StatsController {
     return c.json({}, 202);
   };
 
-  private recordView = async (c: Context, type: ViewEntityType, paramName: string) => {
-    const rawId = this.requireParam(c, paramName);
-    let id: string;
-    if (type === 'page') {
-      // Page keys (home, cart, ...) are slugs, not UUIDs.
-      id = rawId;
-    } else {
-      try {
-        id = Id.create(rawId).value;
-      } catch {
-        return c.json({ message: 'Invalid id format' }, 400);
-      }
-    }
-
-    const decision = await this.viewGuard.shouldTrack({
-      type,
-      id,
-      visitorId: c.req.header('x-visitor-id') ?? c.req.query('visitorId'),
-      ip: this.clientIp(c),
-      ua: c.req.header('user-agent'),
-    });
-
-    if (decision === 'skip') {
-      // Silent non-tracking: duplicates, bots, and rate-limited traffic all
-      // look identical on the wire so attackers can't probe the guard.
-      return c.json({}, 202);
-    }
+  private recordView = (c: Context, type: ViewEntityType) => {
+    // The view guard middleware has already validated the id, decided to
+    // track, and flagged the request via `statsViewId`; `skip` never reaches
+    // this handler (silent 202 from the middleware).
+    const id = c.get('statsViewId');
 
     statsBufferService.track({
       entity: { type, id },
@@ -120,32 +87,11 @@ export class StatsController {
     return rest;
   }
 
-  private async shouldExposeFullStats(
-    c: Context,
-    entityType: string,
-    entityId: string,
-  ): Promise<boolean> {
-    if (c.get('role') === 'admin') return true;
-    if (entityType !== 'product' && entityType !== 'vendor') return true;
-    try {
-      await this.accessGuard.ensureEntityReadable(
-        entityType,
-        entityId,
-        c.get('role'),
-        c.get('userId'),
-      );
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   public getLifetimeStats = async (c: Context) => {
     const entityType = this.requireParam(c, 'entityType') as EntityType;
     const entityId = this.requireParam(c, 'entityId');
     const raw = await statsQueryService.getLifetimeStats(entityType, entityId);
-    const exposeFull = await this.shouldExposeFullStats(c, entityType, entityId);
-    const metrics = exposeFull ? raw : this.maskFinancialMetrics(raw);
+    const metrics = c.get('statsFullAccess') ? raw : this.maskFinancialMetrics(raw);
     return c.json({ entityType, entityId, aggregation: 'lifetime', metrics });
   };
 
@@ -160,7 +106,7 @@ export class StatsController {
       return c.json({ message: '`from` and `to` query params are required (YYYY-MM-DD)' }, 400);
     }
 
-    const exposeFull = await this.shouldExposeFullStats(c, entityType, entityId);
+    const exposeFull = c.get('statsFullAccess');
 
     const rawSeries =
       aggregation === 'weekly'
@@ -196,8 +142,6 @@ export class StatsController {
     const productId = this.requireParam(c, 'entityId');
     const parsed = getProductStatsOverviewQuerySchema.safeParse(c.req.query());
     if (!parsed.success) throw new HTTPException(400, { message: 'Invalid overview query params' });
-
-    await this.accessGuard.ensureProductReadable(productId, c.get('role'), c.get('userId'));
 
     const overview = await statsQueryService.getProductOverview(
       productId,
@@ -313,13 +257,5 @@ export class StatsController {
       throw new HTTPException(400, { message: `Missing required path parameter: ${key}` });
     }
     return value;
-  }
-
-  private clientIp(c: Context): string {
-    return (
-      c.req.header('cf-connecting-ip') ||
-      c.req.header('x-forwarded-for')?.split(',')[0] ||
-      'unknown'
-    );
   }
 }

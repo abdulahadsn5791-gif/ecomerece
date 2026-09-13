@@ -1,350 +1,313 @@
-// components/Navbar.tsx
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useThemeStore } from '@ecomerece/frontend/theme';
+import { useGetMe } from '@ecomerece/frontend/user';
 import {
-    MapPin,
-    Phone,
-    Mail,
-    Package,
-    HelpCircle,
-    Search,
-    Heart,
-    User,
-    ShoppingCart,
-    Moon,
-    Sun,
-    X,
-    CreditCard,
-    PackageOpen,
-    LogOut,
-    Settings,
-    ClipboardList,
-    Menu,
-    ChevronDown,
-    LogIn,
-} from "lucide-react";
-import { useGetMe } from "@ecomerece/frontend/user";
-import { useThemeStore } from "@ecomerece/frontend/theme";
-import Link from "next/link";
+  ChevronDown,
+  ClipboardList,
+  CreditCard,
+  Heart,
+  LogIn,
+  LogOut,
+  MapPin,
+  Menu,
+  Moon,
+  PackageOpen,
+  Search,
+  Settings,
+  ShoppingCart,
+  Sun,
+  User,
+  X,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 const accountItems = [
-    { label: "Profile", icon: User, href: "/account/profile" },
-    { label: "Orders", icon: ClipboardList, href: "/account/order" },
-    { label: "Addresses", icon: MapPin, href: "/account/address" },
-    { label: "Payment Methods", icon: CreditCard, href: "/account/payment" },
-    { label: "Saved Items", icon: PackageOpen, href: "/account/cart" },
-    { label: "Settings", icon: Settings, href: "/account/settings" },
-    { label: "Sign Out", icon: LogOut, danger: true, href: "/auth/signout" },
+  { label: 'Profile', icon: User, href: '/account/profile' },
+  { label: 'Orders', icon: ClipboardList, href: '/account/order' },
+  { label: 'Addresses', icon: MapPin, href: '/account/address' },
+  { label: 'Payment Methods', icon: CreditCard, href: '/account/payment' },
+  { label: 'Saved Items', icon: PackageOpen, href: '/account/cart' },
+  { label: 'Settings', icon: Settings, href: '/account/settings' },
+  { label: 'Sign Out', icon: LogOut, danger: true, href: '/auth/signout' },
+];
+
+const navLinks = [
+  { label: 'Home', href: '/' },
+  { label: 'Shop', href: '/shop' },
+  { label: 'Categories', href: '/categories' },
+  { label: 'Deals', href: '/deals' },
 ];
 
 export default function Navbar() {
-    const { darkMode, toggleTheme } = useThemeStore();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const { darkMode, toggleTheme } = useThemeStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const { data: user } = useGetMe();
 
-    const toggleMobileMenu = () => {
-        setMobileMenuOpen((prev) => !prev);
-        setAccountMenuOpen(false);
-    };
+  const glass = darkMode
+    ? 'bg-neutral-950/80 border-neutral-800 text-white backdrop-blur-2xl'
+    : 'bg-white/80 border-neutral-200 text-neutral-900 backdrop-blur-2xl';
 
-    const toggleAccountMenu = () => {
-        setAccountMenuOpen((prev) => !prev);
-        setMobileMenuOpen(false);
-    };
+  const softSurface = darkMode
+    ? 'bg-neutral-900/80 border-neutral-800'
+    : 'bg-white/60 border-neutral-200';
 
-    const closeAllMenus = () => {
-        setAccountMenuOpen(false);
-        setMobileMenuOpen(false);
-    };
+  const solidButton = darkMode
+    ? 'bg-white text-neutral-900 hover:bg-neutral-200'
+    : 'bg-neutral-900 text-white hover:bg-neutral-700';
 
-    const { data: user } = useGetMe();
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((prev) => !prev);
+    setAccountMenuOpen(false);
+  };
 
-    return (
-        <nav className="relative z-50">
-            {/* ============ TOP BAR ============ */}
-            <div
-                className={`text-xs font-medium border-b transition-colors duration-500 ${darkMode
-                        ? "bg-neutral-950 border-neutral-800 text-neutral-400"
-                        : "bg-neutral-100 border-neutral-200 text-neutral-600"
-                    }`}
+  const toggleAccountMenu = () => {
+    setAccountMenuOpen((prev) => !prev);
+    setMobileMenuOpen(false);
+  };
+
+  const closeAllMenus = () => {
+    setAccountMenuOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  return (
+    <header className="sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4">
+        <nav
+          aria-label="Main navigation"
+          className={`relative rounded-2xl border shadow-sm ${glass}`}
+        >
+          <div className="flex items-center justify-between gap-3 px-3 sm:px-5 py-2.5">
+            {/* Mobile menu */}
+            <button
+              type="button"
+              onClick={toggleMobileMenu}
+              className={`lg:hidden p-2 rounded-xl border transition-colors ${softSurface}`}
+              aria-label="Toggle main navigation"
             >
-                <div className="max-w-7xl mx-auto px-6 flex justify-between items-center flex-wrap gap-2.5 py-2.5">
-                    <div className="flex items-center gap-6">
-                        <a
-                            href="tel:+15551234567"
-                            className={`flex items-center gap-1.5 transition-colors ${darkMode ? "hover:text-white" : "hover:text-neutral-900"
-                                }`}
-                        >
-                            <Phone className="w-3.5 h-3.5" /> +1 (555) 123-4567
-                        </a>
-                        <a
-                            href="mailto:support@shopverse.com"
-                            className={`hidden sm:flex items-center gap-1.5 transition-colors ${darkMode ? "hover:text-white" : "hover:text-neutral-900"
-                                }`}
-                        >
-                            <Mail className="w-3.5 h-3.5" /> support@shopverse.com
-                        </a>
-                    </div>
-                    <div className="flex items-center gap-6">
-                        <Link
-                            href="/account/order"
-                            className={`flex items-center gap-1.5 transition-colors ${darkMode ? "hover:text-white" : "hover:text-neutral-900"
-                                }`}
-                        >
-                            <Package className="w-3.5 h-3.5" /> Track Order
-                        </Link>
-                        <a
-                            href="#"
-                            className={`flex items-center gap-1.5 transition-colors ${darkMode ? "hover:text-white" : "hover:text-neutral-900"
-                                }`}
-                        >
-                            <HelpCircle className="w-3.5 h-3.5" /> Help Center
-                        </a>
-                    </div>
-                </div>
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+
+            {/* Logo */}
+            <Link
+              href="/"
+              onClick={closeAllMenus}
+              className="text-xl font-bold tracking-tight shrink-0"
+            >
+              ShopVerse
+            </Link>
+
+            {/* Desktop nav links */}
+            <div className="hidden lg:flex items-center gap-6">
+              {navLinks.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={closeAllMenus}
+                  className={`text-sm font-medium transition-colors ${
+                    darkMode
+                      ? 'text-neutral-300 hover:text-white'
+                      : 'text-neutral-600 hover:text-black'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
 
-            {/* ============ MAIN HEADER ============ */}
-            <header
-                className={`sticky top-0 z-40 border-b backdrop-blur-md transition-colors duration-500 ${darkMode
-                        ? "bg-neutral-950/80 border-neutral-800 text-white"
-                        : "bg-white/80 border-neutral-200 text-neutral-900"
-                    }`}
+            {/* Search */}
+            <div
+              className={`hidden md:flex flex-1 max-w-sm items-center gap-2 rounded-full border px-3.5 py-2 transition-all ${
+                darkMode ? 'bg-neutral-900/60 border-neutral-800' : 'bg-white/60 border-neutral-200'
+              } focus-within:border-neutral-400`}
             >
-                <div className="max-w-7xl mx-auto px-6 flex items-center justify-between gap-6 py-4">
-                    {/* Left: Mobile Menu Toggle & Logo */}
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={toggleMobileMenu}
-                            className={`md:hidden p-2 rounded-xl border transition-colors ${darkMode
-                                    ? "border-neutral-800 bg-neutral-900 text-white"
-                                    : "border-neutral-200 bg-neutral-50 text-neutral-900"
-                                }`}
-                            aria-label="Toggle main navigation"
-                        >
-                            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                        </button>
+              <Search
+                className={`w-4 h-4 shrink-0 ${darkMode ? 'text-neutral-500' : 'text-neutral-400'}`}
+              />
+              <input
+                type="text"
+                placeholder="Search products…"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-500"
+              />
+            </div>
 
-                        <Link
-                            href="/"
-                            onClick={closeAllMenus}
-                            className="text-2xl font-extrabold tracking-tight flex items-center gap-1"
-                        >
-                            <span className="opacity-60">Shop</span>Verse
-                        </Link>
-                    </div>
+            {/* Actions */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className={`p-2.5 rounded-full border transition-all duration-300 hover:scale-105 ${softSurface}`}
+                aria-label="Toggle theme"
+              >
+                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
 
-                    {/* Center: Search Bar (Desktop) */}
-                    <div className="hidden md:flex flex-1 max-w-lg items-center relative">
-                        <div
-                            className={`w-full flex items-center rounded-full px-4 py-2.5 border transition-all duration-300 shadow-sm ${darkMode
-                                    ? "bg-neutral-900/50 border-neutral-800 focus-within:border-neutral-600 focus-within:bg-neutral-900"
-                                    : "bg-neutral-50 border-neutral-200 focus-within:border-neutral-400 focus-within:bg-white"
-                                }`}
-                        >
-                            <Search
-                                className={`w-4 h-4 mr-3 shrink-0 ${darkMode ? "text-neutral-500" : "text-neutral-400"
-                                    }`}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Search products, brands, and categories..."
-                                className="w-full bg-transparent border-none outline-none text-sm placeholder:text-neutral-500"
-                            />
-                        </div>
-                    </div>
+              <Link
+                href="/account/cart"
+                className={`relative hidden sm:flex items-center justify-center p-2.5 rounded-full border transition-all duration-300 hover:scale-105 ${softSurface}`}
+                aria-label="Wishlist"
+              >
+                <Heart className="w-4 h-4" />
+                <span
+                  className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-white text-[10px] font-bold flex items-center justify-center ${
+                    darkMode ? 'bg-neutral-500' : 'bg-neutral-700'
+                  }`}
+                >
+                  3
+                </span>
+              </Link>
 
-                    {/* Right: Actions (Theme, Wishlist, Account / Login, Cart) */}
-                    <div className="flex items-center gap-3">
-                        {/* Theme Toggle */}
-                        <button
-                            onClick={toggleTheme}
-                            className={`p-2.5 rounded-full border transition-all duration-300 hover:scale-105 ${darkMode
-                                    ? "border-neutral-800 bg-neutral-900 text-yellow-400 hover:bg-neutral-800"
-                                    : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:bg-neutral-100"
-                                }`}
-                            aria-label="Toggle Theme"
-                        >
-                            {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                        </button>
-
-                        {/* Wishlist */}
-                        <Link
-                            href="/account/cart"
-                            className={`relative p-2.5 rounded-full border transition-all duration-300 hover:scale-105 hidden sm:flex items-center justify-center ${darkMode
-                                    ? "border-neutral-800 bg-neutral-900 text-neutral-300 hover:bg-neutral-800 hover:text-white"
-                                    : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:bg-neutral-100 hover:text-black"
-                                }`}
-                            aria-label="Wishlist"
-                        >
-                            <Heart className="w-4 h-4" />
-                            <span className="absolute -top-1 -right-1 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center bg-rose-500 text-white">
-                                3
-                            </span>
-                        </Link>
-
-                        {/* Account Menu / Login Button */}
-                        {user?.email ? (
-                            <div className="relative">
-                                <button
-                                    onClick={toggleAccountMenu}
-                                    className={`flex items-center gap-2 p-2 rounded-full border transition-all duration-300 ${darkMode
-                                            ? "border-neutral-800 bg-neutral-900 text-neutral-300 hover:bg-neutral-800"
-                                            : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:bg-neutral-100"
-                                        }`}
-                                    aria-label="Account Menu"
-                                >
-                                    <div className="w-6 h-6 rounded-full bg-neutral-500/20 flex items-center justify-center">
-                                        <User className="w-3.5 h-3.5" />
-                                    </div>
-                                    <ChevronDown
-                                        className={`w-3.5 h-3.5 transition-transform duration-300 ${accountMenuOpen ? "rotate-180" : ""
-                                            }`}
-                                    />
-                                </button>
-
-                                {/* Account Dropdown */}
-                                {accountMenuOpen && (
-                                    <div
-                                        className={`absolute right-0 mt-3 w-56 rounded-2xl shadow-xl border overflow-hidden p-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${darkMode
-                                                ? "bg-neutral-900 border-neutral-800 text-white"
-                                                : "bg-white border-neutral-200 text-neutral-900"
-                                            }`}
-                                    >
-                                        <div className="px-3 py-2 border-b border-neutral-200/20 mb-1">
-                                            <p className="text-xs font-medium text-neutral-400">Signed in as</p>
-                                            <p className="text-sm font-bold truncate">{user.email}</p>
-                                        </div>
-                                        {accountItems.map((item) => {
-                                            const IconComponent = item.icon;
-                                            return (
-                                                <Link
-                                                    key={item.label}
-                                                    href={item.href}
-                                                    onClick={() => setAccountMenuOpen(false)}
-                                                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${item.danger
-                                                            ? "text-rose-500 hover:bg-rose-500/10"
-                                                            : darkMode
-                                                                ? "hover:bg-neutral-800 text-neutral-300 hover:text-white"
-                                                                : "hover:bg-neutral-100 text-neutral-700 hover:text-black"
-                                                        }`}
-                                                >
-                                                    <IconComponent className="w-4 h-4" />
-                                                    <span>{item.label}</span>
-                                                </Link>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <Link
-                                href="/auth"
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-xs border transition-all duration-300 hover:scale-105 active:scale-95 ${darkMode
-                                        ? "border-neutral-800 bg-neutral-900 text-neutral-200 hover:bg-neutral-800 hover:text-white"
-                                        : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:bg-neutral-100 hover:text-black"
-                                    }`}
-                            >
-                                <LogIn className="w-3.5 h-3.5" />
-                                <span>Sign In</span>
-                            </Link>
-                        )}
-
-                        {/* Cart */}
-                        <Link
-                            href="/account/cart"
-                            className={`relative flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-xs transition-all duration-300 shadow-sm hover:scale-105 active:scale-95 ${darkMode
-                                    ? "bg-white text-black hover:bg-neutral-200"
-                                    : "bg-neutral-900 text-white hover:bg-neutral-800"
-                                }`}
-                        >
-                            <ShoppingCart className="w-4 h-4" />
-                            <span className="hidden sm:inline">Cart</span>
-                            <span className="w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
-                                5
-                            </span>
-                        </Link>
-                    </div>
-                </div>
-
-                {/* ============ MOBILE DRAWER MENU ============ */}
-                {mobileMenuOpen && (
-                    <div
-                        className={`md:hidden absolute top-full left-0 w-full border-b shadow-2xl p-6 transition-all duration-300 ${darkMode
-                                ? "bg-neutral-950 border-neutral-800 text-white"
-                                : "bg-white border-neutral-200 text-neutral-900"
-                            }`}
+              {user?.email ? (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={toggleAccountMenu}
+                    className={`flex items-center gap-1.5 p-1 pr-2 rounded-full border transition-all duration-300 ${softSurface}`}
+                    aria-label="Account menu"
+                  >
+                    <span
+                      className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                        darkMode
+                          ? 'bg-neutral-800 text-neutral-300'
+                          : 'bg-neutral-100 text-neutral-600'
+                      }`}
                     >
-                        {/* Mobile Search */}
-                        <div
-                            className={`flex items-center rounded-full px-4 py-2.5 border mb-4 ${darkMode ? "bg-neutral-900 border-neutral-800" : "bg-neutral-50 border-neutral-200"
-                                }`}
+                      <User className="w-3.5 h-3.5" />
+                    </span>
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 transition-transform duration-300 ${accountMenuOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+
+                  {accountMenuOpen && (
+                    <div
+                      className={`absolute right-0 mt-2.5 w-56 rounded-2xl border p-1.5 shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${glass}`}
+                    >
+                      <div
+                        className={`px-3 py-2 border-b mb-1 ${darkMode ? 'border-neutral-800' : 'border-neutral-200'}`}
+                      >
+                        <p
+                          className={`text-xs ${darkMode ? 'text-neutral-500' : 'text-neutral-500'}`}
                         >
-                            <Search className="w-4 h-4 mr-3 text-neutral-400" />
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                className="w-full bg-transparent border-none outline-none text-sm"
-                            />
-                        </div>
-
-                        {/* Mobile Authentication & Account Links */}
-                        {!user?.email ? (
-                            <Link
-                                href="/auth"
-                                onClick={() => setMobileMenuOpen(false)}
-                                className={`flex items-center justify-center gap-2 w-full py-3 mb-4 rounded-full font-semibold text-sm transition-colors border ${darkMode
-                                        ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800"
-                                        : "border-neutral-200 bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
-                                    }`}
-                            >
-                                <LogIn className="w-4 h-4" />
-                                <span>Sign In / Register</span>
-                            </Link>
-                        ) : (
-                            <div className="space-y-1 mb-4 pb-4 border-b border-neutral-200/20">
-                                {accountItems.map((item) => {
-                                    const IconComponent = item.icon;
-                                    return (
-                                        <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${item.danger
-                                                    ? "text-rose-500 hover:bg-rose-500/10"
-                                                    : darkMode
-                                                        ? "hover:bg-neutral-900 text-neutral-300"
-                                                        : "hover:bg-neutral-100 text-neutral-700"
-                                                }`}
-                                        >
-                                            <IconComponent className="w-4 h-4" />
-                                            <span>{item.label}</span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        )}
-
-                        <div className="pt-2 flex justify-between items-center">
-                            <Link
-                                href="/account/cart"
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="text-xs font-semibold flex items-center gap-1.5 text-rose-500"
-                            >
-                                <Heart className="w-4 h-4" /> Wishlist (3 items)
-                            </Link>
-                            <Link
-                                href="/account/order"
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="text-xs font-semibold flex items-center gap-1.5"
-                            >
-                                <Package className="w-4 h-4" /> Track Order
-                            </Link>
-                        </div>
+                          Signed in as
+                        </p>
+                        <p className="text-sm font-semibold truncate">{user.email}</p>
+                      </div>
+                      {accountItems.map((item) => {
+                        const IconComponent = item.icon;
+                        return (
+                          <Link
+                            key={item.label}
+                            href={item.href}
+                            onClick={() => setAccountMenuOpen(false)}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                              item.danger
+                                ? 'text-rose-500 hover:bg-rose-500/10'
+                                : darkMode
+                                  ? 'text-neutral-300 hover:bg-neutral-800/80 hover:text-white'
+                                  : 'text-neutral-700 hover:bg-neutral-100 hover:text-black'
+                            }`}
+                          >
+                            <IconComponent className="w-4 h-4" />
+                            <span>{item.label}</span>
+                          </Link>
+                        );
+                      })}
                     </div>
-                )}
-            </header>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/auth"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full border font-medium text-sm transition-all duration-300 hover:scale-105 active:scale-95 ${softSurface}`}
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign in</span>
+                </Link>
+              )}
+
+              <Link
+                href="/account/cart"
+                className={`relative flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 ${solidButton}`}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span className="hidden sm:inline">Cart</span>
+                <span
+                  className={`h-4 min-w-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                    darkMode ? 'bg-neutral-900/15 text-neutral-900' : 'bg-white/20 text-white'
+                  }`}
+                >
+                  5
+                </span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Mobile drawer */}
+          {mobileMenuOpen && (
+            <div className={`lg:hidden mx-3 mb-3 rounded-2xl border p-4 space-y-3 ${glass}`}>
+              <div
+                className={`flex items-center gap-2 rounded-full border px-3 py-2 ${darkMode ? 'bg-neutral-900/80 border-neutral-800' : 'bg-white/60 border-neutral-200'}`}
+              >
+                <Search className="w-4 h-4 text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="Search products, brands…"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-1">
+                {navLinks.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-2 rounded-xl text-sm font-medium hover:bg-neutral-500/10"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+
+              {!user?.email ? (
+                <Link
+                  href="/auth"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-full font-semibold text-sm ${solidButton}`}
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign in</span>
+                </Link>
+              ) : (
+                <div className="grid grid-cols-2 gap-1">
+                  {accountItems.map((item) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                          item.danger
+                            ? 'text-rose-500 hover:bg-rose-500/10'
+                            : 'hover:bg-neutral-500/10'
+                        }`}
+                      >
+                        <IconComponent className="w-4 h-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
-    );
+      </div>
+    </header>
+  );
 }

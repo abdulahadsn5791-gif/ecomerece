@@ -1,83 +1,87 @@
 {
-    "name": "@ecomerece/frontend",
-    "version": "1.0.0",
-    "main": "index.ts",
-    "types": "index.ts",
-    "exports": {
-        ".": {
-            "types": "./index.ts",
-            "default": "./index.ts"
-        },
-        "./auth": {
-            "types": "./adapters/auth/auth-adapter.web.ts",
-            "web": "./adapters/auth/auth-adapter.web.ts",
-            "react-native": "./adapters/auth/auth-adapter.native.ts",
-            "default": "./adapters/auth/auth-adapter.web.ts"
-        },
-        "./storage": {
-            "types": "./adapters/storage/storage-adapter.web.ts",
-            "web": "./adapters/storage/storage-adapter.web.ts",
-            "react-native": "./adapters/storage/storage-adapter.native.ts",
-            "default": "./adapters/storage/storage-adapter.web.ts"
-        },
-        "./theme": {
-            "types": "./services/theme.service.ts",
-            "default": "./services/theme.service.ts"
-        },
-        "./error": {
-            "types": "./services/parseModalError.service.ts",
-            "default": "./services/parseModalError.service.ts"
-        },
-        "./supabase": {
-            "types": "./services/supabaseClient.ts",
-            "default": "./services/supabaseClient.ts"
-        },
-        "./user": {
-            "types": "./modules/user/index.ts",
-            "default": "./modules/user/index.ts"
-        },
-        "./home": {
-            "types": "./modules/home/index.ts",
-            "default": "./modules/home/index.ts"
-        },
-        "./category": {
-            "types": "./modules/category/index.ts",
-            "default": "./modules/category/index.ts"
-        },
-        "./product": {
-            "types": "./modules/product/index.ts",
-            "default": "./modules/product/index.ts"
-        },
-        "./vendor": {
-            "types": "./modules/vendor/index.ts",
-            "default": "./modules/vendor/index.ts"
-        },
-        "./address": {
-            "types": "./modules/address/index.ts",
-            "default": "./modules/address/index.ts"
-        },
-        "./stats": {
-            "types": "./modules/stats/index.ts",
-            "default": "./modules/stats/index.ts"
-        }
+  "name": "@ecomerece/frontend",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
     },
-    "dependencies": {
-        "@ecomerece/shared": "workspace:*",
-        "@supabase/ssr": "^0.12.5",
-        "@supabase/supabase-js": "^2.114.0",
-        "@tanstack/react-query": "^5.102.8",
-        "@types/react-dom": "^19.2.5",
-        "framer-motion": "^13.2.0",
-        "lucide-react": "0.468.0",
-        "react-dom": "^19.2.8",
-        "zustand": "^5.0.0"
+    "./auth": {
+      "types": "./adapters/auth/auth-adapter.web.ts",
+      "web": "./adapters/auth/auth-adapter.web.ts",
+      "react-native": "./adapters/auth/auth-adapter.native.ts",
+      "default": "./adapters/auth/auth-adapter.web.ts"
     },
-    "peerDependencies": {
-        "react": "^19.2.8"
+    "./storage": {
+      "types": "./adapters/storage/storage-adapter.web.ts",
+      "web": "./adapters/storage/storage-adapter.web.ts",
+      "react-native": "./adapters/storage/storage-adapter.native.ts",
+      "default": "./adapters/storage/storage-adapter.web.ts"
     },
-    "peerDependenciesMeta": {},
-    "devDependencies": {
-        "@types/react": "^19.2.18",
-        "typescript": "^5.0.0"
+    "./theme": {
+      "types": "./services/theme.service.ts",
+      "default": "./services/theme.service.ts"
+    },
+    "./app-settings": {
+      "types": "./services/app-settings.service.ts",
+      "default": "./services/app-settings.service.ts"
+    },
+    "./error": {
+      "types": "./services/parseModalError.service.ts",
+      "default": "./services/parseModalError.service.ts"
+    },
+    "./supabase": {
+      "types": "./services/supabaseClient.ts",
+      "default": "./services/supabaseClient.ts"
+    },
+    "./user": {
+      "types": "./modules/user/index.ts",
+      "default": "./modules/user/index.ts"
+    },
+    "./home": {
+      "types": "./modules/home/index.ts",
+      "default": "./modules/home/index.ts"
+    },
+    "./category": {
+      "types": "./modules/category/index.ts",
+      "default": "./modules/category/index.ts"
+    },
+    "./product": {
+      "types": "./modules/product/index.ts",
+      "default": "./modules/product/index.ts"
+    },
+    "./vendor": {
+      "types": "./modules/vendor/index.ts",
+      "default": "./modules/vendor/index.ts"
+    },
+    "./address": {
+      "types": "./modules/address/index.ts",
+      "default": "./modules/address/index.ts"
+    },
+    "./stats": {
+      "types": "./modules/stats/index.ts",
+      "default": "./modules/stats/index.ts"
     }
+  },
+  "dependencies": {
+    "@ecomerece/shared": "workspace:*",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.114.0",
+    "@tanstack/react-query": "^5.102.8",
+    "@types/react-dom": "^19.2.5",
+    "framer-motion": "^13.2.0",
+    "lucide-react": "0.468.0",
+    "react-dom": "^19.2.8",
+    "zustand": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.8"
+  },
+  "peerDependenciesMeta": {},
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "typescript": "^5.0.0"
+  }
 }

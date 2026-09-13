@@ -289,6 +289,7 @@ describe('HomeAppService Full CRUD Operations', () => {
                 name: 'Smartphones',
                 image: 'https://example.com/phone.jpg',
                 accent: '#3B82F6',
+                icon: 'Smartphone',
             },
             'admin-1',
         );
@@ -402,11 +403,13 @@ describe('HomeAppService Full CRUD Operations', () => {
                         title: 'Free Shipping',
                         detail: 'On all orders nationwide over Rs. 2,500',
                         accent: '#10B981',
+                        icon: 'Truck',
                     },
                     {
                         title: 'Official Warranty',
                         detail: '100% genuine brand warranty covered',
                         accent: '#3B82F6',
+                        icon: 'ShieldCheck',
                     },
                 ],
             },
@@ -480,7 +483,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
         const { repo, storage, service } = createService();
 
         await service.addCategory(
-            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6' },
+            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6', icon: 'Smartphone' },
             'admin-1',
         );
 
@@ -504,6 +507,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
                 name: 'Laptops',
                 image: 'https://cdn.t.com/laptops.jpg',
                 accent: '#3B82F6',
+                icon: 'Laptop',
             },
             'admin-1',
         );
@@ -517,7 +521,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
     it('should replace a stored image and delete the old one after persistence', async () => {
         const { repo, storage, service } = createService();
         await service.addCategory(
-            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6' },
+            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6', icon: 'Smartphone' },
             'admin-1',
         );
         const layout = await service.getHome();
@@ -539,7 +543,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
     it('should preserve the stored image when an update does not touch it', async () => {
         const { repo, storage, service } = createService();
         await service.addCategory(
-            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6' },
+            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6', icon: 'Smartphone' },
             'admin-1',
         );
         const layout = await service.getHome();
@@ -557,7 +561,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
     it('should delete the stored image when the entity is removed', async () => {
         const { storage, service } = createService();
         await service.addCategory(
-            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6' },
+            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6', icon: 'Smartphone' },
             'admin-1',
         );
         const layout = await service.getHome();
@@ -575,7 +579,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
         storage.failUpload = true;
 
         await expect(
-            service.addCategory({ name: 'Smartphones', image: DATA_URI, accent: '#3B82F6' }, 'admin-1'),
+            service.addCategory({ name: 'Smartphones', image: DATA_URI, accent: '#3B82F6', icon: 'Smartphone' }, 'admin-1'),
         ).rejects.toThrow('upload failed');
 
         expect(storage.uploaded).toHaveLength(0);
@@ -587,7 +591,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
         repo.failSave = true;
 
         await expect(
-            service.addCategory({ name: 'Smartphones', image: DATA_URI, accent: '#3B82F6' }, 'admin-1'),
+            service.addCategory({ name: 'Smartphones', image: DATA_URI, accent: '#3B82F6', icon: 'Smartphone' }, 'admin-1'),
         ).rejects.toThrow('save failed');
 
         expect(storage.uploaded).toHaveLength(1);
@@ -598,7 +602,7 @@ describe('HomeAppService Image Storage Lifecycle', () => {
     it('should swallow storage delete failures on removal', async () => {
         const { storage, service } = createService();
         await service.addCategory(
-            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6' },
+            { name: 'Smartphones', image: DATA_URI, accent: '#3B82F6', icon: 'Smartphone' },
             'admin-1',
         );
         const layout = await service.getHome();

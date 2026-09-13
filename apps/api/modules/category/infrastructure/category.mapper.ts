@@ -86,6 +86,8 @@ export const CategoryMapper = {
             image: category.image.value,
             title: category.title.value,
             createdAt: category.createdAt.value,
+            isDeleted: category.delete.isDeleted,
+            idBlocked: category.block.isBlocked,
         };
     },
 };

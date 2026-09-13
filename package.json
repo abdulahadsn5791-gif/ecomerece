@@ -6,7 +6,7 @@
     ],
     "scripts": {
         "dev": "bun run --filter api dev & bun run --filter web dev",
-        "build": "bun run --filter api build",
+        "build": "bun run --filter api build & bun run --filter web build",
         "typecheck": "bun run --filter '*' typecheck",
         "test": "bun test",
         "test:watch": "bun test --watch",

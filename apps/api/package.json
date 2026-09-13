@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "scripts": {
         "dev": "bun run --watch ./index.ts",
-        "build": "bun run build",
+        "build": "bun run typecheck",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {

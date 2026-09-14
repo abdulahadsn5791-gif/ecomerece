@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
-
+const allowed = process.env.NEXT_PUBLIC_ALLOWED_DEV_ORIGINS?.split(',') ?? [];
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['192.168.100.110', '108.165.233.182'],
+
+  allowedDevOrigins: allowed,
   transpilePackages: ['@ecomerece/domain', '@ecomerece/shared', '@ecomerece/frontend'],
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@ecomerece/frontend'],
@@ -9,7 +10,7 @@ const nextConfig: NextConfig = {
   rewrites: async () => [
     {
       source: '/api/:path*',
-      destination: 'http://localhost:8000/:path*',
+      destination: process.env.NEXT_PUBLIC_API_URL + '/:path*',
     },
   ],
 };

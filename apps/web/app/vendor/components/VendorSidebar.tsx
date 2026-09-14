@@ -31,7 +31,7 @@ export default function VendorSidebar() {
   const mutedText = darkMode ? 'text-neutral-400' : 'text-neutral-500';
 
   const handleSignOut = async () => {
-    router.push('/login');
+    router.push('/auth/signout');
   };
 
   return (

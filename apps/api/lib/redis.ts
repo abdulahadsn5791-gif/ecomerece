@@ -8,4 +8,9 @@ redis.on('error', (err) => {
     console.error('Redis Error:', err);
 });
 
-await redis.connect();
+void (async () => {
+    await redis.connect();
+})().catch((err) => {
+    console.error('Redis connection failed:', err);
+    process.exit(1);
+});

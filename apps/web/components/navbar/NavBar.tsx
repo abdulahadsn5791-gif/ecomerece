@@ -16,6 +16,7 @@ import {
   Search,
   Settings,
   ShoppingCart,
+  Store,
   Sun,
   User,
   X,
@@ -29,6 +30,7 @@ const accountItems = [
   { label: 'Addresses', icon: MapPin, href: '/account/address' },
   { label: 'Payment Methods', icon: CreditCard, href: '/account/payment' },
   { label: 'Saved Items', icon: PackageOpen, href: '/account/cart' },
+  { label: 'Become a Vendor', icon: Store, href: '/vendor/create' },
   { label: 'Settings', icon: Settings, href: '/account/settings' },
   { label: 'Sign Out', icon: LogOut, danger: true, href: '/auth/signout' },
 ];

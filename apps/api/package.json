@@ -4,6 +4,7 @@
     "scripts": {
         "dev": "bun run --watch ./index.ts",
         "build": "bun run typecheck",
+        "start": "NODE_ENV=production bun run ./index.ts",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {

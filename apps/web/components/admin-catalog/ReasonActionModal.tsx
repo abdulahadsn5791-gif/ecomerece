@@ -17,6 +17,8 @@ interface ReasonActionModalProps {
   reasonPlaceholder?: string;
   /** When true the user must enter a reason before confirming. Defaults to true. */
   requireReason?: boolean;
+  /** Renders the reason textarea as optional (no `*`) and not required for confirm. */
+  showReason?: boolean;
   isPending: boolean;
   error: unknown;
   onClose: () => void;
@@ -28,18 +30,20 @@ function ReasonField({
   updatePayload,
   placeholder,
   darkMode,
+  required = true,
 }: {
   payload: Partial<ReasonPayload>;
   updatePayload: (u: Partial<ReasonPayload>) => void;
   placeholder: string;
   darkMode: boolean;
+  required?: boolean;
 }) {
   return (
     <label className="block">
       <span
         className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
       >
-        Reason <span className="text-red-500">*</span>
+        Reason {required && <span className="text-red-500">*</span>}
       </span>
       <textarea
         value={payload.reason ?? ''}
@@ -64,6 +68,7 @@ export function ReasonActionModal({
   confirmText = 'Confirm',
   reasonPlaceholder = 'Provide a short reason…',
   requireReason = true,
+  showReason = false,
   isPending,
   error,
   onClose,
@@ -84,13 +89,14 @@ export function ReasonActionModal({
       defaultPayload={{}}
       onConfirm={onConfirm}
       renderFields={
-        requireReason
+        requireReason || showReason
           ? (payload, updatePayload) => (
               <ReasonField
                 payload={payload}
                 updatePayload={updatePayload}
                 placeholder={reasonPlaceholder}
                 darkMode={darkMode}
+                required={requireReason}
               />
             )
           : undefined

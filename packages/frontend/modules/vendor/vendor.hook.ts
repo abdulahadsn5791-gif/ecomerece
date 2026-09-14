@@ -74,6 +74,7 @@ export interface AdminVendorsInfiniteFilters {
   search?: string;
   verified?: boolean;
   deleted?: boolean;
+  pending?: boolean;
   limit?: number;
 }
 

@@ -134,10 +134,11 @@ export class VendorAppService extends BaseService {
     );
     const tittle = Title.create(data.title);
     const description = Description.create(data.description);
-    const image = ImageInfoVO.create(
-      UrlVO.create(data.image.logo),
-      UrlVO.create(data.image.banner),
-    );
+    const [logo, banner] = await Promise.all([
+      this.resolveImage(data.image.logo, 'vendors'),
+      this.resolveImage(data.image.banner, 'vendors'),
+    ]);
+    const image = ImageInfoVO.create(logo.url, banner.url, logo.imageKey, banner.imageKey);
     const slug = Slug.create(data.slug);
     const newVendor = VendorAggregate.create({
       id: id,
@@ -149,7 +150,16 @@ export class VendorAppService extends BaseService {
       slug,
     });
     newVendor.raiseCreated(id, actorId, tittle, slug);
-    await this.vendorRepo.Create(newVendor);
+
+    try {
+      await this.vendorRepo.Create(newVendor);
+    } catch (error) {
+      const uploadedKeys = [logo.imageKey, banner.imageKey].filter((key): key is string =>
+        Boolean(key),
+      );
+      await Promise.allSettled(uploadedKeys.map((key) => this.deleteImage(key)));
+      throw error;
+    }
     await this.publishEvents(newVendor);
 
     return VendorMessages.createdVendor(id, actorId);
@@ -274,6 +284,11 @@ export class VendorAppService extends BaseService {
     }
     if (query.deleted !== undefined) filter['deleted.deleted'] = query.deleted;
     if (query.verified !== undefined) filter['verification.verified'] = query.verified;
+    if (query.pending) {
+      filter['deleted.deleted'] = false;
+      filter['verification.verified'] = false;
+      filter['verification.rejectedReason'] = null;
+    }
 
     const cursor = query.cursor ? Id.create(query.cursor) : undefined;
     const limit = query.limit ? Quantity.create(query.limit) : undefined;
@@ -293,6 +308,10 @@ export class VendorAppService extends BaseService {
       title: aggregate.title.value,
       slug: aggregate.slug.value,
       stats: statsByIds.get(aggregate.id.value),
+      images: {
+        logo: aggregate.image.logo.value,
+        banner: aggregate.image.banner.value,
+      },
       verification: {
         isVerified: aggregate.verification.isVerified,
         rejectedReason: aggregate.verification.rejectedReason?.value ?? null,

@@ -25,13 +25,14 @@ import { ProductStatsOverviewPanel } from '@/components/stats-page/ProductStatsO
 import { ProductStatsTable } from '@/components/stats-page/ProductStatsTable';
 import { StatsEmptyState } from '@/components/stats-page/StatsEmptyState';
 
-type StatusFilter = 'all' | 'verified' | 'unverified' | 'deleted';
+type StatusFilter = 'all' | 'verified' | 'pending' | 'unverified' | 'deleted';
 
 const VENDOR_SKELETON_KEYS = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6'];
 
 const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'verified', label: 'Verified' },
+  { value: 'pending', label: 'Pending' },
   { value: 'unverified', label: 'Unverified' },
   { value: 'deleted', label: 'Deleted' },
 ];
@@ -95,6 +96,7 @@ export function AdminVendorsTable() {
     const f: AdminVendorsInfiniteFilters = {};
     if (debouncedSearch) f.search = debouncedSearch;
     if (status === 'verified') f.verified = true;
+    else if (status === 'pending') f.pending = true;
     else if (status === 'unverified') f.verified = false;
     else if (status === 'deleted') f.deleted = true;
     return f;
@@ -105,9 +107,16 @@ export function AdminVendorsTable() {
 
   const rows = useMemo(() => data?.pages.flatMap((p) => p.data) ?? [], [data]);
 
-  const sentinelRef = useCursorLoadMore<HTMLTableRowElement>({ hasNextPage, isFetchingNextPage, fetchNextPage });
+  const sentinelRef = useCursorLoadMore<HTMLTableRowElement>({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   // ── Bottom stats ───────────────────────────────────────────────────────
+  const selectedVendor =
+    rows.find((r) => r.id === selectedId) ??
+    (selectedId ? ({ id: selectedId } as VendorListItemReadModel) : null);
   const statsOverview = useGetVendorStatsOverview(selectedId ?? '', { enabled: !!selectedId });
   const selectedProducts = useGetAdminPaginatedProducts({
     vendorId: selectedId ?? '',
@@ -137,6 +146,16 @@ export function AdminVendorsTable() {
         return recoverMut;
     }
   })();
+
+  const handleVerifyNow = async (v: VendorListItemReadModel) => {
+    try {
+      await verifyMut.mutateAsync({ vendorId: v.id });
+      await queryClient.invalidateQueries({ queryKey: [...VENDOR_QUERY_KEY, 'admin-infinite'] });
+      verifyMut.reset();
+    } catch {
+      /* error surfaced via verifyMut.error below */
+    }
+  };
 
   const closeAction = () => {
     verifyMut.reset();
@@ -217,30 +236,32 @@ export function AdminVendorsTable() {
         icon: RotateCcw,
         onClick: () => setAction({ vendor: v, kind: 'recover' }),
       });
-    } else {
-      if (!v.verification?.isVerified) {
-        items.push({
-          key: 'verify',
-          label: 'Verify',
-          icon: ShieldCheck,
-          onClick: () => setAction({ vendor: v, kind: 'verify' }),
-        });
-        items.push({
-          key: 'reject',
-          label: 'Reject',
-          icon: ShieldOff,
-          danger: true,
-          onClick: () => setAction({ vendor: v, kind: 'reject' }),
-        });
-      }
+      return items;
+    }
+
+    if (v.verification?.isVerified) {
       items.push({
-        key: 'delete',
-        label: 'Soft delete',
-        icon: Trash2,
+        key: 'reject',
+        label: 'Unverify',
+        icon: ShieldOff,
         danger: true,
-        onClick: () => setAction({ vendor: v, kind: 'delete' }),
+        onClick: () => setAction({ vendor: v, kind: 'reject' }),
+      });
+    } else {
+      items.push({
+        key: 'verify',
+        label: 'Verify',
+        icon: ShieldCheck,
+        onClick: () => void handleVerifyNow(v),
       });
     }
+    items.push({
+      key: 'delete',
+      label: 'Soft delete',
+      icon: Trash2,
+      danger: true,
+      onClick: () => setAction({ vendor: v, kind: 'delete' }),
+    });
     return items;
   };
 
@@ -272,6 +293,18 @@ export function AdminVendorsTable() {
               Review verification status, recover or remove vendors.
             </p>
           </div>
+
+          {verifyMut.error && (
+            <div
+              className={`rounded-2xl border px-4 py-3 text-sm ${
+                darkMode
+                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                  : 'bg-rose-50 border-rose-200 text-rose-700'
+              }`}
+            >
+              Couldn&apos;t verify vendor. {verifyMut.error.message}
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center gap-3">
             <input
@@ -384,11 +417,20 @@ export function AdminVendorsTable() {
                   >
                     <td className={cellBase}>
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`w-10 h-10 rounded-full bg-gradient-to-br ${AVATAR_COLORS[colorIdx(v.title)]} flex items-center justify-center text-white text-xs font-bold shrink-0`}
-                        >
-                          {initials(v.title)}
-                        </div>
+                        {v.images?.logo ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={v.images.logo}
+                            alt={v.title}
+                            className="w-10 h-10 rounded-full object-cover shrink-0 border border-white/10"
+                          />
+                        ) : (
+                          <div
+                            className={`w-10 h-10 rounded-full bg-gradient-to-br ${AVATAR_COLORS[colorIdx(v.title)]} flex items-center justify-center text-white text-xs font-bold shrink-0`}
+                          >
+                            {initials(v.title)}
+                          </div>
+                        )}
                         <div className="min-w-0">
                           <p className="font-semibold truncate max-w-[200px]">{v.title}</p>
                           <p
@@ -402,6 +444,7 @@ export function AdminVendorsTable() {
                     <td className={cellBase}>
                       <div className="flex flex-wrap gap-1.5">
                         <span
+                          title={v.verification?.rejectedReason ?? undefined}
                           className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap ${verificationBadge(v)}`}
                         >
                           {verificationLabel(v)}
@@ -455,6 +498,72 @@ export function AdminVendorsTable() {
         )}
       </motion.div>
 
+      {/* Vendor profile & banner */}
+      {selectedVendor && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className={`rounded-[28px] overflow-hidden ${darkMode ? 'bg-neutral-900 border border-neutral-800' : 'bg-white shadow-sm'}`}
+        >
+          <div className="h-44 sm:h-56 lg:h-64 w-full bg-neutral-200 dark:bg-neutral-800">
+            {selectedVendor.images?.banner ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={selectedVendor.images.banner}
+                alt={`${selectedVendor.title ?? 'Vendor'} banner`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-neutral-400 dark:text-neutral-600 text-sm">
+                No banner
+              </div>
+            )}
+          </div>
+          <div className="px-6 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-10">
+              <div
+                className={`w-20 h-20 rounded-2xl overflow-hidden shrink-0 border-4 ${
+                  darkMode ? 'bg-neutral-800 border-neutral-900' : 'bg-neutral-100 border-white'
+                }`}
+              >
+                {selectedVendor.images?.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={selectedVendor.images.logo}
+                    alt={selectedVendor.title ?? 'Vendor logo'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className={`w-full h-full bg-gradient-to-br ${AVATAR_COLORS[colorIdx(selectedVendor.title ?? 'vendor')]} flex items-center justify-center text-white text-xl font-bold`}
+                  >
+                    {initials(selectedVendor.title ?? 'Vendor')}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 pb-1 sm:pt-0 pt-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="text-2xl font-bold tracking-tight">
+                    {selectedVendor.title ?? 'Vendor'}
+                  </h3>
+                  {selectedVendor.title && (
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap ${verificationBadge(selectedVendor)}`}
+                    >
+                      {verificationLabel(selectedVendor)}
+                    </span>
+                  )}
+                </div>
+                <p className={`text-sm mt-1 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  @{selectedVendor.slug ?? '—'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Bottom stats panel */}
       {selectedId && statsOverview.isLoading && (
         <div
@@ -489,37 +598,31 @@ export function AdminVendorsTable() {
       <ReasonActionModal
         isOpen={Boolean(action)}
         title={
-          action?.kind === 'verify'
-            ? `Verify ${action?.vendor.title}?`
-            : action?.kind === 'reject'
-              ? `Reject ${action?.vendor.title}?`
-              : action?.kind === 'delete'
-                ? `Soft-delete ${action?.vendor.title}?`
-                : `Recover ${action?.vendor.title}?`
+          action?.kind === 'reject'
+            ? `Unverify ${action?.vendor.title}?`
+            : action?.kind === 'delete'
+              ? `Soft-delete ${action?.vendor.title}?`
+              : `Recover ${action?.vendor.title}?`
         }
         message={
           action?.kind === 'recover'
             ? 'The vendor will be restored to the storefront.'
-            : action?.kind === 'verify'
-              ? 'The vendor will be publicly verified.'
+            : action?.kind === 'reject'
+              ? 'The vendor will no longer be verified and its verification status will be reset to unverified.'
               : 'Provide a short reason for the audit trail.'
         }
-        variant={
-          action?.kind === 'verify' ? 'success' : action?.kind === 'recover' ? 'success' : 'danger'
-        }
+        variant={action?.kind === 'recover' ? 'success' : 'danger'}
         confirmText={
-          action?.kind === 'verify'
-            ? 'Verify vendor'
-            : action?.kind === 'reject'
-              ? 'Reject vendor'
-              : action?.kind === 'delete'
-                ? 'Soft delete'
-                : 'Recover vendor'
+          action?.kind === 'reject'
+            ? 'Unverify vendor'
+            : action?.kind === 'delete'
+              ? 'Soft delete'
+              : 'Recover vendor'
         }
         requireReason={action?.kind === 'reject' || action?.kind === 'delete'}
         reasonPlaceholder={
           action?.kind === 'reject'
-            ? 'Why is this vendor being rejected?'
+            ? 'Why is this vendor being unverified?'
             : 'Why is this vendor being deleted?'
         }
         isPending={activeMutation?.isPending ?? false}

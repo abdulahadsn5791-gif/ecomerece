@@ -3,7 +3,7 @@ module.exports = {
         {
             name: 'hono-bun',
             script: 'bun',
-            args: 'run src/index.ts',        // Bun runs TypeScript directly
+            args: 'run ./dist/index.js',        // compiled output from `bun run build`
             instances: 1,                    // or 'max' for multiple (but see below)
             exec_mode: 'fork',               // Bun doesn't support Node cluster mode
             watch: false,                    // turn on only for development

@@ -49,8 +49,8 @@ app.use(
   }),
 );
 
-app.use('*', dbMiddleware);
 app.use('*', rateLimiter);
+app.use('*', dbMiddleware);
 
 app.options('*', (c) => {
   return c.text('');

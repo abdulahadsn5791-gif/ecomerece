@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "scripts": {
         "dev": "bun run --watch ./index.ts",
-        "build": "bun run typecheck && bun build ./index.ts --target=bun --outdir=dist --splitting",
+        "build": "bun run typecheck && rm -rf dist && bun build ./index.ts --target=bun --outdir=dist --splitting",
         "start": "NODE_ENV=production bun run ./dist/index.js",
         "typecheck": "tsc --noEmit"
     },

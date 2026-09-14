@@ -10,6 +10,7 @@ import { productStatsSyncScheduler } from './modules/stats/application/ProductSt
 import { statsBufferService } from './modules/stats/application/StatsBufferService';
 import routes from './routes';
 
+const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:3000';
 app.use(logger());
 //  middleware
 app.use(
@@ -27,7 +28,7 @@ app.use(
 app.use(
   '*',
   cors({
-    origin: 'http://localhost:3000',
+    origin: corsOrigin,
     credentials: true,
     allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],

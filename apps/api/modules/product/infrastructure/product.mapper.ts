@@ -14,7 +14,6 @@ import { Description } from '@ecomerece/domain/value-objects/description.vo';
 import { EffectiveDate } from '@ecomerece/domain/value-objects/effective-date.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { ImageVO } from '@ecomerece/domain/value-objects/image.vo';
-import { Name } from '@ecomerece/domain/value-objects/name.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
@@ -57,7 +56,7 @@ export const ProductMapper = {
       DisclaimerVO.rehydrate(
         doc.disclaimer.isDisclaimer,
         (doc.disclaimer.disclaimers || []).map((value) => ({
-          name: Name.create(value.name),
+          name: Title.create(value.name),
           title: Title.rehydrate(value.title),
         })),
       ),

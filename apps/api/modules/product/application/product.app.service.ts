@@ -13,7 +13,6 @@ import { AltVO } from '@ecomerece/domain/value-objects/alt.vo';
 import { Description } from '@ecomerece/domain/value-objects/description.vo';
 import { Id } from '@ecomerece/domain/value-objects/id.vo';
 import { ImageVO } from '@ecomerece/domain/value-objects/image.vo';
-import { Name } from '@ecomerece/domain/value-objects/name.vo';
 import { Quantity } from '@ecomerece/domain/value-objects/quantity.vo';
 import { Reason } from '@ecomerece/domain/value-objects/reason.vo';
 import { Title } from '@ecomerece/domain/value-objects/title.vo';
@@ -148,7 +147,7 @@ export class ProductApplicationService extends BaseService {
     const disclaimer = DisclaimerVO.create({
       isDisclaimer: data.disclaimer.isDisclaimer,
       items: data.disclaimer.disclaimers.map((val) => ({
-        name: Name.create(val.name),
+        name: Title.create(val.name),
         title: Title.create(val.title),
       })),
     });

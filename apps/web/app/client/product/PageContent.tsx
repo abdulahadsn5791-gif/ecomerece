@@ -78,7 +78,16 @@ export default function ProductContentPage({
   const [activeImage, setActiveImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const productImages = ['product1', 'product1b', 'product1c', 'product1d'];
+  const dbImages = (product?.image?.images || []).map((img) => img.url);
+  const fallbackSeeds = ['product1', 'product1b', 'product1c', 'product1d'];
+  const productImages =
+    dbImages.length > 0
+      ? dbImages
+      : fallbackSeeds.map((seed) => `https://picsum.photos/seed/${seed}/600/600`);
+  const thumbImages =
+    dbImages.length > 0
+      ? dbImages
+      : fallbackSeeds.map((seed) => `https://picsum.photos/seed/${seed}/100/100`);
   const avgRating = 4.8;
   const totalReviews = 2345;
 
@@ -188,24 +197,20 @@ export default function ProductContentPage({
                 className={`aspect-square rounded-[20px] overflow-hidden border ${cardBorder} ${darkMode ? 'bg-neutral-800' : 'bg-neutral-100'}`}
               >
                 <img
-                  src={`https://picsum.photos/seed/${productImages[activeImage] || 'product1'}/600/600`}
+                  src={productImages[activeImage]}
                   alt={product?.title || 'Product image'}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex gap-3 overflow-x-auto pb-1">
-                {productImages.map((seed, idx) => (
+                {productImages.map((url, idx) => (
                   <button
-                    key={seed}
+                    key={url}
                     onClick={() => setActiveImage(idx)}
                     className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-colors shrink-0 ${idx === activeImage ? 'border-violet-500' : cardBorder}`}
                     aria-label={`View image ${idx + 1}`}
                   >
-                    <img
-                      src={`https://picsum.photos/seed/${seed}/100/100`}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={thumbImages[idx]} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

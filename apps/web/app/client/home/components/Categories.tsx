@@ -27,7 +27,7 @@ export default function Categories({ categories }: { categories: HomeCategoryRes
                         </p>
                     </div>
                     <a
-                        href="#"
+                        href="/client/categories"
                         className={`group hidden sm:inline-flex items-center gap-2 font-semibold text-sm shrink-0 transition-colors ${darkMode
                             ? "text-neutral-400 hover:text-white"
                             : "text-neutral-600 hover:text-black"
@@ -44,7 +44,7 @@ export default function Categories({ categories }: { categories: HomeCategoryRes
                         return (
                             <a
                                 key={cat.id}
-                                href="#"
+                                href={`/client/categories?categoryId=${cat.id}`}
                                 style={{ "--accent": cat.accent } as React.CSSProperties}
                                 className="group flex flex-col items-center gap-3 shrink-0 w-24 sm:w-28 snap-start focus-visible:outline-none"
                             >

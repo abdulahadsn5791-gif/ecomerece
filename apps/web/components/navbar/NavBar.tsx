@@ -38,7 +38,7 @@ const accountItems = [
 const navLinks = [
   { label: 'Home', href: '/' },
   { label: 'Shop', href: '/shop' },
-  { label: 'Categories', href: '/categories' },
+  { label: 'Categories', href: '/client/categories' },
   { label: 'Deals', href: '/deals' },
 ];
 

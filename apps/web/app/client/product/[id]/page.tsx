@@ -11,6 +11,7 @@ export default async function ProductPage({
 
     const productRes = await fetch(`${BASE_URL}/product/${id}`);
     const productObj = await productRes.json();
+    console.log(productObj)
     if (!productObj?.success) throw new Error('Product not found');
     const product = productObj.data as ProductResponseReadModel;
 

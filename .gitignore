@@ -132,6 +132,9 @@ DerivedData/
 ehthumbs.db
 Thumbs.db
 
+# ---- Seed assets (downloaded images, not tracked) ----
+apps/api/scripts/seed-assets/
+
 # ---- Temp files ----
 *.tmp
 *.temp

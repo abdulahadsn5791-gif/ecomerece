@@ -37,9 +37,8 @@ const accountItems = [
 
 const navLinks = [
   { label: 'Home', href: '/' },
-  { label: 'Shop', href: '/shop' },
+  { label: 'Shop', href: '/client/categories' },
   { label: 'Categories', href: '/client/categories' },
-  { label: 'Deals', href: '/deals' },
 ];
 
 export default function Navbar() {

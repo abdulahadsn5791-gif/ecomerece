@@ -1,6 +1,7 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useGetHomeLayout } from '@ecomerece/frontend/home';
+import { useThemeStore } from '@ecomerece/frontend/theme';
 import { trackView } from '@/lib/analytics';
 import HeroBanner from './client/home/components/HeroBanner';
 import FeaturesStrip from './client/home/components/FeaturesStrip';
@@ -12,17 +13,12 @@ import { Loader2 } from 'lucide-react';
 import BgProvider from './providers/BgProvider';
 
 export default function Home() {
-  const [darkMode, setDarkMode] = useState(false);
+  const { darkMode } = useThemeStore();
   const { data: homeLayout, isLoading } = useGetHomeLayout();
 
   useEffect(() => {
     trackView('page', 'home');
   }, []);
-
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark', !darkMode);
-  };
 
   const slides = homeLayout?.slides
     ? [...homeLayout.slides].sort((a, b) => a.displayOrder - b.displayOrder)
@@ -35,7 +31,6 @@ export default function Home() {
     : [];
 
   return (
-
     <div className={darkMode ? 'dark' : ''}>
       <Navbar />
       <BgProvider>
@@ -51,8 +46,9 @@ export default function Home() {
           ))
         )}
         <FeaturesStrip features={features} />
-        <Footer />
       </BgProvider>
+      <Footer />
+
     </div>
   );
 }

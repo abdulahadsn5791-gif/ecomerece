@@ -3,13 +3,14 @@
 import { useThemeStore } from "@ecomerece/frontend/theme";
 import { useGetPaginatedProducts } from "@ecomerece/frontend/product";
 import type { HomeContainerResponse } from "@ecomerece/shared";
-import { ShoppingCart, ArrowRight, Sparkles, Star, Eye, Loader2 } from "lucide-react";
-import { useRef } from "react";
+import { ShoppingCart, ArrowRight, Sparkles, Star, Heart, Loader2, TrendingUp } from "lucide-react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 
 export default function Products({ container }: { container: HomeContainerResponse }) {
     const { darkMode } = useThemeStore();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [wishlisted, setWishlisted] = useState<Record<string, boolean>>({});
 
     const filter = (container.query?.filter || {}) as Record<string, unknown>;
     const { data, isLoading } = useGetPaginatedProducts({
@@ -25,18 +26,17 @@ export default function Products({ container }: { container: HomeContainerRespon
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollContainerRef.current) {
-            const scrollAmount = direction === 'left' ? -320 : 320;
-            scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            scrollContainerRef.current.scrollBy({ left: direction === 'left' ? -340 : 340, behavior: 'smooth' });
         }
     };
 
     const getBadge = (product: typeof products[number]) => {
+        if (!product.inStock) return { label: 'Out of Stock', color: 'bg-neutral-900/60 text-neutral-300' };
         if (product.maxPrice > product.maxDiscountedPrice) {
             const pct = Math.round(((product.maxPrice - product.maxDiscountedPrice) / product.maxPrice) * 100);
-            return `Save ${pct}%`;
+            return { label: `−${pct}%`, color: 'bg-rose-500 text-white' };
         }
-        if (product.averageRating >= 4.5) return 'Best Seller';
-        if (!product.inStock) return 'Out of Stock';
+        if (product.averageRating >= 4.5) return { label: '⭐ Top Rated', color: 'bg-amber-500 text-white' };
         return null;
     };
 
@@ -45,11 +45,32 @@ export default function Products({ container }: { container: HomeContainerRespon
         return def?.url || product.image?.images?.[0]?.url || '';
     };
 
+    const toggleWishlist = (e: React.MouseEvent, id: string) => {
+        e.preventDefault();
+        setWishlisted(prev => ({ ...prev, [id]: !prev[id] }));
+    };
+
     if (isLoading) {
         return (
             <section className={`py-20 sm:py-28 transition-colors duration-500 ${darkMode ? "bg-neutral-950 text-white" : "bg-white text-neutral-900"}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center h-40">
-                    <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                    {/* Skeleton header */}
+                    <div className="mb-10 sm:mb-14 space-y-3">
+                        <div className={`h-5 w-32 rounded-full animate-pulse ${darkMode ? "bg-neutral-800" : "bg-neutral-100"}`} />
+                        <div className={`h-10 w-64 rounded-xl animate-pulse ${darkMode ? "bg-neutral-800" : "bg-neutral-100"}`} />
+                    </div>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className={`rounded-2xl overflow-hidden animate-pulse ${darkMode ? "bg-neutral-900" : "bg-neutral-100"}`}>
+                                <div className={`aspect-[4/5] ${darkMode ? "bg-neutral-800" : "bg-neutral-200"}`} />
+                                <div className="p-4 space-y-2">
+                                    <div className={`h-3 w-20 rounded ${darkMode ? "bg-neutral-800" : "bg-neutral-200"}`} />
+                                    <div className={`h-4 w-full rounded ${darkMode ? "bg-neutral-800" : "bg-neutral-200"}`} />
+                                    <div className={`h-4 w-3/4 rounded ${darkMode ? "bg-neutral-800" : "bg-neutral-200"}`} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
         );
@@ -58,151 +79,162 @@ export default function Products({ container }: { container: HomeContainerRespon
     if (!products.length) return null;
 
     return (
-        <section className={`py-20 sm:py-28 transition-colors duration-500 overflow-hidden ${darkMode ? "bg-neutral-950 text-white" : "bg-white text-neutral-900"
-            }`}>
+        <section className={`py-20 sm:py-28 transition-colors duration-500 overflow-hidden ${darkMode ? "bg-neutral-950 text-white" : "bg-white text-neutral-900"}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
                 {/* Header */}
                 <div className="flex justify-between items-end mb-10 sm:mb-14 flex-wrap gap-4">
                     <div>
-                        <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 sm:mb-4 border shadow-sm ${darkMode ? "border-neutral-800 bg-neutral-900 text-neutral-300" : "border-neutral-200 bg-neutral-50 text-neutral-700"
-                            }`}>
+                        <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 sm:mb-4 border shadow-sm ${darkMode ? "border-neutral-800 bg-neutral-900 text-neutral-300" : "border-neutral-200 bg-neutral-50 text-neutral-700"}`}>
                             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                             <span>Handpicked Selection</span>
                         </div>
-                        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-                            {container.heading}
-                        </h2>
+                        <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">{container.heading}</h2>
                         {container.subTitle && (
-                            <p className={`mt-2 text-sm sm:text-base ${darkMode ? "text-neutral-400" : "text-neutral-600"}`}>
-                                {container.subTitle}
-                            </p>
+                            <p className={`mt-2 text-sm sm:text-base ${darkMode ? "text-neutral-400" : "text-neutral-600"}`}>{container.subTitle}</p>
                         )}
                     </div>
 
                     <div className="flex items-center gap-3">
                         <div className="hidden sm:flex items-center gap-2">
-                            <button
-                                onClick={() => scroll('left')}
-                                className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-neutral-50 text-neutral-900 hover:bg-neutral-100"
-                                    }`}
-                                aria-label="Scroll left"
-                            >
+                            <button onClick={() => scroll('left')} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all hover:scale-105 active:scale-95 ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-100 shadow-sm"}`} aria-label="Scroll left">
                                 <ArrowRight className="w-4 h-4 rotate-180" />
                             </button>
-                            <button
-                                onClick={() => scroll('right')}
-                                className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-all ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-neutral-50 text-neutral-900 hover:bg-neutral-100"
-                                    }`}
-                                aria-label="Scroll right"
-                            >
+                            <button onClick={() => scroll('right')} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all hover:scale-105 active:scale-95 ${darkMode ? "border-neutral-800 bg-neutral-900 text-white hover:bg-neutral-800" : "border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-100 shadow-sm"}`} aria-label="Scroll right">
                                 <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>
-
-                        <a href="#" className={`group inline-flex items-center gap-2 font-semibold text-xs sm:text-sm transition-colors ${darkMode ? "text-neutral-400 hover:text-white" : "text-neutral-600 hover:text-black"
-                            }`}>
+                        <Link href="/client/categories" className={`group inline-flex items-center gap-2 font-semibold text-xs sm:text-sm transition-colors ${darkMode ? "text-neutral-400 hover:text-white" : "text-neutral-600 hover:text-black"}`}>
                             <span>View All</span>
                             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
-                {/* Mobile Swipeable Carousel / Desktop Grid */}
+                {/* Grid / Carousel */}
                 <div
                     ref={scrollContainerRef}
-                    className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory pb-4 sm:pb-0 scrollbar-none [-webkit-overflow-scrolling:touch]"
+                    className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory pb-4 sm:pb-0"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {products.map((product) => {
                         const badge = getBadge(product);
+                        const img = getDefaultImage(product);
+                        const isWished = wishlisted[product.id] ?? false;
+                        const stars = Math.round(product.averageRating ?? 0);
+                        const hasDiscount = product.minPrice > product.minDiscountedPrice;
+
                         return (
                             <Link
                                 key={product.id}
                                 href={`/client/product/${product.id}`}
-                                className={`group rounded-xl sm:rounded-2xl overflow-hidden border flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 shadow-md hover:shadow-2xl shrink-0 w-[78%] sm:w-auto snap-start ${darkMode
-                                    ? "bg-neutral-900/80 border-neutral-800 hover:border-neutral-700"
-                                    : "bg-neutral-50/80 border-neutral-200 hover:border-neutral-300"
-                                    }`}
+                                className={`group relative rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl shrink-0 w-[72%] sm:w-auto snap-start ${darkMode
+                                    ? "bg-neutral-900 border border-neutral-800 hover:border-neutral-700 shadow-lg shadow-black/20"
+                                    : "bg-white border border-neutral-100 hover:border-neutral-200 shadow-md shadow-neutral-200/80"
+                                }`}
                             >
-                                {/* Product Image & Badges Container */}
-                                <div className={`aspect-square m-2.5 sm:m-3 rounded-lg overflow-hidden relative shadow-inner ${darkMode ? "bg-neutral-950" : "bg-neutral-200"
-                                    }`}>
-                                    <img
-                                        src={getDefaultImage(product)}
-                                        alt={product.title}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                                        loading="lazy"
-                                    />
+                                {/* Image area */}
+                                <div className={`relative overflow-hidden aspect-[4/5] ${darkMode ? "bg-neutral-800" : "bg-neutral-100"}`}>
+                                    {img ? (
+                                        <img
+                                            src={img}
+                                            alt={product.title}
+                                            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <ShoppingCart className={`w-10 h-10 ${darkMode ? "text-neutral-700" : "text-neutral-300"}`} />
+                                        </div>
+                                    )}
 
+                                    {/* Gradient overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                    {/* Badge */}
                                     {badge && (
-                                        <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10">
-                                            <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md text-[9px] sm:text-[10px] font-bold tracking-wider uppercase bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-sm">
-                                                {badge}
+                                        <div className="absolute top-3 left-3 z-10">
+                                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wide uppercase shadow-md ${badge.color}`}>
+                                                {badge.label}
                                             </span>
                                         </div>
                                     )}
 
-                                    <div className="absolute inset-0 bg-neutral-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center justify-center">
-                                        <button className="w-10 h-10 rounded-lg bg-white/90 backdrop-blur-md text-neutral-900 flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:scale-110">
-                                            <Eye className="w-4 h-4" />
+                                    {/* Wishlist button */}
+                                    <button
+                                        onClick={(e) => toggleWishlist(e, product.id)}
+                                        className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-md ${isWished
+                                            ? "bg-rose-500 text-white scale-110"
+                                            : "bg-white/80 backdrop-blur-sm text-neutral-600 opacity-0 group-hover:opacity-100 hover:bg-white"
+                                        }`}
+                                        aria-label="Add to wishlist"
+                                    >
+                                        <Heart className={`w-3.5 h-3.5 ${isWished ? "fill-current" : ""}`} />
+                                    </button>
+
+                                    {/* Quick add — slides up on hover */}
+                                    <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
+                                        <button
+                                            onClick={(e) => e.preventDefault()}
+                                            className="w-full py-2.5 rounded-xl bg-white text-neutral-900 text-xs font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-neutral-100 transition-colors active:scale-95"
+                                        >
+                                            <ShoppingCart className="w-3.5 h-3.5" />
+                                            Quick Add
                                         </button>
                                     </div>
                                 </div>
 
-                                {/* Card Content */}
-                                <div className="px-4 pb-4 pt-1.5 sm:px-5 sm:pb-5 sm:pt-2 flex flex-col flex-grow">
-                                    <span className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-1 ${darkMode ? "text-neutral-400" : "text-neutral-500"
-                                        }`}>
+                                {/* Card body */}
+                                <div className="flex flex-col flex-grow px-3.5 pt-3 pb-4 sm:px-4 sm:pt-3.5 sm:pb-4">
+                                    {/* Vendor */}
+                                    <span className={`text-[10px] font-semibold uppercase tracking-widest mb-1 ${darkMode ? "text-neutral-500" : "text-neutral-400"}`}>
                                         {product.vendorTitle}
                                     </span>
 
-                                    <h3 className="font-bold text-sm sm:text-base mb-2 sm:mb-3 leading-snug line-clamp-2 tracking-tight group-hover:text-amber-400 transition-colors duration-300">
+                                    {/* Title */}
+                                    <h3 className={`font-bold text-sm leading-snug line-clamp-2 mb-2.5 transition-colors duration-200 ${darkMode ? "text-neutral-100 group-hover:text-amber-400" : "text-neutral-900 group-hover:text-neutral-600"}`}>
                                         {product.title}
                                     </h3>
 
-                                    <div className="flex items-center gap-1.5 text-[11px] sm:text-xs mb-3 sm:mb-4">
-                                        <div className="flex items-center text-amber-400">
-                                            {[...Array(Math.round(product.averageRating))].map((_, i) => (
-                                                <Star key={i} className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+                                    {/* Stars */}
+                                    <div className="flex items-center gap-1.5 mb-3">
+                                        <div className="flex items-center gap-0.5">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star key={i} className={`w-3 h-3 ${i < stars ? "fill-amber-400 text-amber-400" : darkMode ? "text-neutral-700 fill-neutral-700" : "text-neutral-200 fill-neutral-200"}`} />
                                             ))}
                                         </div>
-                                        <span className={darkMode ? "text-neutral-400" : "text-neutral-500"}>
-                                            ({product.totalReviews})
+                                        <span className={`text-[10px] font-medium ${darkMode ? "text-neutral-500" : "text-neutral-400"}`}>
+                                            {product.averageRating?.toFixed(1)} ({product.totalReviews})
                                         </span>
+                                        {product.averageRating >= 4.5 && (
+                                            <TrendingUp className="w-3 h-3 text-emerald-500 ml-auto" />
+                                        )}
                                     </div>
 
-                                    <div className="flex items-center justify-between mt-auto pt-2.5 sm:pt-3 border-t border-neutral-500/20">
-                                        <div className="flex flex-col">
-                                            <span className={`text-base sm:text-lg font-extrabold tracking-tight ${darkMode ? "text-white" : "text-neutral-900"
-                                                }`}>
+                                    {/* Price row */}
+                                    <div className={`flex items-center justify-between mt-auto pt-3 border-t ${darkMode ? "border-neutral-800" : "border-neutral-100"}`}>
+                                        <div>
+                                            <span className={`text-base sm:text-lg font-extrabold tracking-tight ${darkMode ? "text-white" : "text-neutral-900"}`}>
                                                 ${product.minDiscountedPrice.toFixed(2)}
                                             </span>
-                                            {product.minPrice > product.minDiscountedPrice && (
-                                                <span className={`text-[11px] sm:text-xs line-through ${darkMode ? "text-neutral-500" : "text-neutral-400"
-                                                    }`}>
+                                            {hasDiscount && (
+                                                <span className={`block text-[11px] line-through ${darkMode ? "text-neutral-600" : "text-neutral-400"}`}>
                                                     ${product.minPrice.toFixed(2)}
                                                 </span>
                                             )}
                                         </div>
 
-                                        <button
-                                            className={`inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg font-semibold transition-all duration-300 shadow-md active:scale-95 sm:hover:scale-110 ${darkMode
-                                                ? "bg-white text-black hover:bg-neutral-200"
-                                                : "bg-neutral-900 text-white hover:bg-neutral-800"
-                                                }`}
-                                            aria-label="Add to cart"
-                                            onClick={(e) => e.preventDefault()}
-                                        >
-                                            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                        </button>
+                                        {hasDiscount && (
+                                            <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-lg">
+                                                Save ${(product.minPrice - product.minDiscountedPrice).toFixed(0)}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </Link>
                         );
                     })}
                 </div>
-
             </div>
         </section>
     );

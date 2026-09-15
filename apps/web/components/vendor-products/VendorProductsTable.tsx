@@ -308,80 +308,95 @@ export function VendorProductsTable() {
               <tbody>
                 {rows.map((p) => {
                   const img = defaultImage(p);
+                  const isSelected = selectedId === p.id;
+                  const stars = Math.round(p.averageRating ?? 0);
                   return (
                     <tr
                       key={p.id}
                       onClick={() => setSelectedId((prev) => (prev === p.id ? null : p.id))}
-                      className={`border-b last:border-b-0 cursor-pointer transition-colors ${
-                        selectedId === p.id
+                      className={`border-b last:border-b-0 cursor-pointer transition-all duration-200 ${
+                        isSelected
                           ? darkMode
-                            ? 'bg-emerald-500/10'
-                            : 'bg-emerald-50'
+                            ? 'bg-emerald-500/10 border-l-2 border-l-emerald-500'
+                            : 'bg-emerald-50 border-l-2 border-l-emerald-500'
                           : rowHover
                       } ${border}`}
                     >
-                      <td className={cellBase}>
-                        <div className="flex items-center gap-3">
-                          {img ? (
-                            // biome-ignore lint/performance/noImgElement: small product thumbnail
-                            <img
-                              src={img}
-                              alt={p.title}
-                              className="w-10 h-10 rounded-xl object-cover bg-neutral-200 shrink-0"
-                            />
-                          ) : (
-                            <div
-                              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                                darkMode
-                                  ? 'bg-neutral-800 text-neutral-500'
-                                  : 'bg-neutral-100 text-neutral-400'
-                              }`}
-                            >
-                              <ImageOff className="w-4 h-4" />
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <p className="font-semibold truncate max-w-[220px]">{p.title}</p>
-                            <p
-                              className={`text-xs truncate max-w-[220px] ${darkMode ? 'text-neutral-500' : 'text-neutral-400'}`}
-                            >
-                              {p.appearance === 'public'
-                                ? 'Visible on storefront'
-                                : 'Hidden from storefront'}
+                      {/* Product card cell */}
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-4">
+                          {/* Image */}
+                          <div className={`relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 shadow-md ${darkMode ? 'bg-neutral-800' : 'bg-neutral-100'}`}>
+                            {img ? (
+                              // biome-ignore lint/performance/noImgElement: product thumbnail
+                              <img src={img} alt={p.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ImageOff className={`w-5 h-5 ${darkMode ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                              </div>
+                            )}
+                            {p.isBlocked && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <Package className="w-4 h-4 text-amber-400" />
+                              </div>
+                            )}
+                          </div>
+                          {/* Info */}
+                          <div className="min-w-0 flex flex-col gap-1">
+                            <p className="font-bold text-sm truncate max-w-[200px] leading-tight">{p.title}</p>
+                            <p className={`text-xs font-medium truncate max-w-[200px] ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                              {p.appearance === 'public' ? 'Visible on storefront' : 'Hidden from storefront'}
                             </p>
+                            {/* Stars */}
+                            <div className="flex items-center gap-1 mt-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <svg key={i} className={`w-3 h-3 ${i < stars ? 'text-amber-400' : darkMode ? 'text-neutral-700' : 'text-neutral-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                              <span className={`text-[10px] ml-0.5 ${darkMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                ({p.totalReviews ?? 0})
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </td>
-                      <td className={`${cellBase} whitespace-nowrap font-medium`}>
-                        {fmtCurrency(p.minPrice)}
+
+                      {/* Price */}
+                      <td className="px-5 py-3.5 whitespace-nowrap">
+                        <p className="font-extrabold text-sm">{fmtCurrency(p.minDiscountedPrice ?? p.minPrice)}</p>
+                        {p.minPrice > (p.minDiscountedPrice ?? p.minPrice) && (
+                          <p className={`text-xs line-through ${darkMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
+                            {fmtCurrency(p.minPrice)}
+                          </p>
+                        )}
                       </td>
-                      <td className={cellBase}>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span
-                            className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap ${inStockPill(p)}`}
-                          >
+
+                      {/* Availability */}
+                      <td className="px-5 py-3.5">
+                        <div className="flex flex-col gap-1.5">
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap w-fit ${inStockPill(p)}`}>
                             {p.inStock ? 'In stock' : 'Out of stock'}
                           </span>
                         </div>
                       </td>
-                      <td className={cellBase}>
-                        <div className="flex flex-wrap gap-1.5">
+
+                      {/* Status */}
+                      <td className="px-5 py-3.5">
+                        <div className="flex flex-col gap-1.5">
                           {statusPills(p).map((s) => (
-                            <span
-                              key={s.label}
-                              className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap ${s.cls}`}
-                            >
+                            <span key={s.label} className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap w-fit ${s.cls}`}>
                               {s.label}
                             </span>
                           ))}
-                          <span
-                            className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap capitalize ${appearancePill(p)}`}
-                          >
+                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap capitalize w-fit ${appearancePill(p)}`}>
                             {p.appearance}
                           </span>
                         </div>
                       </td>
-                      <td className={`${cellBase} text-right`}>
+
+                      {/* Actions */}
+                      <td className="px-5 py-3.5 text-right">
                         {menuItems(p).length > 0 ? (
                           <RowActionMenu items={menuItems(p)} />
                         ) : (

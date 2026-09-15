@@ -395,39 +395,96 @@ export default function ProductContentPage({
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.15 }}
           className={`rounded-[28px] p-6 sm:p-8 ${card}`}
         >
-          <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
-            <Package className={`w-5 h-5 ${darkMode ? 'text-violet-400' : 'text-violet-600'}`} />
-            You might also like
-          </h2>
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <div className="flex gap-4 w-max">
-              {relatedProducts?.map((related) => (
-                <a
-                  key={related.id}
-                  href={`/product/${related.id}`}
-                  className={`group rounded-2xl overflow-hidden border w-44 sm:w-48 shrink-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${darkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-neutral-200'}`}
-                >
-                  <div
-                    className={`m-2 aspect-square rounded-xl overflow-hidden ${darkMode ? 'bg-neutral-900' : 'bg-neutral-100'}`}
-                  >
-                    <img
-                      src={
-                        related.image?.images?.find((img) => img.default)?.url ||
-                        related.image?.images?.[0]?.url ||
-                        '/placeholder.jpg'
-                      }
-                      alt={related.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="px-3 pb-3">
-                    <div className="text-sm font-semibold leading-snug mb-1">{related.title}</div>
-                    <div className="text-base font-bold">${related.minDiscountedPrice}</div>
-                  </div>
-                </a>
-              ))}
-            </div>
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Package className={`w-5 h-5 ${darkMode ? 'text-violet-400' : 'text-violet-600'}`} />
+              You might also like
+            </h2>
+            <a href="/client/categories" className={`text-sm font-semibold flex items-center gap-1 transition-colors ${darkMode ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-black'}`}>
+              Browse all <ChevronRight className="w-4 h-4" />
+            </a>
           </div>
+
+          {relatedProducts.length === 0 ? (
+            <p className={`text-sm ${mutedText}`}>No related products found.</p>
+          ) : (
+            <div className="overflow-x-auto -mx-6 sm:-mx-8 px-6 sm:px-8" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex gap-4 w-max pb-1">
+                {relatedProducts.map((related) => {
+                  const relatedImg = related.image?.images?.find((img) => img.default)?.url || related.image?.images?.[0]?.url || '';
+                  const relStars = Math.round(related.averageRating ?? 0);
+                  const relHasDiscount = related.minPrice > related.minDiscountedPrice;
+                  return (
+                    <a
+                      key={related.id}
+                      href={`/client/product/${related.id}`}
+                      className={`group relative flex flex-col rounded-2xl overflow-hidden border w-44 sm:w-52 shrink-0 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl ${darkMode
+                        ? 'bg-neutral-800/80 border-neutral-700 hover:border-neutral-600 shadow-lg shadow-black/20'
+                        : 'bg-white border-neutral-100 hover:border-neutral-200 shadow-md shadow-neutral-100'
+                      }`}
+                    >
+                      {/* Image */}
+                      <div className={`relative aspect-square overflow-hidden ${darkMode ? 'bg-neutral-900' : 'bg-neutral-50'}`}>
+                        {relatedImg ? (
+                          // biome-ignore lint/performance/noImgElement: related product thumbnail
+                          <img
+                            src={relatedImg}
+                            alt={related.title}
+                            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Package className={`w-8 h-8 ${darkMode ? 'text-neutral-700' : 'text-neutral-300'}`} />
+                          </div>
+                        )}
+                        {/* Gradient on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        {relHasDiscount && (
+                          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-rose-500 text-white shadow">
+                            −{Math.round(((related.minPrice - related.minDiscountedPrice) / related.minPrice) * 100)}%
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex flex-col flex-grow px-3.5 pt-3 pb-3.5">
+                        <span className={`text-[10px] font-semibold uppercase tracking-widest mb-1 ${darkMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                          {related.vendorTitle}
+                        </span>
+                        <h3 className={`text-sm font-bold leading-snug line-clamp-2 mb-2 transition-colors ${darkMode ? 'text-neutral-100 group-hover:text-amber-400' : 'text-neutral-900 group-hover:text-neutral-600'}`}>
+                          {related.title}
+                        </h3>
+
+                        {/* Stars */}
+                        <div className="flex items-center gap-1 mb-3">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`w-3 h-3 ${i < relStars ? 'fill-amber-400 text-amber-400' : darkMode ? 'fill-neutral-700 text-neutral-700' : 'fill-neutral-200 text-neutral-200'}`} />
+                          ))}
+                          <span className={`text-[10px] ml-0.5 ${darkMode ? 'text-neutral-600' : 'text-neutral-400'}`}>({related.totalReviews ?? 0})</span>
+                        </div>
+
+                        {/* Price */}
+                        <div className={`flex items-center justify-between mt-auto pt-2.5 border-t ${darkMode ? 'border-neutral-700' : 'border-neutral-100'}`}>
+                          <div>
+                            <span className="text-base font-extrabold">${related.minDiscountedPrice.toFixed(2)}</span>
+                            {relHasDiscount && (
+                              <span className={`block text-[11px] line-through ${darkMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
+                                ${related.minPrice.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${darkMode ? 'bg-neutral-700 text-neutral-200 group-hover:bg-white group-hover:text-neutral-900' : 'bg-neutral-100 text-neutral-700 group-hover:bg-neutral-900 group-hover:text-white'}`}>
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

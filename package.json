@@ -6,7 +6,7 @@
     ],
     "scripts": {
         "dev": "bun run --filter api dev & bun run --filter web dev",
-        "build": "bun run --filter api build & bun run --filter web build",
+        "build": "bun run --filter api build && bun run --filter web build && echo 'All builds completed successfully!'",
         "start": "bun run --filter api start & bun run --filter web start",
         "typecheck": "bun run --filter '*' typecheck",
         "test": "bun test",

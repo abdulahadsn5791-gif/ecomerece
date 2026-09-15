@@ -7,6 +7,7 @@ export const CategoryRoutes = new Hono();
 const { categoryController } = createCategoryModule();
 
 CategoryRoutes.post('/create', authMiddleware, adminMiddleware, categoryController.createCategory);
+CategoryRoutes.patch('/update', authMiddleware, adminMiddleware, categoryController.updateCategory);
 CategoryRoutes.delete('/', authMiddleware, adminMiddleware, categoryController.deleteCategory);
 CategoryRoutes.get('/', categoryController.getPaginated);
 CategoryRoutes.get('/admin/all', authMiddleware, adminMiddleware, categoryController.getAdminPaginated);

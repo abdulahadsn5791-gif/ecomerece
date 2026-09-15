@@ -3,6 +3,7 @@
 import { useThemeStore } from '@ecomerece/frontend/theme';
 
 import { GenericConfirmModal } from '@/components/GenericConfirmModal';
+import { ImageInput } from '@/components/image';
 
 export interface CreateCategoryPayload {
   title?: string;
@@ -22,6 +23,12 @@ function inputCls(darkMode: boolean) {
     darkMode
       ? 'bg-neutral-800 border border-neutral-700 text-white placeholder-neutral-500 focus:border-violet-500'
       : 'bg-white border border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:border-violet-500'
+  }`;
+}
+
+function labelCls(darkMode: boolean) {
+  return `block text-xs font-semibold uppercase tracking-wider mb-1.5 ${
+    darkMode ? 'text-neutral-400' : 'text-neutral-500'
   }`;
 }
 
@@ -50,10 +57,8 @@ export function CreateCategoryModal({
       onConfirm={onConfirm}
       renderFields={(payload, updatePayload) => (
         <div className="space-y-4">
-          <label className="block">
-            <span
-              className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
-            >
+          <div>
+            <span className={labelCls(darkMode)}>
               Title <span className="text-red-500">*</span>
             </span>
             <input
@@ -63,21 +68,18 @@ export function CreateCategoryModal({
               placeholder="e.g. Electronics"
               className={cls}
             />
-          </label>
-          <label className="block">
-            <span
-              className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}
-            >
-              Image URL <span className="text-red-500">*</span>
+          </div>
+          <div>
+            <span className={labelCls(darkMode)}>
+              Image <span className="text-red-500">*</span>
             </span>
-            <input
-              type="url"
+            <ImageInput
               value={payload.image ?? ''}
-              onChange={(e) => updatePayload({ image: e.target.value })}
-              placeholder="https://…"
-              className={cls}
+              onChange={(image) => updatePayload({ image })}
+              darkMode={darkMode}
+              tone="violet"
             />
-          </label>
+          </div>
         </div>
       )}
     />

@@ -10,7 +10,8 @@ import {
     type deleteCategoryType,
     type GetAdminPaginatedCategoriesDto,
     type getPaginatedDtoType,
-
+    updateCategoryDto,
+    type updateCategoryType,
 } from '@ecomerece/shared';
 
 export const CATEGORY_QUERY_KEY = ['categories'];
@@ -100,6 +101,15 @@ export function useDeleteCategoryById() {
     return useMutation({
         mutationFn: (data: deleteCategoryType) =>
             categoryService.deleteCategoryById(deleteCategoryDto.parse(data)),
+        onSuccess: (data) => applyCategoryMutationResult(queryClient, data),
+    });
+}
+
+export function useUpdateCategoryImage() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: updateCategoryType) =>
+            categoryService.updateCategory(updateCategoryDto.parse(data)),
         onSuccess: (data) => applyCategoryMutationResult(queryClient, data),
     });
 }

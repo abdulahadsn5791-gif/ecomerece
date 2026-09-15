@@ -53,6 +53,10 @@ export const CategorySchema = new Schema(
             type: deletedSchema,
             required: true,
         },
+        imageKey: {
+            type: String,
+            default: null,
+        },
     },
 
     {

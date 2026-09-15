@@ -1,10 +1,21 @@
-import { CategoryAggregate, Id, Quantity, Reason, Title, UrlVO } from '@ecomerece/domain';
-import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
 import {
-    type createCategoryDtoType,
-    type deleteCategoryType,
-    type getPaginatedDtoType,
-    type GetAdminPaginatedCategoriesDto,
+    CategoryAggregate,
+    Id,
+    ImageSource,
+    Quantity,
+    Reason,
+    Title,
+    UrlVO,
+    type IImageStoragePort,
+    type ImageKey,
+} from '@ecomerece/domain';
+import type { IEventBus } from '@ecomerece/domain/events/event-bus.interface';
+import type {
+    createCategoryDtoType,
+    deleteCategoryType,
+    getPaginatedDtoType,
+    GetAdminPaginatedCategoriesDto,
+    updateCategoryType,
 } from '@ecomerece/shared';
 import type { FilterQuery } from 'mongoose';
 import { BaseService } from '../../../core/services/base.services';
@@ -13,6 +24,8 @@ import { CategoryMapper } from '../infrastructure/category.mapper';
 import type { CategoryRepository } from '../infrastructure/category.repository';
 import type { CategoryPersistence } from '../infrastructure/category.models';
 import { type CategoryMessagesType, CategoryMessags } from '../presentation/category.messages';
+
+type ResolvedImage = { url: UrlVO; imageKey?: ImageKey };
 
 const CATEGORY_COLLATION = { locale: 'en', strength: 2 };
 
@@ -23,6 +36,7 @@ export class CategoryAppService extends BaseService {
     constructor(
         private readonly categoryRepo: CategoryRepository,
         private readonly eventBus: IEventBus,
+        private readonly imageStorage: IImageStoragePort,
     ) {
         super();
     }
@@ -34,6 +48,53 @@ export class CategoryAppService extends BaseService {
         }
     }
 
+    private async persist(category: CategoryAggregate, cleanupKey?: ImageKey): Promise<void> {
+        try {
+            await this.categoryRepo.Save(category);
+        } catch (error) {
+            await this.deleteImage(cleanupKey);
+            throw error;
+        }
+        await this.publishEvents(category);
+    }
+
+    private isDataUri(value: string): boolean {
+        return value.startsWith('data:image/');
+    }
+
+    private decodeDataUri(value: string): { contentType: string; bytes: Uint8Array } {
+        const separator = value.indexOf(',');
+        const header = value.slice(5, separator);
+        return {
+            contentType: header.split(';')[0],
+            bytes: Buffer.from(value.slice(separator + 1), 'base64'),
+        };
+    }
+
+    private async resolveImage(value: string, folder: string): Promise<ResolvedImage> {
+        if (!this.isDataUri(value)) {
+            return { url: UrlVO.create(value) };
+        }
+        const { contentType, bytes } = this.decodeDataUri(value);
+        const stored = await this.imageStorage.upload(ImageSource.fromBytes(bytes, contentType), {
+            folder,
+            access: 'public',
+        });
+        return { url: UrlVO.create(stored.publicUrl), imageKey: stored.key };
+    }
+
+    private async deleteImage(key?: ImageKey): Promise<void> {
+        if (!key) return;
+        try {
+            await this.imageStorage.delete(key);
+        } catch (error) {
+            console.error(
+                `[category] failed to clean up stored image '${key.value}':`,
+                error instanceof Error ? error.message : error,
+            );
+        }
+    }
+
     async createCategory(
         data: createCategoryDtoType,
         actor: UserPersistence,
@@ -41,16 +102,42 @@ export class CategoryAppService extends BaseService {
         const id = Id.create();
         const title = Title.create(data.title);
         const actorId = Id.create(actor._id);
-        const image = UrlVO.create(data.image);
+        const image = await this.resolveImage(data.image, 'categories');
         const category = CategoryAggregate.create({
             title: title,
             id: id,
-            image: image,
+            image: image.url,
             createdBy: actorId,
+            imageKey: image.imageKey,
         });
-        await this.categoryRepo.Create(category);
-        await this.publishEvents(category);
+        await this.persist(category, image.imageKey);
         return CategoryMessags.created(id, actorId);
+    }
+
+    async updateCategory(
+        data: updateCategoryType,
+        actor: UserPersistence,
+    ): Promise<CategoryMessagesType> {
+        const id = Id.create(data.id);
+        const actorId = Id.create(actor._id);
+        const category = await this.categoryRepo.FindByIdOrThrow(id);
+
+        if (data.title) {
+            category.updateMeta(Title.create(data.title), actorId);
+        }
+
+        if (data.image) {
+            const image = await this.resolveImage(data.image, 'categories');
+            category.updateImage(image.url, image.imageKey);
+            await this.persist(category, image.imageKey);
+            if (category.imageKey && !image.imageKey?.equals(category.imageKey)) {
+                await this.deleteImage(category.imageKey);
+            }
+            return CategoryMessags.updated(id, actorId);
+        }
+
+        await this.persist(category);
+        return CategoryMessags.updated(id, actorId);
     }
 
     async deleteCategoryById(
@@ -62,8 +149,7 @@ export class CategoryAppService extends BaseService {
         const reason = Reason.create(data.reason);
         const category = await this.categoryRepo.FindByIdOrThrow(id);
         category.deleteCategory(reason, actorId);
-        await this.categoryRepo.Save(category);
-        await this.publishEvents(category);
+        await this.persist(category);
         return CategoryMessags.deleted(id, actorId);
     }
 
@@ -81,7 +167,6 @@ export class CategoryAppService extends BaseService {
             hasMore: boolean;
         };
     }> {
-        // Public: non-deleted, non-blocked categories
         const filter: FilterQuery<CategoryPersistence> = {
             'deleted.deleted': false,
             'block.blocked': false,
@@ -106,7 +191,6 @@ export class CategoryAppService extends BaseService {
             hasMore: boolean;
         };
     }> {
-        // Admin: all categories — no baseline restrictions
         const filter: FilterQuery<CategoryPersistence> = {};
         if (data.search) {
             filter.title = { $regex: `^${escapeRegex(data.search)}` };

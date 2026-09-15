@@ -11,6 +11,11 @@ export const CategoryMessags = {
             message: `Category ${id.value} was created by ${actorId.value} on ${EffectiveDate.today().value}.`,
         };
     },
+    updated(id: Id, actorId: Id): CategoryMessagesType {
+        return {
+            message: `Category ${id.value} was updated by ${actorId.value} on ${EffectiveDate.today().value}.`,
+        };
+    },
     deleted(id: Id, actorId: Id): CategoryMessagesType {
         return {
             message: `Category ${id.value} was deleted by ${actorId.value} on ${EffectiveDate.today().value}.`,

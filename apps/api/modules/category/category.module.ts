@@ -1,5 +1,6 @@
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
+import { createImageStorageModule } from '../image-storage/image-storage.module';
 import { CategoryAppService } from './application/category.app.service';
 import { CategoryInternalServcie } from './application/category.internal.service';
 import { VerifyCategoryAndGetQuery } from './application/queries/verify-category.query';
@@ -14,7 +15,7 @@ export function createCategoryModule() {
         VerifyCategoryAndGetQuery,
         new VerifyCategoryAndGetHandler(categoryInternalService),
     );
-    const categoryAppService = new CategoryAppService(categoryRepository, eventBus);
+    const categoryAppService = new CategoryAppService(categoryRepository, eventBus, createImageStorageModule());
     const categoryController = new CategoryController(categoryAppService);
     return { categoryController };
 }

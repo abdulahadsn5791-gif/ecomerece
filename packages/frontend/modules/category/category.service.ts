@@ -6,6 +6,7 @@ import type {
     deleteCategoryType,
     GetAdminPaginatedCategoriesDto,
     getPaginatedDtoType,
+    updateCategoryType,
 
 } from '@ecomerece/shared';
 
@@ -61,6 +62,10 @@ export class CategoryService {
 
     createCategory(data: createCategoryDtoType): Promise<CategoryMutationResult> {
         return http.post<CategoryMutationResult>('/category/create', data);
+    }
+
+    updateCategory(data: updateCategoryType): Promise<CategoryMutationResult> {
+        return http.patch<CategoryMutationResult>('/category/update', data);
     }
 
     deleteCategoryById(data: deleteCategoryType): Promise<CategoryMutationResult> {

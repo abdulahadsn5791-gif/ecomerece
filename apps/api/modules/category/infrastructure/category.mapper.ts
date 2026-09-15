@@ -5,6 +5,7 @@ import {
     DeleteInfoVO,
     EffectiveDate,
     Id,
+    ImageKey,
     Quantity,
     Reason,
     Title,
@@ -34,6 +35,7 @@ export const CategoryMapper = {
             ),
             Quantity.rehydrate(doc.version),
             EffectiveDate.rehydrate(doc.createdAt),
+            doc.imageKey ? ImageKey.rehydrate(doc.imageKey) : undefined,
         );
     },
     aggregateToPersistence(category: CategoryAggregate) {
@@ -46,6 +48,7 @@ export const CategoryMapper = {
                 reason: category.delete.reason?.value ?? null,
             },
             image: category.image.value,
+            imageKey: category.imageKey?.value ?? null,
             title: category.title.value,
             createdBy: category.createdBy.value,
             block: {

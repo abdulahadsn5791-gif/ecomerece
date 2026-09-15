@@ -1,4 +1,11 @@
-import { createCategoryDto, deleteCategoryDto, getAdminPaginatedCategoriesSchema, getPaginatedDto, idSchema } from '@ecomerece/shared';
+import {
+    createCategoryDto,
+    deleteCategoryDto,
+    getAdminPaginatedCategoriesSchema,
+    getPaginatedDto,
+    idSchema,
+    updateCategoryDto,
+} from '@ecomerece/shared';
 import type { Context } from 'hono';
 import { BaseController } from '../../../core/controller/base.controller';
 import type { CategoryAppService } from '../application/category.app.service';
@@ -8,6 +15,11 @@ export class CategoryController extends BaseController<CategoryAppService> {
         const actor = c.get('user');
         const data = await this.body(c, createCategoryDto);
         return this.ok(c, await this.service.createCategory(data, actor));
+    };
+    updateCategory = async (c: Context) => {
+        const actor = c.get('user');
+        const data = await this.body(c, updateCategoryDto);
+        return this.ok(c, await this.service.updateCategory(data, actor));
     };
     getPaginated = async (c: Context) => {
         const data = this.query(c, getPaginatedDto);
@@ -19,7 +31,6 @@ export class CategoryController extends BaseController<CategoryAppService> {
     };
     deleteCategory = async (c: Context) => {
         const actor = c.get('user');
-        console.log('1');
         const data = await this.body(c, deleteCategoryDto);
         return this.ok(c, await this.service.deleteCategoryById(data, actor));
     };

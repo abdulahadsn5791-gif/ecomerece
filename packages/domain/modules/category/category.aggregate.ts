@@ -1,5 +1,6 @@
 
 import { AggregateRoot } from "../../aggregate-root";
+import { ImageKey } from "../image-storage/value-objects/image-key.vo";
 import { BlockInfoVO, DeleteInfoVO, EffectiveDate, Id, Quantity, Reason, Title, UrlVO } from "../../value-objects";
 import { CategoryBlockedEvent } from "./events/category-blocked.event";
 import { CategoryCreatedEvent } from "./events/category-created.event";
@@ -13,6 +14,7 @@ export type createCategoryProps = {
     title: Title,
     image: UrlVO,
     createdBy: Id,
+    imageKey?: ImageKey,
 }
 
 export class CategoryAggregate extends AggregateRoot {
@@ -26,6 +28,7 @@ export class CategoryAggregate extends AggregateRoot {
         private _block: BlockInfoVO,
         private readonly _version: Quantity,
         private readonly _createdAt: EffectiveDate,
+        private _imageKey?: ImageKey,
     ) { super(); }
 
     get id() {
@@ -52,23 +55,34 @@ export class CategoryAggregate extends AggregateRoot {
     get createdAt() {
         return this._createdAt;
     }
+    get imageKey() {
+        return this._imageKey;
+    }
 
     static create(data: createCategoryProps): CategoryAggregate {
-        const category = new CategoryAggregate(data.id, data.title, data.createdBy, DeleteInfoVO.none(), data.image, BlockInfoVO.none(), Quantity.create(0), EffectiveDate.today());
+        const category = new CategoryAggregate(
+            data.id, data.title, data.createdBy, DeleteInfoVO.none(), data.image,
+            BlockInfoVO.none(), Quantity.create(0), EffectiveDate.today(), data.imageKey,
+        );
         category.raise(new CategoryCreatedEvent({ categoryId: category._id, createdBy: category._createdBy }));
 
         return category;
     }
-    static rehydrate(_id: Id, title: Title, _createdBy: Id, _delete: DeleteInfoVO, _image: UrlVO, _block: BlockInfoVO, _version: Quantity, _createdAt: EffectiveDate,): CategoryAggregate {
-        return new CategoryAggregate(_id, title, _createdBy, _delete, _image, _block, _version, _createdAt)
+    static rehydrate(
+        _id: Id, title: Title, _createdBy: Id, _delete: DeleteInfoVO,
+        _image: UrlVO, _block: BlockInfoVO, _version: Quantity,
+        _createdAt: EffectiveDate, _imageKey?: ImageKey,
+    ): CategoryAggregate {
+        return new CategoryAggregate(_id, title, _createdBy, _delete, _image, _block, _version, _createdAt, _imageKey)
     }
 
     updateMeta(title: Title, actorId: Id) {
         this._title = title;
         this.raise(new CategoryMetaUpdatedEvent({ categoryId: this._id, actorId }));
     }
-    updateImage(image: UrlVO) {
+    updateImage(image: UrlVO, imageKey?: ImageKey) {
         this._image = image;
+        this._imageKey = imageKey;
         this.raise(new CategoryImageUpdatedEvent({ categoryId: this._id, image }));
     }
 

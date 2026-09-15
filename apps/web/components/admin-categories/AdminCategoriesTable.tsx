@@ -6,13 +6,14 @@ import {
   useCreateCategory,
   useDeleteCategoryById,
   useGetAdminCategoriesInfinite,
+  useUpdateCategoryImage,
 } from '@ecomerece/frontend/category';
 import { useGetCategoryStatsOverview } from '@ecomerece/frontend/stats';
 import { useThemeStore } from '@ecomerece/frontend/theme';
 import type { categoryResponseReadModels } from '@ecomerece/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ImageOff, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
+import { ImageOff, ImageUp, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react'; 
 import { ReasonActionModal } from '@/components/admin-catalog/ReasonActionModal';
 import { type RowActionItem, RowActionMenu } from '@/components/admin-catalog/RowActionMenu';
@@ -20,6 +21,7 @@ import { useCursorLoadMore } from '@/components/admin-catalog/useCursorLoadMore'
 import { ProductStatsOverviewPanel } from '@/components/stats-page/ProductStatsOverviewPanel';
 import { StatsEmptyState } from '@/components/stats-page/StatsEmptyState';
 import { CreateCategoryModal } from './CreateCategoryModal';
+import { EditCategoryImageModal } from './EditCategoryImageModal';
 
 type StatusFilter = 'all' | 'active' | 'blocked' | 'deleted';
 
@@ -55,6 +57,7 @@ export function AdminCategoriesTable() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<categoryResponseReadModels | null>(null);
+  const [editTarget, setEditTarget] = useState<categoryResponseReadModels | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search.trim()), 400);
@@ -86,6 +89,7 @@ export function AdminCategoriesTable() {
   // ── Mutations ───────────────────────────────────────────────────────
   const createMut = useCreateCategory();
   const deleteMut = useDeleteCategoryById();
+  const imageMut = useUpdateCategoryImage();
 
   const handleCreate = async (payload: { title?: string; image?: string }) => {
     if (!payload.title?.trim() || !payload.image?.trim()) return;
@@ -94,6 +98,18 @@ export function AdminCategoriesTable() {
       await queryClient.invalidateQueries({ queryKey: [...CATEGORY_QUERY_KEY, 'admin-infinite'] });
       setCreateOpen(false);
       createMut.reset();
+    } catch {
+      /* surfaced in modal */
+    }
+  };
+
+  const handleEditImage = async (payload: { image?: string }) => {
+    if (!editTarget || !payload.image?.trim()) return;
+    try {
+      await imageMut.mutateAsync({ id: editTarget.id, image: payload.image.trim() });
+      await queryClient.invalidateQueries({ queryKey: [...CATEGORY_QUERY_KEY, 'admin-infinite'] });
+      setEditTarget(null);
+      imageMut.reset();
     } catch {
       /* surfaced in modal */
     }
@@ -144,6 +160,12 @@ export function AdminCategoriesTable() {
   const menuItems = (c: categoryResponseReadModels): RowActionItem[] => {
     if (c.isDeleted) return [];
     return [
+      {
+        key: 'edit-image',
+        label: 'Change image',
+        icon: ImageUp,
+        onClick: () => setEditTarget(c),
+      },
       {
         key: 'delete',
         label: 'Soft delete',
@@ -411,6 +433,19 @@ export function AdminCategoriesTable() {
           setDeleteTarget(null);
         }}
         onConfirm={handleDelete}
+      />
+
+      <EditCategoryImageModal
+        isOpen={Boolean(editTarget)}
+        isPending={imageMut.isPending}
+        error={imageMut.error}
+        title={editTarget?.title ?? ''}
+        initialImage={editTarget?.image ?? ''}
+        onClose={() => {
+          imageMut.reset();
+          setEditTarget(null);
+        }}
+        onConfirm={handleEditImage}
       />
     </>
   );

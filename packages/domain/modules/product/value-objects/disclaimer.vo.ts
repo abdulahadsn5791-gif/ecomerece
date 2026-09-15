@@ -1,9 +1,9 @@
 import { BadRequestError } from "../../../../../apps/api/errors/app-error";
-import { Name, Title } from "../../../value-objects";
+import { Title } from "../../../value-objects";
 
 
 export interface DisclaimerItem {
-    name: Name;
+    name: Title;
     title: Title;
 }
 
@@ -62,9 +62,8 @@ export class DisclaimerVO {
         if (!this.isDisclaimer) throw new BadRequestError('Disclaimer is disabled.');
         const disclaimer: DisclaimerItem = {
             name: Title.create(name),
-            title: Name.create(title),
+            title: Title.create(title),
         };
-
         if (this.has(name)) {
             throw new BadRequestError(`Disclaimer "${name}" already exists.`);
         }
@@ -91,7 +90,7 @@ export class DisclaimerVO {
         }
 
         const nameVO = Title.create(name);
-        const titleVO = Name.create(title);
+        const titleVO = Title.create(title);
 
         return new DisclaimerVO(
             true,

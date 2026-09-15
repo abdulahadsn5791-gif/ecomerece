@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ReasonActionModal } from '@/components/admin-catalog/ReasonActionModal';
 import { type RowActionItem, RowActionMenu } from '@/components/admin-catalog/RowActionMenu';
 import { useCursorLoadMore } from '@/components/admin-catalog/useCursorLoadMore';
+import { AdminProductVariantsPanel } from '@/components/admin-products/AdminProductVariantsPanel';
 import { fmtCurrency } from '@/components/stats-page/format';
 import { ProductStatsOverviewPanel } from '@/components/stats-page/ProductStatsOverviewPanel';
 import { StatsEmptyState } from '@/components/stats-page/StatsEmptyState';
@@ -75,7 +76,11 @@ export function AdminProductsTable() {
     useGetAdminProductsInfinite(filters);
 
   const rows = useMemo(() => data?.pages.flatMap((p) => p.data) ?? [], [data]);
-  const sentinelRef = useCursorLoadMore<HTMLTableRowElement>({ hasNextPage, isFetchingNextPage, fetchNextPage });
+  const sentinelRef = useCursorLoadMore<HTMLTableRowElement>({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   // ── Bottom stats ───────────────────────────────────────────────────────
   const overview = useGetProductStatsOverview(selectedId ?? '', { enabled: !!selectedId });
@@ -442,6 +447,8 @@ export function AdminProductsTable() {
           accent="#7C3AED"
         />
       )}
+
+      {selectedId && <AdminProductVariantsPanel productId={selectedId} />}
 
       {!selectedId && (
         <StatsEmptyState

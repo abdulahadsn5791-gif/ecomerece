@@ -1,11 +1,11 @@
 'use client';
 
 import { useThemeStore } from '@ecomerece/frontend/theme';
-import { Layers, Package } from 'lucide-react';
+import { ArrowLeft, Layers } from 'lucide-react';
 import Link from 'next/link';
-import { VendorEditProductForm } from '@/components/vendor-products/VendorEditProductForm';
+import { VendorProductVariantsTable } from '@/components/vendor-products/VendorProductVariantsTable';
 
-export function VendorEditProductPage({ productId }: { productId: string }) {
+export function VendorProductVariantsPage({ productId }: { productId: string }) {
   const { darkMode } = useThemeStore();
 
   return (
@@ -21,29 +21,29 @@ export function VendorEditProductPage({ productId }: { productId: string }) {
               darkMode ? 'bg-emerald-500/15 text-emerald-400' : 'bg-emerald-100 text-emerald-600'
             }`}
           >
-            <Package className="w-6 h-6" />
+            <Layers className="w-6 h-6" />
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">Edit product</h1>
+            <h1 className="text-2xl font-bold">Manage variants</h1>
             <p className={`text-sm mt-1 ${darkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
-              Update details, images, ingredients, disclaimers, and appearance.
+              Create, edit, and manage product variants and their pricing.
             </p>
           </div>
           <Link
-            href={`/vendor/products/${productId}/variants`}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-colors shrink-0 ${
+            href={`/vendor/products/${productId}`}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-colors ${
               darkMode
                 ? 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
                 : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
             }`}
           >
-            <Layers className="w-4 h-4" />
-            Manage variants
+            <ArrowLeft className="w-4 h-4" />
+            Back to product
           </Link>
         </div>
       </div>
 
-      <VendorEditProductForm productId={productId} />
+      <VendorProductVariantsTable productId={productId} />
     </main>
   );
 }

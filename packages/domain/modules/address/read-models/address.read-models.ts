@@ -14,5 +14,5 @@ export interface AddressReadModel {
         deletedBy: string | null;
         reason: string | null;
     };
-    createdAt: NativeDate;
+    createdAt: Date;
 }

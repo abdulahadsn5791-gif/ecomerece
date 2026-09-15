@@ -90,6 +90,9 @@
     "packages/domain": {
       "name": "@ecomerece/domain",
       "version": "1.0.0",
+      "dependencies": {
+        "@ecomerece/shared": "workspace:*",
+      },
       "devDependencies": {
         "typescript": "^5.0.0",
       },

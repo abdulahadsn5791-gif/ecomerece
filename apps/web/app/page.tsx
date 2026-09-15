@@ -9,6 +9,7 @@ import Products from './client/home/components/Products';
 import Navbar from '@/components/navbar/NavBar';
 import Footer from '@/components/footer/Footer';
 import { Loader2 } from 'lucide-react';
+import BgProvider from './providers/BgProvider';
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
@@ -34,9 +35,10 @@ export default function Home() {
     : [];
 
   return (
+
     <div className={darkMode ? 'dark' : ''}>
       <Navbar />
-      <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+      <BgProvider>
         <HeroBanner slides={slides} promos={promos} />
         <Categories categories={categories} />
         {isLoading ? (
@@ -50,7 +52,7 @@ export default function Home() {
         )}
         <FeaturesStrip features={features} />
         <Footer />
-      </div>
+      </BgProvider>
     </div>
   );
 }

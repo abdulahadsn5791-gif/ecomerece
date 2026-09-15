@@ -12,7 +12,7 @@ export default function FeaturesStrip({ features }: { features: HomeFeatureRespo
 
     return (
         <section
-            className={`border-b py-2 transition-colors duration-500 ${darkMode ? "bg-neutral-950 border-neutral-800" : "bg-white border-neutral-200"
+            className={` pt-2 transition-colors duration-500 ${darkMode ? "bg-neutral-950 border-neutral-800" : "bg-white border-neutral-200"
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6">

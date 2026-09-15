@@ -5,6 +5,7 @@ import { useGetPaginatedProducts } from "@ecomerece/frontend/product";
 import type { HomeContainerResponse } from "@ecomerece/shared";
 import { ShoppingCart, ArrowRight, Sparkles, Star, Eye, Loader2 } from "lucide-react";
 import { useRef } from "react";
+import Link from "next/link";
 
 export default function Products({ container }: { container: HomeContainerResponse }) {
     const { darkMode } = useThemeStore();
@@ -116,8 +117,9 @@ export default function Products({ container }: { container: HomeContainerRespon
                     {products.map((product) => {
                         const badge = getBadge(product);
                         return (
-                            <div
+                            <Link
                                 key={product.id}
+                                href={`/client/product/${product.id}`}
                                 className={`group rounded-xl sm:rounded-2xl overflow-hidden border flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 shadow-md hover:shadow-2xl shrink-0 w-[78%] sm:w-auto snap-start ${darkMode
                                     ? "bg-neutral-900/80 border-neutral-800 hover:border-neutral-700"
                                     : "bg-neutral-50/80 border-neutral-200 hover:border-neutral-300"
@@ -184,15 +186,19 @@ export default function Products({ container }: { container: HomeContainerRespon
                                             )}
                                         </div>
 
-                                        <button className={`inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg font-semibold transition-all duration-300 shadow-md active:scale-95 sm:hover:scale-110 ${darkMode
-                                            ? "bg-white text-black hover:bg-neutral-200"
-                                            : "bg-neutral-900 text-white hover:bg-neutral-800"
-                                            }`} aria-label="Add to cart">
+                                        <button
+                                            className={`inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg font-semibold transition-all duration-300 shadow-md active:scale-95 sm:hover:scale-110 ${darkMode
+                                                ? "bg-white text-black hover:bg-neutral-200"
+                                                : "bg-neutral-900 text-white hover:bg-neutral-800"
+                                                }`}
+                                            aria-label="Add to cart"
+                                            onClick={(e) => e.preventDefault()}
+                                        >
                                             <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>

@@ -110,7 +110,13 @@ export class CategoryAppService extends BaseService {
             createdBy: actorId,
             imageKey: image.imageKey,
         });
-        await this.persist(category, image.imageKey);
+        try {
+            await this.categoryRepo.Create(category);
+        } catch (error) {
+            await this.deleteImage(image.imageKey);
+            throw error;
+        }
+        await this.publishEvents(category);
         return CategoryMessags.created(id, actorId);
     }
 
@@ -127,11 +133,12 @@ export class CategoryAppService extends BaseService {
         }
 
         if (data.image) {
+            const previousImageKey = category.imageKey;
             const image = await this.resolveImage(data.image, 'categories');
             category.updateImage(image.url, image.imageKey);
             await this.persist(category, image.imageKey);
-            if (category.imageKey && !image.imageKey?.equals(category.imageKey)) {
-                await this.deleteImage(category.imageKey);
+            if (previousImageKey && !image.imageKey?.equals(previousImageKey)) {
+                await this.deleteImage(previousImageKey);
             }
             return CategoryMessags.updated(id, actorId);
         }

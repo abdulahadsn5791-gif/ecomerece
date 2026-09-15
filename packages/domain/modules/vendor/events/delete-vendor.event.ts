@@ -2,6 +2,7 @@ import type { IEvent } from '../../../events/event-bus.interface';
 import { type DeleteInfoVO, EffectiveDate, type Id } from '../../../value-objects';
 export interface VendorDeletedPayload {
   vendorId: Id;
+  ownerId: Id;
   deletionInfo: DeleteInfoVO;
 }
 

@@ -165,6 +165,7 @@ export class VendorAggregate extends AggregateRoot {
     this.raise(
       new VendorVerifiedEvent({
         vendorId: this._id,
+        ownerId: this._ownerId,
         verificationInfo: this.verification,
       }),
     );
@@ -177,6 +178,7 @@ export class VendorAggregate extends AggregateRoot {
     this.raise(
       new VendorVerificationRejectedEvent({
         vendorId: this._id,
+        ownerId: this._ownerId,
         rejectionInfo: this._verification,
       }),
     );
@@ -205,7 +207,13 @@ export class VendorAggregate extends AggregateRoot {
   deleteVendor(actor: Id, reason: Reason): void {
     if (this._delete.isDeleted) throw new BadRequestError('This vendor has already been deleted.');
     this._delete = DeleteInfoVO.create(actor, reason);
-    this.raise(new VendorDeletedEvent({ vendorId: this._id, deletionInfo: this._delete }));
+    this.raise(
+      new VendorDeletedEvent({
+        vendorId: this._id,
+        ownerId: this._ownerId,
+        deletionInfo: this._delete,
+      }),
+    );
   }
 
   recoverVendor(actor: Id) {

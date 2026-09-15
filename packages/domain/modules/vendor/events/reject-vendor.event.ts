@@ -4,6 +4,7 @@ import type { VerificationInfoVO } from '../value-objects/verification-info.vo';
 
 export interface VendorRejectionPayload {
   vendorId: Id;
+  ownerId: Id;
   rejectionInfo: VerificationInfoVO;
 }
 

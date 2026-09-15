@@ -1,6 +1,9 @@
 import { eventBus } from '../../core/infrastructure/buses/in-memory-event-bus';
 import { queryBus } from '../../core/infrastructure/buses/in-memory-query-bus';
 import { UserSignedInHandler } from './application/event-handlers/user-signed-in.handler';
+import { VendorDeletedHandler } from './application/event-handlers/vendor-deleted.handler';
+import { VendorRejectedHandler } from './application/event-handlers/vendor-rejected.handler';
+import { VendorVerifiedHandler } from './application/event-handlers/vendor-verified.handler';
 import { EnsureActiveQuery } from './application/queries/ensure-active.query';
 import { EnsureActiveUserGetByIdQuery } from './application/queries/ensure-active-user-get-by-id.query';
 import { GetUserByIdQuery } from './application/queries/get-user-by-id.query';
@@ -15,29 +18,29 @@ import { UserRepository } from './infrastructure/user.repository';
 import { UserController } from './presentation/user.controller';
 
 export function createUserModule() {
-    const userRepo = new UserRepository();
+  const userRepo = new UserRepository();
 
-    const internalSvc = new UserInternalService(userRepo);
-    const appSvc = new UserAppService(userRepo, eventBus);
-    const userController = new UserController(appSvc);
+  const internalSvc = new UserInternalService(userRepo, eventBus);
+  const appSvc = new UserAppService(userRepo, eventBus);
+  const userController = new UserController(appSvc);
 
-    eventBus.register('user.signed-in', new UserSignedInHandler());
-    queryBus.register(GetUserByIdQuery, new GetUserByIdHandler(internalSvc));
-    queryBus.register(EnsureActiveQuery, new EnsureActiveHandler(internalSvc));
-    queryBus.register(
-        EnsureActiveUserGetByIdQuery,
-        new EnsureActiveUserGetByIdHandler(internalSvc),
-    );
-    queryBus.register(VerifyUserAndGetQuery, new VerifyUserAndGetHandler(internalSvc));
+  eventBus.register('user.signed-in', new UserSignedInHandler());
+  eventBus.register('vendor.verified', new VendorVerifiedHandler(internalSvc));
+  eventBus.register('vendor.deleted', new VendorDeletedHandler(internalSvc));
+  eventBus.register('vendor.rejected', new VendorRejectedHandler(internalSvc));
+  queryBus.register(GetUserByIdQuery, new GetUserByIdHandler(internalSvc));
+  queryBus.register(EnsureActiveQuery, new EnsureActiveHandler(internalSvc));
+  queryBus.register(EnsureActiveUserGetByIdQuery, new EnsureActiveUserGetByIdHandler(internalSvc));
+  queryBus.register(VerifyUserAndGetQuery, new VerifyUserAndGetHandler(internalSvc));
 
-    return {
-        userController,
-        appSvc,
-        internalSvc,
+  return {
+    userController,
+    appSvc,
+    internalSvc,
 
-        queries: {
-            GetUserByIdQuery,
-            EnsureActiveQuery,
-        },
-    };
+    queries: {
+      GetUserByIdQuery,
+      EnsureActiveQuery,
+    },
+  };
 }

@@ -15,11 +15,11 @@ export class VendorInternalService extends BaseService {
   }
   async canCreateVendor(id: Id) {
     const user = await this.queryBus.execute(new EnsureActiveQuery({ userId: id }));
-
     if (!user) throw new BadRequestError('User is not active.');
     const vendor = await this.vendorRepo.FindByOwnerId(id);
     if (vendor) throw new BadRequestError('Each user can create only one vendor.');
   }
+
   async getVendorByUserId(id: Id): Promise<VendorReadModel | null> {
     const vendor = await this.vendorRepo.FindByOwnerId(id);
     if (!vendor) return null;

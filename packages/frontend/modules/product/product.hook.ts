@@ -133,7 +133,7 @@ export function useGetMyProductsInfinite(filters: MyProductsInfiniteFilters = {}
         direction: 'next',
       }),
     getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 60,
   });
 }
 
@@ -164,7 +164,7 @@ export function useGetAdminProductsInfinite(filters: AdminProductsInfiniteFilter
         direction: 'next',
       }),
     getNextPageParam: (lastPage) => lastPage.meta.nextCursor ?? undefined,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 60,
   });
 }
 

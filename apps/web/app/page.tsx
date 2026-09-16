@@ -1,7 +1,7 @@
 import { HomeResponseReadModel } from '@ecomerece/shared';
 import HomeContent from './client/home/HomeContent';
 
-export const revalidate = 3600;
+export const revalidate = process.env.NODE_ENV === 'development' ? false : 3600;
 
 const EMPTY_LAYOUT: HomeResponseReadModel = {
   slides: [],
@@ -16,7 +16,9 @@ async function getHomeLayout(): Promise<HomeResponseReadModel> {
 
   try {
     const res = await fetch(`${baseUrl}/home`, {
-      next: { revalidate: 3600 },
+      next: process.env.NODE_ENV === 'development'
+        ? { cache: 'no-store' }
+        : { revalidate: 3600 },
     });
 
     if (!res.ok) {

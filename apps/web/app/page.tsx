@@ -16,9 +16,9 @@ async function getHomeLayout(): Promise<HomeResponseReadModel> {
 
   try {
     const res = await fetch(`${baseUrl}/home`, {
-      next: process.env.NODE_ENV === 'development'
+      ...(process.env.NODE_ENV === 'development'
         ? { cache: 'no-store' }
-        : { revalidate: 3600 },
+        : { next: { revalidate: 3600 } }),
     });
 
     if (!res.ok) {

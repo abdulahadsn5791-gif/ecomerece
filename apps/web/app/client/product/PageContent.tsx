@@ -145,40 +145,40 @@ export default function ProductContentPage({
     <div
       className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-neutral-950 text-white' : 'bg-white text-neutral-900'}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-4 sm:space-y-6">
         {/* Header card */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          className={`rounded-[28px] p-6 ${card}`}
+          className={`rounded-2xl sm:rounded-[28px] p-4 sm:p-6 ${card}`}
         >
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3 sm:gap-4">
             <div
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${iconBadge}`}
+              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 ${iconBadge}`}
             >
-              <Package className="w-6 h-6" />
+              <Package className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0">
-              <div className={`flex items-center gap-1.5 text-sm mb-2 ${mutedText}`}>
+              <div className={`flex items-center gap-1.5 text-xs sm:text-sm mb-1.5 sm:mb-2 ${mutedText}`}>
                 <a
                   href="#"
                   className={`transition-colors ${darkMode ? 'hover:text-white' : 'hover:text-neutral-900'}`}
                 >
                   Home
                 </a>
-                <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <a
                   href="#"
                   className={`transition-colors ${darkMode ? 'hover:text-white' : 'hover:text-neutral-900'}`}
                 >
                   Store
                 </a>
-                <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                 <span className={`font-medium truncate ${headingText}`}>{product?.title}</span>
               </div>
-              <h1 className="text-2xl font-bold tracking-tight">{product?.title}</h1>
-              <p className={`text-sm mt-1 ${mutedText}`}>{product?.description}</p>
+              <h1 className="text-lg sm:text-2xl font-bold tracking-tight">{product?.title}</h1>
+              <p className={`text-xs sm:text-sm mt-1 ${mutedText}`}>{product?.description}</p>
             </div>
           </div>
         </motion.div>
@@ -188,9 +188,9 @@ export default function ProductContentPage({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
-          className={`rounded-[28px] p-6 sm:p-8 ${card}`}
+          className={`rounded-2xl sm:rounded-[28px] p-4 sm:p-6 lg:p-8 ${card}`}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
             {/* Gallery */}
             <div className="flex flex-col gap-4">
               <div
@@ -202,12 +202,12 @@ export default function ProductContentPage({
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex gap-3 overflow-x-auto pb-1">
+              <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1">
                 {productImages.map((url, idx) => (
                   <button
                     key={url}
                     onClick={() => setActiveImage(idx)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-colors shrink-0 ${idx === activeImage ? 'border-violet-500' : cardBorder}`}
+                    className={`w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-lg sm:rounded-xl overflow-hidden border-2 transition-colors shrink-0 ${idx === activeImage ? 'border-violet-500' : cardBorder}`}
                     aria-label={`View image ${idx + 1}`}
                   >
                     <img src={thumbImages[idx]} alt="" className="w-full h-full object-cover" />
@@ -224,8 +224,8 @@ export default function ProductContentPage({
                 <span className={mutedText}>({totalReviews.toLocaleString()} reviews)</span>
               </div>
 
-              <div className="flex items-center gap-3 mb-4 flex-wrap">
-                <span className="text-3xl font-bold">${variantDiscountedPrice.toFixed(2)}</span>
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
+                <span className="text-2xl sm:text-3xl font-bold">${variantDiscountedPrice.toFixed(2)}</span>
                 {hasDiscount && (
                   <>
                     <span className={`text-lg line-through ${mutedText}`}>
@@ -241,11 +241,11 @@ export default function ProductContentPage({
               </div>
 
               {/* Meta badges */}
-              <div className="flex gap-2 flex-wrap mb-6">
+              <div className="flex gap-1.5 sm:gap-2 flex-wrap mb-4 sm:mb-6">
                 {metaPills.map((pill) => (
                   <span
                     key={pill.label}
-                    className={`px-2.5 py-1 rounded-full text-xs font-semibold border inline-flex items-center gap-1.5 ${pill.className}`}
+                    className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border inline-flex items-center gap-1 sm:gap-1.5 ${pill.className}`}
                   >
                     <pill.icon className="w-3.5 h-3.5" /> {pill.label}
                   </span>
@@ -254,18 +254,18 @@ export default function ProductContentPage({
 
               {/* Variant selector */}
               {activeVariants.length > 0 && selectedVariant && (
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                   <span
-                    className={`text-xs font-bold uppercase tracking-wider block mb-2 ${mutedText}`}
+                    className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider block mb-1.5 sm:mb-2 ${mutedText}`}
                   >
                     Variant ({selectedVariant.title})
                   </span>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                     {activeVariants.map((variant) => (
                       <button
                         key={variant.id}
                         onClick={() => setSelectedVariant(variant)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
                           selectedVariant?.id === variant.id ? pillActive : pillIdle
                         }`}
                       >
@@ -277,20 +277,20 @@ export default function ProductContentPage({
               )}
 
               {/* Action buttons */}
-              <div className="flex gap-3 flex-wrap mb-6">
+              <div className="flex gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6">
                 <button
-                  className={`flex-1 min-w-[140px] px-5 py-3 sm:px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors ${darkMode ? 'bg-white text-black hover:bg-neutral-200' : 'bg-neutral-900 text-white hover:bg-neutral-800'}`}
+                  className={`flex-1 min-w-[120px] sm:min-w-[140px] px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors text-sm sm:text-base ${darkMode ? 'bg-white text-black hover:bg-neutral-200' : 'bg-neutral-900 text-white hover:bg-neutral-800'}`}
                 >
-                  <ShoppingCart className="w-5 h-5" /> Add to cart
+                  <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" /> Add to cart
                 </button>
-                <button className="flex-1 min-w-[140px] px-5 py-3 sm:px-6 rounded-xl bg-violet-600 text-white font-semibold flex items-center justify-center gap-2 shadow-md shadow-violet-600/20 transition-colors hover:bg-violet-700">
-                  <Zap className="w-5 h-5" /> Buy now
+                <button className="flex-1 min-w-[120px] sm:min-w-[140px] px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-violet-600 text-white font-semibold flex items-center justify-center gap-2 shadow-md shadow-violet-600/20 transition-colors hover:bg-violet-700 text-sm sm:text-base">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5" /> Buy now
                 </button>
                 <button
                   onClick={() => setIsWishlisted((w) => !w)}
                   aria-pressed={isWishlisted}
                   aria-label="Save to wishlist"
-                  className={`px-4 py-3 rounded-xl border flex items-center justify-center transition-colors ${isWishlisted ? 'border-violet-500 bg-violet-500/10' : `${cardBorder} ${darkMode ? 'hover:bg-neutral-800' : 'hover:bg-neutral-100'}`}`}
+                  className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border flex items-center justify-center transition-colors ${isWishlisted ? 'border-violet-500 bg-violet-500/10' : `${cardBorder} ${darkMode ? 'hover:bg-neutral-800' : 'hover:bg-neutral-100'}`}`}
                 >
                   <Heart
                     className={`w-5 h-5 transition-colors ${isWishlisted ? 'fill-violet-500 text-violet-500' : ''}`}
@@ -308,7 +308,7 @@ export default function ProductContentPage({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
-          className={`rounded-[28px] p-6 sm:p-8 ${card}`}
+          className={`rounded-2xl sm:rounded-[28px] p-4 sm:p-6 lg:p-8 ${card}`}
         >
           <div className="flex gap-2 flex-wrap mb-6">
             {tabs.map((tab) => (
@@ -322,7 +322,7 @@ export default function ProductContentPage({
             ))}
           </div>
 
-          <div className={`rounded-[20px] border p-6 ${cardBorder}`}>
+          <div className={`rounded-xl sm:rounded-[20px] border p-4 sm:p-6 ${cardBorder}`}>
             {activeTab === 'description' && (
               <div>
                 <h3 className={`text-xl font-semibold mb-4 ${headingText}`}>Product description</h3>
@@ -393,7 +393,7 @@ export default function ProductContentPage({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut', delay: 0.15 }}
-          className={`rounded-[28px] p-6 sm:p-8 ${card}`}
+          className={`rounded-2xl sm:rounded-[28px] p-4 sm:p-6 lg:p-8 ${card}`}
         >
           <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
             <h2 className="text-xl font-bold flex items-center gap-2">
@@ -408,8 +408,8 @@ export default function ProductContentPage({
           {relatedProducts.length === 0 ? (
             <p className={`text-sm ${mutedText}`}>No related products found.</p>
           ) : (
-            <div className="overflow-x-auto -mx-6 sm:-mx-8 px-6 sm:px-8" style={{ scrollbarWidth: 'none' }}>
-              <div className="flex gap-4 w-max pb-1">
+            <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex gap-3 sm:gap-4 w-max pb-1">
                 {relatedProducts.map((related) => {
                   const relatedImg = related.image?.images?.find((img) => img.default)?.url || related.image?.images?.[0]?.url || '';
                   const relStars = Math.round(related.averageRating ?? 0);
@@ -418,7 +418,7 @@ export default function ProductContentPage({
                     <a
                       key={related.id}
                       href={`/client/product/${related.id}`}
-                      className={`group relative flex flex-col rounded-2xl overflow-hidden border w-44 sm:w-52 shrink-0 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl ${darkMode
+                      className={`group relative flex flex-col rounded-xl sm:rounded-2xl overflow-hidden border w-36 sm:w-44 lg:w-52 shrink-0 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl ${darkMode
                         ? 'bg-neutral-800/80 border-neutral-700 hover:border-neutral-600 shadow-lg shadow-black/20'
                         : 'bg-white border-neutral-100 hover:border-neutral-200 shadow-md shadow-neutral-100'
                       }`}
@@ -448,11 +448,11 @@ export default function ProductContentPage({
                       </div>
 
                       {/* Info */}
-                      <div className="flex flex-col flex-grow px-3.5 pt-3 pb-3.5">
-                        <span className={`text-[10px] font-semibold uppercase tracking-widest mb-1 ${darkMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                      <div className="flex flex-col flex-grow px-2.5 sm:px-3.5 pt-2 sm:pt-3 pb-2.5 sm:pb-3.5">
+                        <span className={`text-[8px] sm:text-[10px] font-semibold uppercase tracking-widest mb-0.5 sm:mb-1 ${darkMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
                           {related.vendorTitle}
                         </span>
-                        <h3 className={`text-sm font-bold leading-snug line-clamp-2 mb-2 transition-colors ${darkMode ? 'text-neutral-100 group-hover:text-amber-400' : 'text-neutral-900 group-hover:text-neutral-600'}`}>
+                        <h3 className={`text-xs sm:text-sm font-bold leading-snug line-clamp-2 mb-1.5 sm:mb-2 transition-colors ${darkMode ? 'text-neutral-100 group-hover:text-amber-400' : 'text-neutral-900 group-hover:text-neutral-600'}`}>
                           {related.title}
                         </h3>
 
@@ -465,17 +465,17 @@ export default function ProductContentPage({
                         </div>
 
                         {/* Price */}
-                        <div className={`flex items-center justify-between mt-auto pt-2.5 border-t ${darkMode ? 'border-neutral-700' : 'border-neutral-100'}`}>
+                        <div className={`flex items-center justify-between mt-auto pt-2 sm:pt-2.5 border-t ${darkMode ? 'border-neutral-700' : 'border-neutral-100'}`}>
                           <div>
-                            <span className="text-base font-extrabold">${related.minDiscountedPrice.toFixed(2)}</span>
+                            <span className="text-sm sm:text-base font-extrabold">${related.minDiscountedPrice.toFixed(2)}</span>
                             {relHasDiscount && (
                               <span className={`block text-[11px] line-through ${darkMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
                                 ${related.minPrice.toFixed(2)}
                               </span>
                             )}
                           </div>
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${darkMode ? 'bg-neutral-700 text-neutral-200 group-hover:bg-white group-hover:text-neutral-900' : 'bg-neutral-100 text-neutral-700 group-hover:bg-neutral-900 group-hover:text-white'}`}>
-                            <ShoppingCart className="w-3.5 h-3.5" />
+                          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm ${darkMode ? 'bg-neutral-700 text-neutral-200 group-hover:bg-white group-hover:text-neutral-900' : 'bg-neutral-100 text-neutral-700 group-hover:bg-neutral-900 group-hover:text-white'}`}>
+                            <ShoppingCart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                           </div>
                         </div>
                       </div>

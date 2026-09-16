@@ -9,7 +9,7 @@ import Categories from './components/Categories';
 import Products from './components/Products';
 import Navbar from '@/components/navbar/NavBar';
 import Footer from '@/components/footer/Footer';
-import BgProvider from '@/providers/BgProvider';
+import BgProvider from '@/app/providers/BgProvider';
 
 interface HomeContentProps {
   initialData: any;
